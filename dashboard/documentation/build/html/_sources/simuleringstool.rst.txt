@@ -1,0 +1,7 @@
+simuleringstool module
+======================
+
+.. automodule:: simuleringstool
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,743 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vehicle module &#8212; AI Fleetmanagement Fase 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">AI Fleetmanagement Fase 1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">vehicle module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-vehicle">
+<span id="vehicle-module"></span><h1>vehicle module<a class="headerlink" href="#module-vehicle" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="vehicle.Bike">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">vehicle.</span></span><span class="sig-name descname"><span class="pre">Bike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.Bike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vehicle.VehicleModel" title="vehicle.VehicleModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">vehicle.VehicleModel</span></code></a></p>
+<p>Class for representing a bike</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vehicle.Bike.accept_trip" title="vehicle.Bike.accept_trip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accept_trip</span></code></a>(trip)</p></td>
+<td><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">book_trip</span></code>(trip)</p></td>
+<td><p>Function for trying to book trip on vehicle</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_info</span></code>()</p></td>
+<td><p>Print info.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_timestamps</span></code>(new_timestamps)</p></td>
+<td><p>Initailize timeslot of vehicle to match timestamps.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>class_info</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Bike.NOx_per_km">
+<span class="sig-name descname"><span class="pre">NOx_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.Bike.NOx_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.Bike.accept_trip">
+<span class="sig-name descname"><span class="pre">accept_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.Bike.accept_trip" title="Permalink to this definition">¶</a></dt>
+<dd><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trip</strong><span class="classifier">pandas row with a trip</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Bike.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">5</span></em><a class="headerlink" href="#vehicle.Bike.co2emission_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Bike.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"> <span class="pre">=</span> <span class="pre">20</span></em><a class="headerlink" href="#vehicle.Bike.max_distance_per_day" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Bike.particles_per_km">
+<span class="sig-name descname"><span class="pre">particles_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.Bike.particles_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Bike.tco_per_month">
+<span class="sig-name descname"><span class="pre">tco_per_month</span></span><em class="property"> <span class="pre">=</span> <span class="pre">175.0</span></em><a class="headerlink" href="#vehicle.Bike.tco_per_month" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Bike.vehicle_type_number">
+<span class="sig-name descname"><span class="pre">vehicle_type_number</span></span><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#vehicle.Bike.vehicle_type_number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vehicle.Car">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">vehicle.</span></span><span class="sig-name descname"><span class="pre">Car</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.Car" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vehicle.VehicleModel" title="vehicle.VehicleModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">vehicle.VehicleModel</span></code></a></p>
+<p>Class for representing a car</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">accept_trip</span></code>(trip)</p></td>
+<td><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">book_trip</span></code>(trip)</p></td>
+<td><p>Function for trying to book trip on vehicle</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_info</span></code>()</p></td>
+<td><p>Print info.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_timestamps</span></code>(new_timestamps)</p></td>
+<td><p>Initailize timeslot of vehicle to match timestamps.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>class_info</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Car.NOx_per_km">
+<span class="sig-name descname"><span class="pre">NOx_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#vehicle.Car.NOx_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Car.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">150</span></em><a class="headerlink" href="#vehicle.Car.co2emission_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Car.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"> <span class="pre">=</span> <span class="pre">9999</span></em><a class="headerlink" href="#vehicle.Car.max_distance_per_day" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Car.particles_per_km">
+<span class="sig-name descname"><span class="pre">particles_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">4</span></em><a class="headerlink" href="#vehicle.Car.particles_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Car.tco_per_month">
+<span class="sig-name descname"><span class="pre">tco_per_month</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1800.33</span></em><a class="headerlink" href="#vehicle.Car.tco_per_month" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Car.vehicle_type_number">
+<span class="sig-name descname"><span class="pre">vehicle_type_number</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.Car.vehicle_type_number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vehicle.ElectricBike">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">vehicle.</span></span><span class="sig-name descname"><span class="pre">ElectricBike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.ElectricBike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vehicle.VehicleModel" title="vehicle.VehicleModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">vehicle.VehicleModel</span></code></a></p>
+<p>Class for representing an electric bike</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vehicle.ElectricBike.accept_trip" title="vehicle.ElectricBike.accept_trip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accept_trip</span></code></a>(trip)</p></td>
+<td><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">book_trip</span></code>(trip)</p></td>
+<td><p>Function for trying to book trip on vehicle</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_info</span></code>()</p></td>
+<td><p>Print info.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_timestamps</span></code>(new_timestamps)</p></td>
+<td><p>Initailize timeslot of vehicle to match timestamps.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>class_info</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricBike.NOx_per_km">
+<span class="sig-name descname"><span class="pre">NOx_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.ElectricBike.NOx_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.ElectricBike.accept_trip">
+<span class="sig-name descname"><span class="pre">accept_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.ElectricBike.accept_trip" title="Permalink to this definition">¶</a></dt>
+<dd><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trip</strong><span class="classifier">pandas row with a trip</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricBike.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">20</span></em><a class="headerlink" href="#vehicle.ElectricBike.co2emission_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricBike.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"> <span class="pre">=</span> <span class="pre">50</span></em><a class="headerlink" href="#vehicle.ElectricBike.max_distance_per_day" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricBike.particles_per_km">
+<span class="sig-name descname"><span class="pre">particles_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.ElectricBike.particles_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricBike.tco_per_month">
+<span class="sig-name descname"><span class="pre">tco_per_month</span></span><em class="property"> <span class="pre">=</span> <span class="pre">600.2</span></em><a class="headerlink" href="#vehicle.ElectricBike.tco_per_month" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricBike.vehicle_type_number">
+<span class="sig-name descname"><span class="pre">vehicle_type_number</span></span><em class="property"> <span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#vehicle.ElectricBike.vehicle_type_number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vehicle.ElectricCar">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">vehicle.</span></span><span class="sig-name descname"><span class="pre">ElectricCar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.ElectricCar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vehicle.VehicleModel" title="vehicle.VehicleModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">vehicle.VehicleModel</span></code></a></p>
+<p>Class for representing an electric car</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vehicle.ElectricCar.accept_trip" title="vehicle.ElectricCar.accept_trip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accept_trip</span></code></a>(trip)</p></td>
+<td><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">book_trip</span></code>(trip)</p></td>
+<td><p>Function for trying to book trip on vehicle</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_info</span></code>()</p></td>
+<td><p>Print info.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_timestamps</span></code>(new_timestamps)</p></td>
+<td><p>Initailize timeslot of vehicle to match timestamps.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>class_info</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricCar.NOx_per_km">
+<span class="sig-name descname"><span class="pre">NOx_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.ElectricCar.NOx_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.ElectricCar.accept_trip">
+<span class="sig-name descname"><span class="pre">accept_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.ElectricCar.accept_trip" title="Permalink to this definition">¶</a></dt>
+<dd><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trip</strong><span class="classifier">pandas row with a trip</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricCar.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">48</span></em><a class="headerlink" href="#vehicle.ElectricCar.co2emission_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricCar.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"> <span class="pre">=</span> <span class="pre">200</span></em><a class="headerlink" href="#vehicle.ElectricCar.max_distance_per_day" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricCar.particles_per_km">
+<span class="sig-name descname"><span class="pre">particles_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.ElectricCar.particles_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricCar.tco_per_month">
+<span class="sig-name descname"><span class="pre">tco_per_month</span></span><em class="property"> <span class="pre">=</span> <span class="pre">2759.26</span></em><a class="headerlink" href="#vehicle.ElectricCar.tco_per_month" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.ElectricCar.vehicle_type_number">
+<span class="sig-name descname"><span class="pre">vehicle_type_number</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#vehicle.ElectricCar.vehicle_type_number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vehicle.FleetInventory">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">vehicle.</span></span><span class="sig-name descname"><span class="pre">FleetInventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ebikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fleetinventory'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.FleetInventory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for containing a fleet of vehicles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>models: available models type model.VehicleFactory</strong></dt><dd></dd>
+<dt><strong>bikes</strong><span class="classifier">int, number of bikes in fleet</span></dt><dd></dd>
+<dt><strong>ebikes: int, number of electric bikes in fleet</strong></dt><dd></dd>
+<dt><strong>cars: int, number of cars in fleet</strong></dt><dd></dd>
+<dt><strong>ecars: int, number of electric cars in fleet</strong></dt><dd></dd>
+<dt><strong>name: string, name of the fleet, typically ‘simulation’ or ‘current’</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vehicle.FleetInventory.initialise_fleet" title="vehicle.FleetInventory.initialise_fleet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialise_fleet</span></code></a>()</p></td>
+<td><p>Initialise fleet</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#vehicle.FleetInventory.print_timetable" title="vehicle.FleetInventory.print_timetable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_timetable</span></code></a>()</p></td>
+<td><p>Print timetable for fleet.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vehicle.FleetInventory.set_timestamps" title="vehicle.FleetInventory.set_timestamps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_timestamps</span></code></a>(timestamps)</p></td>
+<td><p>set timestamps for all vehicles</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 57%" />
+<col style="width: 43%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>get_total</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.FleetInventory.get_total">
+<span class="sig-name descname"><span class="pre">get_total</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.FleetInventory.get_total" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.FleetInventory.initialise_fleet">
+<span class="sig-name descname"><span class="pre">initialise_fleet</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.FleetInventory.initialise_fleet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialise fleet</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.FleetInventory.print_timetable">
+<span class="sig-name descname"><span class="pre">print_timetable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.FleetInventory.print_timetable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print timetable for fleet. Mostly for debugging.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.FleetInventory.set_timestamps">
+<span class="sig-name descname"><span class="pre">set_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.FleetInventory.set_timestamps" title="Permalink to this definition">¶</a></dt>
+<dd><p>set timestamps for all vehicles</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vehicle.Unassigned">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">vehicle.</span></span><span class="sig-name descname"><span class="pre">Unassigned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.Unassigned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vehicle.VehicleModel" title="vehicle.VehicleModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">vehicle.VehicleModel</span></code></a></p>
+<p>Class for representing an unassigned vehicle. Used for computing capacity.</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vehicle.Unassigned.accept_trip" title="vehicle.Unassigned.accept_trip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accept_trip</span></code></a>(trip)</p></td>
+<td><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">book_trip</span></code>(trip)</p></td>
+<td><p>Function for trying to book trip on vehicle</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_info</span></code>()</p></td>
+<td><p>Print info.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_timestamps</span></code>(new_timestamps)</p></td>
+<td><p>Initailize timeslot of vehicle to match timestamps.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>class_info</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Unassigned.NOx_per_km">
+<span class="sig-name descname"><span class="pre">NOx_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.Unassigned.NOx_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.Unassigned.accept_trip">
+<span class="sig-name descname"><span class="pre">accept_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.Unassigned.accept_trip" title="Permalink to this definition">¶</a></dt>
+<dd><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trip</strong><span class="classifier">pandas row with a trip</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Unassigned.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.Unassigned.co2emission_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Unassigned.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.Unassigned.max_distance_per_day" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Unassigned.particles_per_km">
+<span class="sig-name descname"><span class="pre">particles_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.Unassigned.particles_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Unassigned.tco_per_month">
+<span class="sig-name descname"><span class="pre">tco_per_month</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#vehicle.Unassigned.tco_per_month" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.Unassigned.vehicle_type_number">
+<span class="sig-name descname"><span class="pre">vehicle_type_number</span></span><em class="property"> <span class="pre">=</span> <span class="pre">-1</span></em><a class="headerlink" href="#vehicle.Unassigned.vehicle_type_number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vehicle.VehicleFactory">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">vehicle.</span></span><span class="sig-name descname"><span class="pre">VehicleFactory</span></span><a class="headerlink" href="#vehicle.VehicleFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for containing the vehicle types that are used in the simulation</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vehicle.VehicleFactory.get_new_vehicle" title="vehicle.VehicleFactory.get_new_vehicle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_new_vehicle</span></code></a>(vtype, name, vehicle_id)</p></td>
+<td><p>Function for creating new vehicles</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#vehicle.VehicleFactory.load_options" title="vehicle.VehicleFactory.load_options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_options</span></code></a>(options)</p></td>
+<td><p>Load options from option file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vehicle.VehicleFactory.set_vehicle_options" title="vehicle.VehicleFactory.set_vehicle_options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_vehicle_options</span></code></a>(vtype, df)</p></td>
+<td><p>Helper function to set vehicle options</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.VehicleFactory.get_new_vehicle">
+<span class="sig-name descname"><span class="pre">get_new_vehicle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicle_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.VehicleFactory.get_new_vehicle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function for creating new vehicles</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>vtype</strong><span class="classifier">string, vtype as key into vmapper, one of (“Bike”, “ElectricBike”, “Car”, “ElectricCar”,”Unassigned”)</span></dt><dd></dd>
+<dt><strong>name</strong><span class="classifier">string, name of vehicle</span></dt><dd></dd>
+<dt><strong>vehicle_id</strong><span class="classifier">int, id of vehicle</span></dt><dd></dd>
+<dt><strong>returns</strong></dt><dd></dd>
+<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.VehicleFactory.load_options">
+<span class="sig-name descname"><span class="pre">load_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.VehicleFactory.load_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load options from option file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.VehicleFactory.set_vehicle_options">
+<span class="sig-name descname"><span class="pre">set_vehicle_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.VehicleFactory.set_vehicle_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to set vehicle options</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vehicle.VehicleModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">vehicle.</span></span><span class="sig-name descname"><span class="pre">VehicleModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicle_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.VehicleModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>General vehicle model. Not directly instantiated but specific vehicle models inherit from it</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>NOx_per_km</strong></dt><dd></dd>
+<dt><strong>co2emission_per_km</strong></dt><dd></dd>
+<dt><strong>max_distance_per_day</strong></dt><dd></dd>
+<dt><strong>particles_per_km</strong></dt><dd></dd>
+<dt><strong>tco_per_month</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vehicle.VehicleModel.accept_trip" title="vehicle.VehicleModel.accept_trip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accept_trip</span></code></a>(trip)</p></td>
+<td><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#vehicle.VehicleModel.book_trip" title="vehicle.VehicleModel.book_trip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">book_trip</span></code></a>(trip)</p></td>
+<td><p>Function for trying to book trip on vehicle</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vehicle.VehicleModel.print_info" title="vehicle.VehicleModel.print_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_info</span></code></a>()</p></td>
+<td><p>Print info.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#vehicle.VehicleModel.set_timestamps" title="vehicle.VehicleModel.set_timestamps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_timestamps</span></code></a>(new_timestamps)</p></td>
+<td><p>Initailize timeslot of vehicle to match timestamps.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>class_info</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.VehicleModel.NOx_per_km">
+<span class="sig-name descname"><span class="pre">NOx_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#vehicle.VehicleModel.NOx_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.VehicleModel.accept_trip">
+<span class="sig-name descname"><span class="pre">accept_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.VehicleModel.accept_trip" title="Permalink to this definition">¶</a></dt>
+<dd><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trip</strong><span class="classifier">pandas row with a trip</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.VehicleModel.book_trip">
+<span class="sig-name descname"><span class="pre">book_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.VehicleModel.book_trip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function for trying to book trip on vehicle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trip</strong><span class="classifier">pandas row with a trip</span></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>booked</strong><span class="classifier">boolean, True if vehicle is booked on this vehile</span></dt><dd></dd>
+<dt><strong>accept</strong><span class="classifier">boolean, True if it can accept the type of trip</span></dt><dd></dd>
+<dt>available: boolean, True if the vehicle is available in this timeperiod</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.VehicleModel.class_info">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">class_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.VehicleModel.class_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.VehicleModel.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#vehicle.VehicleModel.co2emission_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.VehicleModel.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#vehicle.VehicleModel.max_distance_per_day" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.VehicleModel.particles_per_km">
+<span class="sig-name descname"><span class="pre">particles_per_km</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#vehicle.VehicleModel.particles_per_km" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.VehicleModel.print_info">
+<span class="sig-name descname"><span class="pre">print_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.VehicleModel.print_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print info. Mostly for debugging</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vehicle.VehicleModel.set_timestamps">
+<span class="sig-name descname"><span class="pre">set_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_timestamps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vehicle.VehicleModel.set_timestamps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initailize timeslot of vehicle to match timestamps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>new_timestamp</strong><span class="classifier">array of timestamps</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vehicle.VehicleModel.tco_per_month">
+<span class="sig-name descname"><span class="pre">tco_per_month</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#vehicle.VehicleModel.tco_per_month" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/vehicle.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">AI Fleetmanagement Fase 1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">vehicle module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Allan Lyckegaard, Droids Agency.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>controller module &#8212; AI Fleetmanagement Fase 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">AI Fleetmanagement Fase 1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">controller module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-controller">
+<span id="controller-module"></span><h1>controller module<a class="headerlink" href="#module-controller" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="controller.Controller">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">controller.</span></span><span class="sig-name descname"><span class="pre">Controller</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curdoc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#controller.Controller.run_simulation" title="controller.Controller.run_simulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_simulation</span></code></a>()</p></td>
+<td><p>Run simulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#controller.Controller.set_callbacks" title="controller.Controller.set_callbacks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_callbacks</span></code></a>()</p></td>
+<td><p>Set all callbacks for the view.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#controller.Controller.update_current_bike" title="controller.Controller.update_current_bike"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_current_bike</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#controller.Controller.update_current_car" title="controller.Controller.update_current_car"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_current_car</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#controller.Controller.update_current_da_high" title="controller.Controller.update_current_da_high"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_current_da_high</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#controller.Controller.update_current_da_low" title="controller.Controller.update_current_da_low"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_current_da_low</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#controller.Controller.update_current_ebike" title="controller.Controller.update_current_ebike"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_current_ebike</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#controller.Controller.update_current_ecar" title="controller.Controller.update_current_ecar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_current_ecar</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#controller.Controller.update_departments" title="controller.Controller.update_departments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_departments</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#controller.Controller.update_simulation_bike" title="controller.Controller.update_simulation_bike"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_simulation_bike</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#controller.Controller.update_simulation_car" title="controller.Controller.update_simulation_car"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_simulation_car</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#controller.Controller.update_simulation_da_high" title="controller.Controller.update_simulation_da_high"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_simulation_da_high</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#controller.Controller.update_simulation_da_low" title="controller.Controller.update_simulation_da_low"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_simulation_da_low</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#controller.Controller.update_simulation_ebike" title="controller.Controller.update_simulation_ebike"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_simulation_ebike</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#controller.Controller.update_simulation_ecar" title="controller.Controller.update_simulation_ecar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_simulation_ecar</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#controller.Controller.update_trip_range" title="controller.Controller.update_trip_range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_trip_range</span></code></a>(attr, old, new)</p></td>
+<td><p>Callback funtion for updating the model from the view</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#controller.Controller.update_view_from_model" title="controller.Controller.update_view_from_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_view_from_model</span></code></a>()</p></td>
+<td><p>Update the view from the model</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.run_simulation">
+<span class="sig-name descname"><span class="pre">run_simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.run_simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run simulation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.set_callbacks">
+<span class="sig-name descname"><span class="pre">set_callbacks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.set_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set all callbacks for the view.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_current_bike">
+<span class="sig-name descname"><span class="pre">update_current_bike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_current_bike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_current_car">
+<span class="sig-name descname"><span class="pre">update_current_car</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_current_car" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_current_da_high">
+<span class="sig-name descname"><span class="pre">update_current_da_high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_current_da_high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_current_da_low">
+<span class="sig-name descname"><span class="pre">update_current_da_low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_current_da_low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_current_ebike">
+<span class="sig-name descname"><span class="pre">update_current_ebike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_current_ebike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_current_ecar">
+<span class="sig-name descname"><span class="pre">update_current_ecar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_current_ecar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_departments">
+<span class="sig-name descname"><span class="pre">update_departments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_departments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_simulation_bike">
+<span class="sig-name descname"><span class="pre">update_simulation_bike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_simulation_bike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_simulation_car">
+<span class="sig-name descname"><span class="pre">update_simulation_car</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_simulation_car" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_simulation_da_high">
+<span class="sig-name descname"><span class="pre">update_simulation_da_high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_simulation_da_high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_simulation_da_low">
+<span class="sig-name descname"><span class="pre">update_simulation_da_low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_simulation_da_low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_simulation_ebike">
+<span class="sig-name descname"><span class="pre">update_simulation_ebike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_simulation_ebike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_simulation_ecar">
+<span class="sig-name descname"><span class="pre">update_simulation_ecar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_simulation_ecar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_trip_range">
+<span class="sig-name descname"><span class="pre">update_trip_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_trip_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback funtion for updating the model from the view</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="controller.Controller.update_view_from_model">
+<span class="sig-name descname"><span class="pre">update_view_from_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#controller.Controller.update_view_from_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the view from the model</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/controller.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">AI Fleetmanagement Fase 1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">controller module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Allan Lyckegaard, Droids Agency.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,93 @@
+dashboard package
+=================
+
+Submodules
+----------
+
+dashboard.controller module
+---------------------------
+
+.. automodule:: dashboard.controller
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dashboard.data module
+---------------------
+
+.. automodule:: dashboard.data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dashboard.examples module
+-------------------------
+
+.. automodule:: dashboard.examples
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dashboard.main module
+---------------------
+
+.. automodule:: dashboard.main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dashboard.model module
+----------------------
+
+.. automodule:: dashboard.model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dashboard.simuleringstool module
+--------------------------------
+
+.. automodule:: dashboard.simuleringstool
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dashboard.tests module
+----------------------
+
+.. automodule:: dashboard.tests
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dashboard.utils module
+----------------------
+
+.. automodule:: dashboard.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dashboard.vehicle module
+------------------------
+
+.. automodule:: dashboard.vehicle
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dashboard.view module
+---------------------
+
+.. automodule:: dashboard.view
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: dashboard
+   :members:
+   :undoc-members:
+   :show-inheritance:
