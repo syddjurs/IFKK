@@ -1,6 +1,6 @@
 # Indledning
 Dette repositorie indeholder simuleringstoolet som er udviklet i løbet af fase 1 af AI-signaturprojektet Intelligent flådestyring og klimasmarte kørselsmønstre (https://ifkk.syddjurs.dk/forside/). 
-Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, https://github.com/syddjurs/IFKK/dashboard/documentation/build/html/index.html. Den anvendelsesorienterede dokumentation findes i https://github.com/syddjurs/IFKK/dashboard/documentation/simuleringstool_dokumentation_DA.docx.
+Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, https://github.com/syddjurs/IFKK/blob/master/dashboard/documentation/build/html/index.html. Den anvendelsesorienterede dokumentation findes i https://github.com/syddjurs/IFKK/blob/master/dashboard/documentation/simuleringstool_dokumentation_DA.docx.
 Simuleringstoolet er udviklet i fase 1 er ikke en færdig løsning, men en funktionel prototype af den endelige løsning. Den funktionelle prototype vil kunne anvendes som udgangspunkt for den videre udvikling af værktøjet i fase 2.
 # Formål
 Simuleringstoolet er udviklet med formål om at kunne tage en proaktiv tilgang til indkøb af køretøjsflåden i en kommune.
