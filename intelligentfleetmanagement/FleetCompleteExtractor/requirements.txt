@@ -1,0 +1,8 @@
+mysqlclient
+python-dotenv
+mysql-connector-python==8.0.23
+pandas==1.4.0
+requests
+sqlalchemy==1.4.31
+datetime
+importlib_resources

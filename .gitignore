@@ -51,3 +51,10 @@ Thumbs.db
 .vscode/
 dashboard/data/
 data/
+
+venv/
+
+.env
+
+build/
+src/fleetmanager_droidsagency.egg-info/

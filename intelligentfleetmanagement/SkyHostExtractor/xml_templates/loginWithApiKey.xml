@@ -1,0 +1,19 @@
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:r="http://schemas.xmlsoap.org/ws/2005/02/rm" xmlns:a="http://www.w3.org/2005/08/addressing">
+    <s:Header>
+        <r:Sequence s:mustUnderstand="1">
+            <r:Identifier>urn:uuid:992f5130-ad9f-4a45-855f-97b4f0d5912e</r:Identifier>
+            <r:MessageNumber>1</r:MessageNumber>
+        </r:Sequence>
+        <a:Action s:mustUnderstand="1">http://tempuri.org/IBasic/LoginWithApiKey</a:Action>
+        <a:MessageID>urn:uuid:2090f1e9-23dd-4a2c-8b53-2ec43f343e3d</a:MessageID>
+        <a:ReplyTo>
+            <a:Address>http://www.w3.org/2005/08/addressing/anonymous</a:Address>
+        </a:ReplyTo>
+        <a:To s:mustUnderstand="1">http://www.skyhost.dk/soap/Basic.svc</a:To>
+    </s:Header>
+    <s:Body>
+        <LoginWithApiKey xmlns="http://tempuri.org/">
+            <apiKey></apiKey>
+        </LoginWithApiKey>
+    </s:Body>
+</s:Envelope>

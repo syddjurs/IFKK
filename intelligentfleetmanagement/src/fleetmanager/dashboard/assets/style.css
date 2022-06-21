@@ -1,0 +1,342 @@
+.styled-numeric-input input:invalid {
+  border-color: #dc3545;
+  padding-right: calc(1.5em + 0.75rem);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+  outline: none;
+}
+
+/* ============ General ============ */
+
+body {
+    background-color: #FBFCFD;
+}
+
+.bot-margin {
+    margin-bottom: 10px;
+}
+
+.description-header {
+    width: auto;
+    box-shadow: 0 .1rem 1rem rgba(0,0,0,.15);
+    margin-bottom: 20px;
+    background-color: #FAFAFA;
+}
+
+.description-header .toast-header {
+    color: black;
+    font-size: 16px;
+    background-color: inherit;
+}
+
+.container {
+    margin: 0px 250px 0px 250px;
+    max-width: 85vw;
+}
+
+.config-nav {
+    border-top: 1px solid lightgray !important;
+}
+
+.btn {
+    margin: 2px;
+}
+
+.header-row {
+    border-bottom: 2px solid black;
+    padding-top: 13px;
+}
+
+.header-row h4 {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.center-content {
+    display: flex !important;
+    justify-content: center;
+}
+
+.sidebar .fas {
+    margin-right: 5px;
+}
+
+.flex-container {
+    display: flex;
+    justify-content: right;
+}
+
+.btn-col {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.right-btn {
+    float: right;
+}
+button#choose_all.left-btn.btn.btn-success {
+    box-shadow: 0 0 0 0 rgba(0,0,0,0);
+    border: none;
+    border-color: #000;
+    background: grey;
+}
+
+button#choose_all.left-btn.btn.btn-success:hover {
+    background: #6c6c6c;
+}
+
+.nav-item .btn {
+    color: #FFFFFF !important;
+}
+
+/* ============ Simuleringssetup ============= */
+/*#choose_all_div {
+    display: block;
+    padding-right: 10em;
+    padding-top: 5px;
+}*/
+
+#location_view {
+    height: 800px;
+    overflow: scroll;
+    padding: 1em;
+}
+
+#location_view .form-check {
+    margin: 10px 0px 10px 0px;
+    border-bottom: 1px solid lightgray;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#location_view .form-check .form-check-label {
+    min-width: 48%;
+    overflow-wrap: anywhere;
+}
+
+.DateRangePickerInput{
+  border: 0px;
+}
+
+.locations-card {
+    position: relative;
+    height: 200px;
+    overflow: auto;
+}
+
+.location-date-picker {
+    left: 50;
+}
+
+.vehicle-card {
+    position: relative;
+    height: 600px;
+    overflow: auto;
+}
+
+div#vehicle_view.vehicle-card table.table thead{
+    position: sticky;
+    top: 0;
+    background: #fff;
+}
+
+.right-column-elements {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.delete-button {
+    margin: 31px 0px 0px 0px;
+}
+
+.fullscreen_spinner {
+    background: rgba(255, 255, 255, 0.75) !important;
+}
+
+.large_spinner {
+    width: 6rem;
+    height: 6rem;
+}
+
+/** Config page **/
+
+#config_table table tr th:nth-child(2), #config_table table tr td:nth-child(2)  {
+    background-color: lightgray;
+}
+
+.data-alert {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 350px;
+    z-index: 100;
+}
+
+#config_table th, #config_table td {
+    padding: 10px;
+}
+
+.Select {
+    height: auto !important;
+}
+
+.dbc .Select-control {
+    border: none !important;
+}
+
+.Select-menu {
+    background-color: #FBFCFD;
+    scrollbar-width: thin;
+    width: 100%;
+    min-width: 120px;
+    scrollbar-color: gray lightgray;
+}
+
+.Select-menu-outer {
+    width: 100%;
+    color: black !important;
+}
+
+.Select-option {
+    color: black !important;
+}
+
+#config_table {
+    box-shadow: 0 .1rem 1rem rgba(0,0,0,.15);
+    margin: 5px;
+    overflow-x: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: gray lightgray;
+    font-size: 12px;
+    background-color: #FFFFFF;
+}
+
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner table {
+    font-family: inherit !important;
+}
+
+.dash-spreadsheet-container {
+    height: 600px;
+}
+
+#config_table tr:first-child th {
+    background-color: #FBFCFD;
+    border-top: none !important;
+}
+
+.download-link {
+    cursor: pointer;
+}
+
+/** ===================== **/
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 230px;
+    padding: 20px 10px;
+    background-color: #FFFFFF;
+}
+
+.content {
+    padding: 20px 10px;
+    background-color: #FBFCFD;
+}
+
+/* ============ Flådesammensætning =========== */
+.fleet-view table.table thead{
+    position: sticky;
+    top: 0;
+    background: #fff;
+}
+
+
+.fleet-view {
+    position: relative;
+    max-height: 1050px;
+    overflow: auto;
+}
+[id*=\,\"type\"\:\"vehicle_values\"\}]{
+    background: #ff0;
+    width: 100px;
+}
+
+.metric-card {
+    text-align: center;
+}
+
+.metric-card p {
+    font-size: 30px;
+    margin: 0px;
+    color: #0b5ed7;
+}
+
+.left-column-elements {
+    float: left;
+    padding: .5em;
+}
+
+#intelligent_simulation{
+    display: block;
+    float: left;
+    padding: .2em;
+    border-radius: 13px;
+    background: #ff0;
+    background: #0d6efd;
+    color: #fff;
+    box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+    -webkit-box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+    -moz-box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+}
+
+#km_aar {
+    display: block;
+    margin-left: 1em;
+    float: right;
+    padding: .2em;
+    border-radius: 13px;
+    background: #808080;
+    color: #fff;
+    box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+    -webkit-box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+    -moz-box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+}
+
+
+
+/* ============ page goal =========== */
+[class^="rc-slider-tooltip rc-slider-tooltip-placement-top"] {
+    visibility: hidden;
+}
+
+#intelligent_simulation_op{
+    display: block;
+    float: left;
+    padding: .2em;
+    border-radius: 13px;
+    background: #ff0;
+    background: #0d6efd;
+    color: #fff;
+    box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+    -webkit-box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+    -moz-box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+}
+
+#km_aar_op {
+    display: block;
+    margin-left: 1em;
+    float: right;
+    padding: .2em;
+    border-radius: 13px;
+    background: #808080;
+    color: #fff;
+    box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+    -webkit-box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+    -moz-box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+}

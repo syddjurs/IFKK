@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: skyhostextractor
+spec:
+  schedule: "0 0 * * 0"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: skyhostextractor
+            image: $REGISTRY/$IMAGE:$TAG
+            imagePullPolicy: Always
+            env:
+              - name: DB_NAME
+                valueFrom:
+                  secretKeyRef:
+                    name: client-details
+                    key: db_name
+              - name: DB_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: client-details
+                    key: db_password
+              - name: SOAP_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: client-details
+                    key: soap_key
+          restartPolicy: OnFailure
