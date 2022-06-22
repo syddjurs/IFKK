@@ -2,7 +2,7 @@
 ### Indledning
 Dette repositorie indeholder simuleringstoolet som er udviklet i løbet af AI-signaturprojektet Intelligent flådestyring og klimasmarte kørselsmønstre (https://ifkk.syddjurs.dk/forside/). 
 
-Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, https://github.com/syddjurs/IFKK/blob/master/src/_build/html/index.html. Den anvendelsesorienterede dokumentation findes i https://github.com/syddjurs/IFKK/master/src/_build/ifkk_dokumentation.pdf.
+Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, https://andreasdroid.github.io/ifkkDoc/src/build/html/index.html. Den anvendelsesorienterede dokumentation findes i https://andreasdroid.github.io/ifkkDoc/src/build/ifkk_dokumentation.pdf.
 
 
 ### Repository oversigt
@@ -29,12 +29,12 @@ Simuleringstoolet sammenligner den nuværende flåde med en fremtidig simuleret 
 Specifikt, deles applikationen op 3 typer simulering:
 1. CO2e-orienteret simulering. En simulering, hvor køretøjer med lavere CO2e aftryk prioriteres. Giver ikke nødvendigs det absolutte lavest CO2e aftryk.
 2. Intelligent simulering. En optimal simulering, hvor køretøjets variable pris pr. km. afvejes med dets CO2e aftryk. Her vægtes på køretøjets attributter således turene allokeres biler på den mest optimale måde.
-3. Målsimulering. En optimering på flådesammensætning, hvor delflåden optimeres på både CO2e og omkostning, hvor flåden samtidig tilfredsstiller kørselsbehovet. 
+3. Målsimulering. En optimering på flådesammensætning, hvor delflåden optimeres på både CO2e og omkostning og hvor flåden samtidig tilfredsstiller kørselsbehovet. 
 ### Teknisk overblik
-![Package relationship](src/_build/ark.png)
+![Package relationship](src/build/ark.png)
 
 Simuleringstoolet er udviklet i python på backenden og brugergrænsefladen er ligeledes opsat med python-biblioteket Dash.
-Dokumentationen på de enkelte dele af koden er at finde i det tilhørende Github-projekt, https://github.com/syddjurs/IFKK.
+Dokumentationen på de enkelte dele af koden er at finde i det tilhørende Github-projekt, https://github.com/syddjurs/IFKK eller på https://andreasdroid.github.io/ifkkDoc/src/build/html/index.html
 #### Extractors
 I dette repository findes to moduler udviklet for at trække data fra flådestyringssystemerne; FleetComplete `FleetCompleteExtractor` og SkyHost `SkyHostExtractor`.
 De har hver deres readme og requirements filer. 
@@ -88,9 +88,9 @@ Dash is running on http://127.0.0.1:8050/
 
 ### Data
 Applikationen er afhængig af data på tilladte startsteder, biler (inkl. metadata) og ikke mindst rundture. I applikation run-time er alle tabeller påkrævet, 
-på-nær: `trips` og `leasing-types`. `RoundTrips` vil altid kun indeholde GPS-koordinater der er tæt på det tilladte startsted (+- x antal meter, den tilladte distance defineret i extractor'en).
-For at læse mere om hvor data stammer fra, hvilke forudsætninger der er og hvilke antagelser der laves, refereres til `FleetCompleteExtractor` eller `SkyhostExtractor` eller den fulde dokumentation på data og algortimer her:  
+på-nær: `trips` og `leasing_types`. `RoundTrips` vil altid kun indeholde GPS-koordinater der er tæt på det tilladte startsted (+- x antal meter, den tilladte distance defineret i extractor'en).
+For at læse mere om hvor data stammer fra, hvilke forudsætninger der er og hvilke antagelser der laves, refereres til `FleetCompleteExtractor` eller `SkyhostExtractor` eller den fulde dokumentation på data og algortimer her: https://andreasdroid.github.io/ifkkDoc/src/build/ifkk_dokumentation.pdf   
 
-![ER diagram](src/_build/er.png)
+![ER diagram](src/build/er.png)
 
 
