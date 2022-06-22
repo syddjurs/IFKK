@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.model.roundtripgenerator &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>fleetmanager.model.roundtripgenerator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fleetmanager.model.roundtripgenerator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+
+<div class="viewcode-block" id="calc_distance"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.roundtripgenerator.calc_distance">[docs]</a><span class="k">def</span> <span class="nf">calc_distance</span><span class="p">(</span><span class="n">coord1</span><span class="p">,</span> <span class="n">coord2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple distance function to measure the distance in km from two coordinates (lat, long) (lat, long)</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    coord1 : (latitude, longitude)</span>
+<span class="sd">    coord2 : (latitude, longitude)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    distance in km</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span> <span class="o">=</span> <span class="n">coord1</span>
+    <span class="n">lat2</span><span class="p">,</span> <span class="n">lon2</span> <span class="o">=</span> <span class="n">coord2</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="mi">6371</span>
+    <span class="n">phi1</span> <span class="o">=</span> <span class="n">lat1</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
+    <span class="n">phi2</span> <span class="o">=</span> <span class="n">lat2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
+    <span class="n">delta_phi</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat2</span> <span class="o">-</span> <span class="n">lat1</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
+    <span class="n">delta_lambda</span> <span class="o">=</span> <span class="p">(</span><span class="n">lon2</span> <span class="o">-</span> <span class="n">lon1</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">delta_phi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">delta_phi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi1</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span>
+        <span class="n">phi2</span>
+    <span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">delta_lambda</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">delta_lambda</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">R</span> <span class="o">*</span> <span class="n">c</span></div>
+
+
+<div class="viewcode-block" id="point_to_starts"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.roundtripgenerator.point_to_starts">[docs]</a><span class="k">def</span> <span class="nf">point_to_starts</span><span class="p">(</span><span class="n">coordinate</span><span class="p">,</span> <span class="n">starts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function used to measure the distance between a selected start to a list of starts</span>
+<span class="sd">    iterates over the starts list and returns the distance and coordinates to the starting location</span>
+<span class="sd">    to which there&#39;s the shortest distance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    coordinate : (lat, lon)</span>
+<span class="sd">    starts : list of (lat, lon) - [(lat, lon), (lat, lon), (lat, lon) ...]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    (min_distance, best_start) - distance to closest start, (lat, lon) to closest start</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">min_distance</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+    <span class="n">best_start</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="n">starts</span><span class="p">:</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="n">calc_distance</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">coordinate</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">min_distance</span><span class="p">:</span>
+            <span class="n">min_distance</span> <span class="o">=</span> <span class="n">distance</span>
+            <span class="n">best_start</span> <span class="o">=</span> <span class="n">start</span>
+    <span class="k">return</span> <span class="n">min_distance</span><span class="p">,</span> <span class="n">best_start</span></div>
+
+
+<div class="viewcode-block" id="get_car_starts"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.roundtripgenerator.get_car_starts">[docs]</a><span class="k">def</span> <span class="nf">get_car_starts</span><span class="p">(</span><span class="n">trips</span><span class="p">,</span> <span class="n">allowed_starts_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to retrieve allowed starts for the cars. Iterates over all trips for a specific car</span>
+<span class="sd">    and finds the start to which it&#39;s closest. If the distance to an allowed start is less than .2 km</span>
+<span class="sd">    the start is accepted. The 3 most frequent starts for each car is returned for use in the later</span>
+<span class="sd">    process when the roundtrips are defined</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trips : trips from the table expected in pandas format. At least &quot;car_id&quot;, &quot;start_latitude&quot;, &quot;start_longitude&quot;</span>
+<span class="sd">    allowed_starts : list of cordinates (lat, lon) that are accepted start locations</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dictionary for each car id that contain the 3 most frequent starts for the car</span>
+<span class="sd">    {car_id: [(lat,lon), (lat,lon), (lat,lon)], car_id: [(lat,lon), (lat,lon), (lat,lon)] ...}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cars</span> <span class="o">=</span> <span class="n">trips</span><span class="o">.</span><span class="n">car_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">car_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">car</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">car</span> <span class="ow">in</span> <span class="n">cars</span><span class="p">}</span>
+    <span class="n">allowed_starts_coordinates</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">allowed_starts_</span><span class="o">.</span><span class="n">itertuples</span><span class="p">()</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">car</span> <span class="ow">in</span> <span class="n">cars</span><span class="p">:</span>
+        <span class="n">log_points</span> <span class="o">=</span> <span class="n">trips</span><span class="p">[</span><span class="n">trips</span><span class="o">.</span><span class="n">car_id</span> <span class="o">==</span> <span class="n">car</span><span class="p">]</span>
+        <span class="n">car_starts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">log_points</span><span class="o">.</span><span class="n">start_latitude</span><span class="p">,</span> <span class="n">log_points</span><span class="o">.</span><span class="n">start_longitude</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+        <span class="p">]</span>
+        <span class="n">closest</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">point_to_starts</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">allowed_starts_coordinates</span><span class="p">)</span> <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="n">car_starts</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">distance</span><span class="p">,</span> <span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="ow">in</span> <span class="n">closest</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">points</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">car_dict</span><span class="p">[</span><span class="n">car</span><span class="p">]:</span>
+                    <span class="n">car_dict</span><span class="p">[</span><span class="n">car</span><span class="p">][</span><span class="n">points</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">car_dict</span><span class="p">[</span><span class="n">car</span><span class="p">][</span><span class="n">points</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">allowed_car_starts</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">car</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">point</span>
+            <span class="k">for</span> <span class="n">point</span><span class="p">,</span> <span class="n">frequency</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="n">car_dict</span><span class="p">[</span><span class="n">car</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)[:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">car</span> <span class="ow">in</span> <span class="n">cars</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">allowed_car_starts</span></div>
+
+
+<div class="viewcode-block" id="post_routing_sanitation"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.roundtripgenerator.post_routing_sanitation">[docs]</a><span class="k">def</span> <span class="nf">post_routing_sanitation</span><span class="p">(</span><span class="n">routes</span><span class="p">,</span> <span class="n">trips</span><span class="p">,</span> <span class="n">starts_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function used post routing to do sanitation - especially useful to scrutinise the trips that doesn&#39;t &quot;make sense&quot;</span>
+<span class="sd">    from a distance or time perspective.</span>
+<span class="sd">    The time (7 days) and distance (200 km) criteria defines which routes will be sought to be re-defined.</span>
+<span class="sd">    For the selected routes it selects the trips points from the start - and end time, new starting locations are</span>
+<span class="sd">    defined - isolated to those present as opposed to all log points for the car. The trips log points and new</span>
+<span class="sd">    locations are sent to the trip extractor to define possible new routes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    routes : the defined routes from trip_extractor</span>
+<span class="sd">    trips : the trips frame</span>
+<span class="sd">    starts_ : frame holding the allowed starts from the allowed_starts table</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    routes that were originally accepted and possible sanitized routes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">distance_criteria</span> <span class="o">=</span> <span class="mi">200</span>
+    <span class="n">time_criteria</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">confirmed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">check</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">sanitized</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">routes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">route</span><span class="p">[</span><span class="s2">&quot;end_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">-</span> <span class="n">route</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">days</span> <span class="o">&gt;=</span> <span class="n">time_criteria</span> <span class="ow">or</span> <span class="n">route</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">distance_criteria</span><span class="p">:</span>
+            <span class="n">check</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">route</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">confirmed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">route</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">check</span><span class="p">:</span>
+        <span class="c1"># check which starts it&#39;s most in relation with</span>
+        <span class="c1"># select one start based on frequency</span>
+        <span class="n">car</span> <span class="o">=</span> <span class="n">route</span><span class="p">[</span><span class="s2">&quot;car_id&quot;</span><span class="p">]</span>
+        <span class="n">trip_points</span> <span class="o">=</span> <span class="n">trips</span><span class="p">[</span>
+            <span class="p">(</span><span class="n">trips</span><span class="o">.</span><span class="n">car_id</span> <span class="o">==</span> <span class="n">route</span><span class="p">[</span><span class="s2">&quot;car_id&quot;</span><span class="p">])</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">trips</span><span class="o">.</span><span class="n">start_timestamp</span> <span class="o">&gt;=</span> <span class="n">route</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">])</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">trips</span><span class="o">.</span><span class="n">end_timestamp</span> <span class="o">&lt;=</span> <span class="n">route</span><span class="p">[</span><span class="s2">&quot;end_time&quot;</span><span class="p">])</span>
+        <span class="p">]</span>
+        <span class="n">new_starts</span> <span class="o">=</span> <span class="p">{</span><span class="n">car</span><span class="p">:</span> <span class="n">get_car_starts</span><span class="p">(</span><span class="n">trip_points</span><span class="p">,</span> <span class="n">starts_</span><span class="p">)[</span><span class="n">car</span><span class="p">][:]}</span>
+        <span class="n">new_routes</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">trip_extractor</span><span class="p">(</span>
+            <span class="n">trip_points</span><span class="p">,</span>
+            <span class="n">allowed_car_starts</span><span class="o">=</span><span class="n">new_starts</span><span class="p">,</span>
+            <span class="n">start_frame</span><span class="o">=</span><span class="n">starts_</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">sanitized</span> <span class="o">+=</span> <span class="n">new_routes</span>
+
+    <span class="k">return</span> <span class="n">confirmed</span> <span class="o">+</span> <span class="n">sanitized</span></div>
+
+
+<div class="viewcode-block" id="trip_extractor"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.roundtripgenerator.trip_extractor">[docs]</a><span class="k">def</span> <span class="nf">trip_extractor</span><span class="p">(</span>
+    <span class="n">frame</span><span class="p">,</span>
+    <span class="n">allowed_car_starts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">start_frame</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">hour_threshold</span><span class="o">=</span><span class="mf">16.9</span><span class="p">,</span>
+    <span class="n">definition_of_home</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">min_travel_distance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">recurs</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">enforce_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Major roundtrip generator function. Takes the trips pulled and the defined allowed starts</span>
+<span class="sd">    for each car. Assumes that a route will start and end at the same location (+-definition of home), exists of</span>
+<span class="sd">    at least 2 log points, travelled distance is more than 500 meters and driver is the same</span>
+<span class="sd">    (except if driver defined moves from nan to driver_name or driver_name to nan once)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frame : trips frame from trips table</span>
+<span class="sd">    allowed_car_starts : dictionary of allowed starts for each car_id present in trips frame</span>
+<span class="sd">    start_frame: frame holding the allowed starts from the allowed_starts table</span>
+<span class="sd">    hour_threshold  :   int, standard for limiting the allowed length of a trip.</span>
+<span class="sd">    definition_of_home  :   int, allowed distance to home. If a log is definition_of_home close to an allowed start</span>
+<span class="sd">                            at unstarted trip, the trip will begin. If a trip is underway, the trips ends if a log</span>
+<span class="sd">                            is seen that is definition_of_home close to the defined allowed start</span>
+<span class="sd">    min_travel_distance :   int, the minimum travel distance for accepting the trip as a valid roundtrip</span>
+<span class="sd">    recurs  :   int, should not be changed. Internal value for constraining the function to only recurs once to parse</span>
+<span class="sd">                unqualified roundtrips in to qualified roundtrips. E.g. There could be vehicles that find home after</span>
+<span class="sd">                days because it has been lend out to another location, then the allowed start has been &quot;wrongly&quot; selected</span>
+<span class="sd">                and should be defined to the location to which the vehicle has been lend in order to record the trips</span>
+<span class="sd">                driven in the other location.</span>
+<span class="sd">    enforce_location    :   int, defining the location. In accordance with the aforementioned, this value will overwrite</span>
+<span class="sd">                            the found location and always allocate the trip to the location to where the vehicle belong</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of accepted routes in dictionary format including following attributes: start_time, end_time, start_point,</span>
+<span class="sd">        end_point, car_id, distance, gps_points, driver, ids</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time_sorted_frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;start_time&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+    <span class="n">time_sorted_frame</span><span class="p">[</span><span class="s2">&quot;start_timestamp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_sorted_frame</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span>
+        <span class="k">else</span> <span class="n">x</span>
+    <span class="p">)</span>
+    <span class="n">time_sorted_frame</span><span class="p">[</span><span class="s2">&quot;end_timestamp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_sorted_frame</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span>
+        <span class="k">else</span> <span class="n">x</span>
+    <span class="p">)</span>
+
+    <span class="n">all_routes</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list for qualified routes</span>
+    <span class="k">for</span> <span class="n">car_id</span> <span class="ow">in</span> <span class="n">time_sorted_frame</span><span class="o">.</span><span class="n">car_id</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+        <span class="n">current_route</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list for holding log points for current running route</span>
+        <span class="n">trip_end</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">trip_frame</span> <span class="o">=</span> <span class="n">time_sorted_frame</span><span class="p">[</span><span class="n">time_sorted_frame</span><span class="o">.</span><span class="n">car_id</span> <span class="o">==</span> <span class="n">car_id</span><span class="p">]</span>
+        <span class="n">trip_frame_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">trip_frame</span><span class="p">)</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="n">trip_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;driver_name&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
+            <span class="n">driver</span> <span class="o">=</span> <span class="s2">&quot;nan&quot;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">segment</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trip_frame</span><span class="o">.</span><span class="n">itertuples</span><span class="p">()):</span>
+            <span class="c1"># to allow nan driver log points to be allocated to route</span>
+            <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">driver_name</span><span class="p">):</span>
+                <span class="n">current_driver</span> <span class="o">=</span> <span class="s2">&quot;nan&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">current_driver</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">driver_name</span>
+
+            <span class="c1"># check that current driver is equal to the previous - except if one of them is a nan</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">current_driver</span> <span class="o">!=</span> <span class="n">driver</span> <span class="ow">and</span> <span class="n">driver</span> <span class="o">!=</span> <span class="s2">&quot;nan&quot;</span> <span class="ow">and</span> <span class="n">current_driver</span> <span class="o">!=</span> <span class="s2">&quot;nan&quot;</span>
+            <span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="s2">&quot;nan&quot;</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">driver_name</span><span class="p">)</span> <span class="k">else</span> <span class="n">a</span><span class="o">.</span><span class="n">driver_name</span>
+                        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">current_route</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="c1"># discard already logged points to the route because driver changed</span>
+                <span class="n">current_route</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_route</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># if this is the first log of the trip ensure that the location is an accepted start</span>
+                <span class="n">distances_to_starts</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">calc_distance</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">start_latitude</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">start_longitude</span><span class="p">),</span> <span class="p">(</span><span class="n">start</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="n">allowed_car_starts</span><span class="p">[</span><span class="n">car_id</span><span class="p">]</span>
+                <span class="p">]</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">dist</span> <span class="o">&gt;</span> <span class="n">definition_of_home</span> <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">distances_to_starts</span><span class="p">]):</span>
+                    <span class="k">continue</span>
+                <span class="n">test</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">driver</span> <span class="o">=</span> <span class="n">current_driver</span>
+                <span class="n">total_travelled</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">start_point</span> <span class="o">=</span> <span class="n">allowed_car_starts</span><span class="p">[</span><span class="n">car_id</span><span class="p">][</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">distances_to_starts</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">]</span>
+                <span class="n">start_time</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">start_timestamp</span>
+
+                <span class="n">locat</span> <span class="o">=</span> <span class="n">start_frame</span><span class="p">[</span>
+                    <span class="p">(</span><span class="n">start_frame</span><span class="o">.</span><span class="n">latitude</span> <span class="o">==</span> <span class="n">start_point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">start_frame</span><span class="o">.</span><span class="n">longitude</span> <span class="o">==</span> <span class="n">start_point</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">allowed_stops</span> <span class="o">=</span> <span class="n">start_frame</span><span class="p">[</span><span class="n">start_frame</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">locat</span><span class="p">][</span>
+                    <span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">,</span> <span class="s2">&quot;longitude&quot;</span><span class="p">]</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">values</span>
+                <span class="n">multiple_stops</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">allowed_stops</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="kc">False</span>
+
+            <span class="n">current_route</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">trip_frame_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># due to &quot;teleportation&quot; where the current end coordinate is not the next start</span>
+                <span class="n">point</span> <span class="o">=</span> <span class="n">trip_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span>
+                    <span class="p">[</span><span class="s2">&quot;start_latitude&quot;</span><span class="p">,</span> <span class="s2">&quot;start_longitude&quot;</span><span class="p">]</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">point</span> <span class="o">=</span> <span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">end_latitude</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">end_longitude</span><span class="p">)</span>
+            <span class="c1"># we need the end location to determine whether it&#39;s parked close to home</span>
+
+            <span class="k">if</span> <span class="n">multiple_stops</span><span class="p">:</span>
+                <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">calc_distance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">))</span> <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="ow">in</span> <span class="n">allowed_stops</span>
+                <span class="p">]</span>
+                <span class="n">distance</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">distances</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">distance</span> <span class="o">=</span> <span class="n">calc_distance</span><span class="p">(</span><span class="n">start_point</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
+            <span class="c1"># sanity check (sometimes the gps distance is wrong)</span>
+            <span class="n">point_to_point</span> <span class="o">=</span> <span class="n">calc_distance</span><span class="p">(</span>
+                <span class="n">point</span><span class="p">,</span> <span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">start_latitude</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">start_longitude</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># gps points from skyhost is sometimes missing or (0, 0)</span>
+            <span class="k">if</span> <span class="n">point_to_point</span> <span class="o">&gt;</span> <span class="mi">5000</span><span class="p">:</span>
+                <span class="n">point_to_point</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">distance</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">total_travelled</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="n">point_to_point</span>
+                    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="n">point_to_point</span> <span class="o">/</span> <span class="n">segment</span><span class="o">.</span><span class="n">distance</span> <span class="o">&gt;</span> <span class="mf">1.5</span><span class="p">,</span>
+                            <span class="mf">0.05</span> <span class="o">&gt;</span> <span class="n">point_to_point</span> <span class="o">/</span> <span class="n">segment</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="k">else</span> <span class="n">segment</span><span class="o">.</span><span class="n">distance</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+                <span class="n">total_travelled</span> <span class="o">+=</span> <span class="n">point_to_point</span>
+            <span class="c1"># distance to the route start</span>
+
+            <span class="n">time_difference</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">start_timestamp</span> <span class="o">-</span> <span class="n">start_time</span>
+            <span class="n">time_difference_seconds</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">time_difference</span><span class="o">.</span><span class="n">days</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">3600</span>
+            <span class="p">)</span> <span class="o">+</span> <span class="n">time_difference</span><span class="o">.</span><span class="n">seconds</span>
+            <span class="c1"># time to the last start checkpoint</span>
+
+            <span class="c1"># if time exceeds 24 * 7 hours, trip must have ended</span>
+            <span class="n">time_exceeded</span> <span class="o">=</span> <span class="n">time_difference_seconds</span> <span class="o">&gt;</span> <span class="mi">3600</span> <span class="o">*</span> <span class="n">hour_threshold</span>
+
+            <span class="c1"># is a route if back to start</span>
+            <span class="k">if</span> <span class="n">distance</span> <span class="o">&lt;=</span> <span class="n">definition_of_home</span> <span class="ow">and</span> <span class="n">total_travelled</span> <span class="o">&gt;</span> <span class="n">min_travel_distance</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_route</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">trip_end</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1"># trip ends</span>
+                <span class="k">elif</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">trip_frame</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># test if the next point is also at the start, then we end the trip</span>
+                    <span class="n">next_start_point</span> <span class="o">=</span> <span class="n">trip_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span>
+                        <span class="p">[</span><span class="s2">&quot;start_latitude&quot;</span><span class="p">,</span> <span class="s2">&quot;start_longitude&quot;</span><span class="p">]</span>
+                    <span class="p">]</span><span class="o">.</span><span class="n">values</span>
+                    <span class="n">distance_between_points</span> <span class="o">=</span> <span class="n">calc_distance</span><span class="p">(</span>
+                        <span class="n">start_point</span><span class="p">,</span> <span class="n">next_start_point</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">distance_between_points</span> <span class="o">&lt;</span> <span class="n">definition_of_home</span><span class="p">:</span>
+                        <span class="n">trip_end</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">time_exceeded</span><span class="p">:</span>
+                <span class="c1"># recursive check to see if we can route it more segmented</span>
+                <span class="n">ar</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">if</span> <span class="n">current_route</span> <span class="ow">and</span> <span class="n">recurs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">n_allow</span> <span class="o">=</span> <span class="n">get_car_starts</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">current_route</span><span class="p">),</span> <span class="n">start_frame</span><span class="p">)</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">test</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">test</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="k">elif</span> <span class="p">(</span>
+                        <span class="n">current_route</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">current_route</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start_time</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3600</span> <span class="o">&gt;</span> <span class="mi">72</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                            <span class="n">ar</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">trip_extractor</span><span class="p">(</span>
+                                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">current_route</span><span class="p">[</span><span class="n">i</span><span class="p">:]),</span>
+                                <span class="n">n_allow</span><span class="p">,</span>
+                                <span class="n">start_frame</span><span class="p">,</span>
+                                <span class="n">recurs</span><span class="o">=</span><span class="n">recurs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                <span class="n">definition_of_home</span><span class="o">=</span><span class="n">definition_of_home</span><span class="p">,</span>
+                                <span class="n">hour_threshold</span><span class="o">=</span><span class="n">hour_threshold</span><span class="p">,</span>
+                                <span class="n">enforce_location</span><span class="o">=</span><span class="n">enforce_location</span><span class="p">,</span>
+                            <span class="p">)</span>
+                            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="k">if</span> <span class="n">ar</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_route</span><span class="p">)</span> <span class="o">==</span> <span class="n">i</span><span class="p">:</span>
+                                <span class="k">break</span>
+                <span class="k">if</span> <span class="n">ar</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ar</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="p">(</span>
+                            <span class="n">a</span><span class="p">[</span><span class="s2">&quot;end_time&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">]</span>
+                        <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3600</span> <span class="o">&gt;</span> <span class="n">hour_threshold</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">a</span><span class="p">[</span><span class="s2">&quot;from&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span>
+                        <span class="n">all_routes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                    <span class="n">current_route</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">trip_end</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">trip_end</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">time_exceeded</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">all_routes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">route_format</span><span class="p">(</span>
+                        <span class="n">current_route</span><span class="p">,</span>
+                        <span class="n">car_id</span><span class="p">,</span>
+                        <span class="n">locat</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">enforce_location</span><span class="p">)</span> <span class="k">else</span> <span class="n">enforce_location</span><span class="p">,</span>
+                        <span class="n">total_travelled</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+                <span class="c1"># reset parameters when trip has been saved or dismissed</span>
+                <span class="n">current_route</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">trip_end</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="n">all_routes</span><span class="p">,</span> <span class="n">time_sorted_frame</span></div>
+
+
+<div class="viewcode-block" id="trip_aggregator"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.roundtripgenerator.trip_aggregator">[docs]</a><span class="k">def</span> <span class="nf">trip_aggregator</span><span class="p">(</span>
+    <span class="n">car</span><span class="p">,</span>
+    <span class="n">c_trips</span><span class="p">,</span>
+    <span class="n">allowed_starts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">hour_threshold</span><span class="o">=</span><span class="mf">16.9</span><span class="p">,</span>
+    <span class="n">definition_of_home</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">min_travel_distance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function for handling the aggregation library.</span>
+<span class="sd">    Called by the SkyHost - and FleetCompleteExtractor to easily aggregate the new trips. Handles the whole</span>
+<span class="sd">    process.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    car :   car object, with a defined id and location id</span>
+<span class="sd">    c_trips :   dataframe, the car trips that will be sought to be aggregated into roundtrips</span>
+<span class="sd">    allowed_starts  :   dataframe, the starts that are available to the car</span>
+<span class="sd">    hour_threshold  :   int, the hour threshold for the aggregated trips</span>
+<span class="sd">    definition_of_home  int, the distance allowed to a start</span>
+<span class="sd">    min_travel_distance int, the minimum travel distance for a trip.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of aggregated trips in dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c_trips</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Processing </span><span class="si">{}</span><span class="s2"> trips&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c_trips</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">allowed_car_starts</span> <span class="o">=</span> <span class="n">get_car_starts</span><span class="p">(</span><span class="n">c_trips</span><span class="p">,</span> <span class="n">allowed_starts</span><span class="p">)</span>
+    <span class="n">car_routes</span><span class="p">,</span> <span class="n">trips_time</span> <span class="o">=</span> <span class="n">trip_extractor</span><span class="p">(</span>
+        <span class="n">c_trips</span><span class="p">,</span>
+        <span class="n">allowed_car_starts</span><span class="p">,</span>
+        <span class="n">allowed_starts</span><span class="p">,</span>
+        <span class="n">definition_of_home</span><span class="o">=</span><span class="n">definition_of_home</span><span class="p">,</span>
+        <span class="n">enforce_location</span><span class="o">=</span><span class="n">car</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
+        <span class="n">hour_threshold</span><span class="o">=</span><span class="n">hour_threshold</span><span class="p">,</span>
+        <span class="n">min_travel_distance</span><span class="o">=</span><span class="n">min_travel_distance</span>
+    <span class="p">)</span>
+    <span class="n">trip_routes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;ids&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">car_routes</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">trip_routes</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">c_trips</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.95</span><span class="p">:</span>
+        <span class="n">unused_trips</span><span class="p">,</span> <span class="n">groups</span> <span class="o">=</span> <span class="n">get_consective_groups</span><span class="p">(</span><span class="n">trips_time</span><span class="p">,</span> <span class="n">car_routes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unused_trips</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="n">unused_trips</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">unused_trips</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start_time</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">days</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">allow_skip_last</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">car_routes</span><span class="p">:</span>
+                <span class="n">allow_skip_last</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="kc">True</span>
+                    <span class="k">if</span> <span class="n">unused_trips</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span> <span class="o">!=</span> <span class="n">car_routes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;end_time&quot;</span><span class="p">]</span>
+                    <span class="k">else</span> <span class="kc">False</span>
+                <span class="p">)</span>
+
+            <span class="n">unused_routed</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">route_format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">car</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">car</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">group_exceeded</span><span class="p">(</span>
+                    <span class="n">unused_trips</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">],</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span> <span class="ow">and</span> <span class="n">allow_skip_last</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">car_routes</span> <span class="o">+=</span> <span class="n">unused_routed</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">car_routes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">car_routes_frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">car_routes</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;start_time&quot;</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">car_routes_frame</span><span class="o">.</span><span class="n">start_time</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span>
+            <span class="o">-</span> <span class="n">car_routes_frame</span><span class="o">.</span><span class="n">end_time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="p">)</span>
+        <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span>
+        <span class="o">/</span> <span class="mi">3600</span>
+        <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="p">),</span> <span class="s2">&quot;Overlapping routes&quot;</span>
+
+    <span class="k">return</span> <span class="n">car_routes_frame</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;records&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="route_check"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.roundtripgenerator.route_check">[docs]</a><span class="k">def</span> <span class="nf">route_check</span><span class="p">(</span><span class="n">route</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience function to check if a list of trips qualifies to a roundtrip.</span>
+<span class="sd">    Checks that the distance of the trip is above .5 km and the duration is less than 16.9 hours.</span>
+<span class="sd">    Criteria are hardcoded since the function is only called with roundtrips that are aggregated based on</span>
+<span class="sd">    trips that could not be aggregated with trip_extractor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    route   :   list of frame objects that make up the</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool    :   roundtrip qualified</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">distance</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">route</span><span class="p">])</span>
+    <span class="n">route_duration</span> <span class="o">=</span> <span class="p">(</span><span class="n">route</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">route</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3600</span>
+    <span class="n">km_over_duration</span> <span class="o">=</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">route_duration</span>
+    <span class="k">if</span> <span class="n">distance</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="ow">and</span> <span class="n">route_duration</span> <span class="o">&lt;</span> <span class="mf">16.9</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="group_exceeded"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.roundtripgenerator.group_exceeded">[docs]</a><span class="k">def</span> <span class="nf">group_exceeded</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">skip_last</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function for collecting un-aggregated trips. The trip_extractor returns the aggregated trips, from the original</span>
+<span class="sd">    frame we can extract the trips logs that are not used in a qualified roundtrip. The logs that have adjacent</span>
+<span class="sd">    logs will be sought to be grouped and added together in order to attribute these logs in the roundtrip frame.</span>
+<span class="sd">    Otherwise, we end up having less trips in the dataset than what has actually be driven.</span>
+<span class="sd">    Calls the route_check to check the coherence of the collection of trips.</span>
+
+<span class="sd">    Iterates over the group, and adds the trip to a route if the log is started less than .75 hour from the last log</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    group   :   dataframe, the collected trips that are adjacent</span>
+<span class="sd">    skip_last   :   bool, if the group is part of the last pulled trips on the major trip frame,</span>
+<span class="sd">                    we skip adding as a route to allow the next aggregation job to properly aggregate these trips</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of routes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">routes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">last_time</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span>
+        <span class="n">route</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">itertuples</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">start_time</span> <span class="o">-</span> <span class="n">last_time</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3600</span> <span class="o">&gt;</span> <span class="mf">0.75</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">route_check</span><span class="p">(</span><span class="n">route</span><span class="p">):</span>
+                <span class="n">routes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">route</span><span class="p">)</span>
+            <span class="n">route</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">route</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">last_time</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">end_time</span>
+
+    <span class="k">if</span> <span class="n">skip_last</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">route_check</span><span class="p">(</span><span class="n">route</span><span class="p">):</span>
+        <span class="n">routes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">route</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">routes</span></div>
+
+
+<div class="viewcode-block" id="inb"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.roundtripgenerator.inb">[docs]</a><span class="k">def</span> <span class="nf">inb</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks that there are no overlapping timestamps. Sometimes the APIs return invalid data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    row :   dataframe row</span>
+<span class="sd">    ts  :   times of the trips in route</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    False if everything is ok, else ids for overlapping</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ovs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">k</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;end_time&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ovs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ovs</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="get_consective_groups"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.roundtripgenerator.get_consective_groups">[docs]</a><span class="k">def</span> <span class="nf">get_consective_groups</span><span class="p">(</span><span class="n">car_trips</span><span class="p">,</span> <span class="n">routes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the untripped trips from the car trips dataframe. The trip_extractor returns the aggregated trips,</span>
+<span class="sd">    from the original frame we can extract the trips logs that are not used in a qualified roundtrip.</span>
+<span class="sd">    The logs that have adjacent logs will be sought to be grouped and added together in order to attribute these logs</span>
+<span class="sd">    in the roundtrip frame. Otherwise, we end up having less trips in the dataset than what has actually be driven.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    car_trips   :   dataframe, the trips</span>
+<span class="sd">    routes  :   routes, the aggregated routes</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    not_in  :   dataframe, the trips that are not used in a route</span>
+<span class="sd">    groups  :   list, list of index groups that are adjacent and unused</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="p">[(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;end_time&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">routes</span><span class="p">]</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">routes</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">b</span><span class="p">[</span><span class="s2">&quot;ids&quot;</span><span class="p">]]</span>
+    <span class="n">not_in</span> <span class="o">=</span> <span class="n">car_trips</span><span class="p">[</span><span class="o">~</span><span class="n">car_trips</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">ids</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">not_in</span><span class="p">[</span><span class="s2">&quot;overlap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">not_in</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">inb</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">times</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">not_in</span> <span class="o">=</span> <span class="n">not_in</span><span class="p">[</span><span class="n">not_in</span><span class="o">.</span><span class="n">overlap</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">not_in</span><span class="p">[</span><span class="s2">&quot;t_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">not_in</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">not_in</span><span class="o">.</span><span class="n">t_id</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tr</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">not_in</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(),</span> <span class="n">diff</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">b</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">Index</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">group</span><span class="p">:</span>
+        <span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">not_in</span><span class="p">,</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">groups</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="route_format"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.roundtripgenerator.route_format">[docs]</a><span class="k">def</span> <span class="nf">route_format</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="n">car_id</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience function to convert to unified route format before saving to database</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    route   :   list of trips that makes up the route</span>
+<span class="sd">    car_id  :   int, id of the car</span>
+<span class="sd">    location    :   int, id of the location that should be enforced</span>
+<span class="sd">    distance    :   int, the km distance of trip</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dictionary of the trip</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;start_time&quot;</span><span class="p">:</span> <span class="n">route</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span>
+        <span class="s2">&quot;end_time&quot;</span><span class="p">:</span> <span class="n">route</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span><span class="p">,</span>
+        <span class="s2">&quot;start_latitude&quot;</span><span class="p">:</span> <span class="n">route</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start_latitude</span><span class="p">,</span>
+        <span class="s2">&quot;start_longitude&quot;</span><span class="p">:</span> <span class="n">route</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start_longitude</span><span class="p">,</span>
+        <span class="s2">&quot;end_latitude&quot;</span><span class="p">:</span> <span class="n">route</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end_latitude</span><span class="p">,</span>
+        <span class="s2">&quot;end_longitude&quot;</span><span class="p">:</span> <span class="n">route</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end_longitude</span><span class="p">,</span>
+        <span class="s2">&quot;car_id&quot;</span><span class="p">:</span> <span class="n">car_id</span><span class="p">,</span>
+        <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">distance</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">route</span><span class="p">])</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span> <span class="k">else</span> <span class="n">distance</span><span class="p">,</span>
+        <span class="s2">&quot;gps_points&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">start_latitude</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">start_longitude</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">end_latitude</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">end_longitude</span><span class="p">),</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">route</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;ids&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">route</span><span class="p">],</span>
+        <span class="s2">&quot;start_location_id&quot;</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span>
+    <span class="p">}</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

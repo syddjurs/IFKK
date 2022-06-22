@@ -1,0 +1,29 @@
+data\_access package
+====================
+
+Submodules
+----------
+
+data\_access.db\_engine module
+------------------------------
+
+.. automodule:: data_access.db_engine
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_access.dbschema module
+----------------------------
+
+.. automodule:: data_access.dbschema
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: data_access
+   :members:
+   :undoc-members:
+   :show-inheritance:

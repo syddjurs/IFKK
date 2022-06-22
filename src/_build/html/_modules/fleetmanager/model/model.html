@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.model.model &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>fleetmanager.model.model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fleetmanager.model.model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">groupby</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">ColumnDataSource</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm.query</span> <span class="kn">import</span> <span class="n">Query</span>
+
+<span class="kn">from</span> <span class="nn">fleetmanager.data_access</span> <span class="kn">import</span> <span class="n">AllowedStarts</span><span class="p">,</span> <span class="n">RoundTrips</span><span class="p">,</span> <span class="n">engine_creator</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model</span> <span class="kn">import</span> <span class="n">vehicle</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.qampo</span> <span class="kn">import</span> <span class="n">qampo_simulation</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.qampo.classes</span> <span class="kn">import</span> <span class="n">AlgorithmType</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.qampo.classes</span> <span class="kn">import</span> <span class="n">Fleet</span> <span class="k">as</span> <span class="n">qampo_fleet</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.qampo.classes</span> <span class="kn">import</span> <span class="n">Trip</span> <span class="k">as</span> <span class="n">qampo_trip</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.tco_calculator</span> <span class="kn">import</span> <span class="n">TCOCalculator</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.vehicle</span> <span class="kn">import</span> <span class="n">Bike</span><span class="p">,</span> <span class="n">ElectricBike</span>
+
+
+<div class="viewcode-block" id="Trips"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Trips">[docs]</a><span class="k">class</span> <span class="nc">Trips</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Trips class for containing and manipulating trips of the simulation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset : name (string) of dummy dataset to load. If dataset is a pandas DataFrame it is loaded as trips.all_trips.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    all_trips : All trips in dataset (no filtering)</span>
+<span class="sd">    trips : Trips in dataset applying date and department filter</span>
+<span class="sd">    date_filter : boolean numpy array with same length as all_trips</span>
+<span class="sd">    department_filter : boolean numpy array with same length as all_trips</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dates</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">engine_creator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">([</span><span class="n">RoundTrips</span><span class="p">,</span> <span class="n">AllowedStarts</span><span class="o">.</span><span class="n">address</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">location</span><span class="p">:</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">RoundTrips</span><span class="o">.</span><span class="n">start_location_id</span> <span class="o">==</span> <span class="n">location</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dates</span><span class="p">:</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">RoundTrips</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&gt;</span> <span class="n">dates</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">RoundTrips</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;</span> <span class="n">dates</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span>
+                    <span class="n">query</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="n">AllowedStarts</span><span class="p">,</span> <span class="n">RoundTrips</span><span class="o">.</span><span class="n">start_location_id</span> <span class="o">==</span> <span class="n">AllowedStarts</span><span class="o">.</span><span class="n">id</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">statement</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;start_time&quot;</span><span class="p">])</span>
+                <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+                <span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not find any roundtrips&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_assignment</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance_range</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Trips.set_assignment"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Trips.set_assignment">[docs]</a>    <span class="k">def</span> <span class="nf">set_assignment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for setting up necessary columns on the trips in order</span>
+<span class="sd">        to book-keep the allocated vehicles on the trips.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="p">[</span><span class="s2">&quot;department&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="p">[</span><span class="s2">&quot;address&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="p">[</span><span class="s2">&quot;tripid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="p">[</span><span class="s2">&quot;current&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="p">[</span><span class="n">vehicle</span><span class="o">.</span><span class="n">Unassigned</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="p">[</span><span class="s2">&quot;current_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="p">[</span><span class="s2">&quot;simulation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="p">[</span><span class="n">vehicle</span><span class="o">.</span><span class="n">Unassigned</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="p">[</span><span class="s2">&quot;simulation_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trips.get_dummy_trips"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Trips.get_dummy_trips">[docs]</a>    <span class="k">def</span> <span class="nf">get_dummy_trips</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function to generate fake data for testing&quot;&quot;&quot;</span>
+        <span class="n">tripid</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="mf">1.9</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span>
+            <span class="n">year</span><span class="o">=</span><span class="mi">2021</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="mi">25</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;H&quot;</span><span class="p">)</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="p">[</span><span class="n">vehicle</span><span class="o">.</span><span class="n">Unassigned</span><span class="p">()]</span>
+        <span class="n">current_type</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">simulation</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="p">[</span><span class="n">vehicle</span><span class="o">.</span><span class="n">Unassigned</span><span class="p">()]</span>
+        <span class="n">simulation_type</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;car_id&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+                <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">distance</span><span class="p">,</span>
+                <span class="s2">&quot;start_time&quot;</span><span class="p">:</span> <span class="n">start</span><span class="p">,</span>
+                <span class="s2">&quot;end_time&quot;</span><span class="p">:</span> <span class="n">end</span><span class="p">,</span>
+                <span class="s2">&quot;start_latitude&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="s2">&quot;start_longitude&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="s2">&quot;end_latitude&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="s2">&quot;end_longitude&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="s2">&quot;start_location_id&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+                <span class="s2">&quot;current&quot;</span><span class="p">:</span> <span class="n">current</span><span class="p">,</span>
+                <span class="s2">&quot;current_type&quot;</span><span class="p">:</span> <span class="n">current_type</span><span class="p">,</span>
+                <span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="n">simulation</span><span class="p">,</span>
+                <span class="s2">&quot;simulation_type&quot;</span><span class="p">:</span> <span class="n">simulation_type</span><span class="p">,</span>
+                <span class="s2">&quot;department&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s2">&quot;dept1&quot;</span><span class="p">,</span> <span class="s2">&quot;dept2&quot;</span><span class="p">,</span> <span class="s2">&quot;dept3&quot;</span><span class="p">],</span> <span class="n">n</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;start_time&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;tripid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tripid</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Yield trips as a single pandas row.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">r</span>
+
+    <span class="k">def</span> <span class="nf">_timestamp_to_timeslot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TODO: checkout this for a speed up: https://stackoverflow.com/questions/56796775/is-there-an-equivalent-to-numpy-digitize-that-works-on-an-pandas-intervalindex</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        timestamp : timestamp to be mapped to a timeslot</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        i : timeslot index as int. If None is returned the timestamp is outside the timeslots.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">time_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&lt;=</span> <span class="n">timestamp</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&gt;</span> <span class="n">timestamp</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">time_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">time_indexes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Trips.set_timestamps"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Trips.set_timestamps">[docs]</a>    <span class="k">def</span> <span class="nf">set_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set timestamps of Trips and mapped all trips to the corresponding timeslots.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        timestamps : pandas PeriodIndex</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span> <span class="o">=</span> <span class="n">timestamps</span>
+        <span class="n">start_slot</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">end_slot</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">roundtrip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">()):</span>
+            <span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">start_slot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timestamp_to_timeslot</span><span class="p">(</span><span class="n">roundtrip</span><span class="o">.</span><span class="n">start_time</span><span class="p">))</span>
+            <span class="n">end_slot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timestamp_to_timeslot</span><span class="p">(</span><span class="n">roundtrip</span><span class="o">.</span><span class="n">end_time</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="s2">&quot;start_slot&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_slot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="s2">&quot;end_slot&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">end_slot</span></div>
+
+<div class="viewcode-block" id="Trips.set_filtered_trips"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Trips.set_filtered_trips">[docs]</a>    <span class="k">def</span> <span class="nf">set_filtered_trips</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies date and department filter and sets model.trips accordingly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># this function should create the filtered trips from filters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_trips</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance_range</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ConsequenceCalculator"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.ConsequenceCalculator">[docs]</a><span class="k">class</span> <span class="nc">ConsequenceCalculator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ConsequenceCalculator class for computing economical, transport and emission consequences of a simulation</span>
+
+
+<span class="sd">    Attributes</span>
+
+<span class="sd">    ----------</span>
+
+<span class="sd">    capacity_source : bokeh ColumnDataSource for containing capacity computed by the simulation</span>
+
+<span class="sd">    consequence_table : bokeh ColumnDataSource for containing consequences computed by the simulation</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeframe</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initiates the class with default timeframe on 30 days with default states on &quot;current&quot; and &quot;simulation&quot;.</span>
+<span class="sd">        The states will be used by the compute method to iterate over the elements in order to calculate the</span>
+<span class="sd">        consequences.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        timeframe   :   list of datetimes - [start time, end time] - defaults to [a month ago, now]</span>
+<span class="sd">        states      :   list of strings - default to [&quot;current&quot;, &quot;simulation&quot;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">states</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;current&quot;</span><span class="p">,</span> <span class="s2">&quot;simulation&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">timeframe</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">amonthback</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timeframe</span> <span class="o">=</span> <span class="p">[</span><span class="n">amonthback</span><span class="p">,</span> <span class="n">now</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_keys</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;CO2-udledning [kg]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Antal ture uden køretøj&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Udbetalte kørepenge [kr]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Årlig gns. omkostning [kr/år]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;POGI årlig brændstofforbrug [kr/år]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;POGI CO2-ækvivalent udledning [CO2e]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;POGI samfundsøkonomiske omkostninger [kr/år]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Samlet omkostning [kr/år]&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="n">states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_keys</span><span class="p">)</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">consequence_table</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">()</span>
+
+        <span class="c1"># capacity</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_capacity&quot;</span><span class="p">,</span>
+                <span class="p">{</span><span class="s2">&quot;unassigned_trips&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;trip_capacity&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]},</span>
+            <span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">_allowance&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">capacity_source</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_consequence_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_capacity_source</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ConsequenceCalculator.update_consequence_table"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.ConsequenceCalculator.update_consequence_table">[docs]</a>    <span class="k">def</span> <span class="nf">update_consequence_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the consequence table&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consequence_table</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;keys&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_keys</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">consequence_table</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">_values&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span>
+            <span class="p">)[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ConsequenceCalculator.update_capacity_source"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.ConsequenceCalculator.update_capacity_source">[docs]</a>    <span class="k">def</span> <span class="nf">update_capacity_source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;timeframe&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeframe</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="n">c_name</span> <span class="o">=</span> <span class="n">state</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">d</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">c_name</span><span class="si">}</span><span class="s2">_unassigned_trips&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_capacity&quot;</span><span class="p">)[</span>
+                <span class="s2">&quot;unassigned_trips&quot;</span>
+            <span class="p">]</span>
+            <span class="n">d</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">c_name</span><span class="si">}</span><span class="s2">_trip_capacity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_capacity&quot;</span><span class="p">)[</span>
+                <span class="s2">&quot;trip_capacity&quot;</span>
+            <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capacity_source</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="ConsequenceCalculator.compute"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.ConsequenceCalculator.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">drivingallowance</span><span class="p">,</span> <span class="n">tco_period</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The compute function that calculate the consequences;</span>
+<span class="sd">        1) explicit CO2 emission,</span>
+<span class="sd">            Calculated by taking the product of each vehicle&#39;s allocated km to a yearly approximation</span>
+<span class="sd">            and the vehicle&#39;s explict noted gram CO2-emission pr. kilometer. Since this is only relevant</span>
+<span class="sd">            for fossile vehicles, we don&#39;t report this number because it would always show the electrical vehicles</span>
+<span class="sd">            to have 0 emission. Hence, we refer to 6) yearly CO2-e.</span>
+<span class="sd">        2) number of trips without vehicle,</span>
+<span class="sd">            Sum of all trips that have no vehicle assigned. Displayed in the simulation.trips.[inventory_type_column]</span>
+<span class="sd">            with a value of -1.</span>
+<span class="sd">        3) pay out in driving allowance,</span>
+<span class="sd">            In order to punish the unallocated trips driving allowance is simulated. All unallocated trips are summed</span>
+<span class="sd">            to a yearly approximation. The driving allowance is paid in rates; 3.44 kr. pr. km. under 840 kilometer</span>
+<span class="sd">            threshold and 1.90 kr. pr. km. above 840 kilometer threshold.</span>
+<span class="sd">        4) yearly average expense on hardware</span>
+<span class="sd">            Is calculated by taking the sum of the reported &quot;omkostning_aar&quot; for all vehicles</span>
+<span class="sd">        5) yearly expense on fuel</span>
+<span class="sd">            Is calculated through the tco_calcluate.TCOCalculator, which is based on the tool</span>
+<span class="sd">            &quot;tco-vaerktoej-motorkoeretoejer&quot; from POGI. Check the details on the class.</span>
+<span class="sd">        6) yearly CO2-e expense (implicit CO2 emission)</span>
+<span class="sd">            Is calculated through the tco_calcluate.TCOCalculator, which is based on the tool</span>
+<span class="sd">            &quot;tco-vaerktoej-motorkoeretoejer&quot; from POGI. Check the details on the class.</span>
+<span class="sd">        7) total yearly expense</span>
+<span class="sd">            Is calculated by taking the sum of driving allowance, yearly average expense on hardware and yearly expense</span>
+<span class="sd">            on fuel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        simulation  :   model.Simulation class - the simulation class with it&#39;s associated trips. The inventory - and distance columns of the</span>
+<span class="sd">                            simulation.trips frame holds the necessary data to calculate the aforementioned values.</span>
+<span class="sd">        drivingallowance    :   model.DrivingAllowance - a DrivingAllowance class or None.</span>
+<span class="sd">        tco_period  :   list of two ints ([0, 1]) - the selected tco_period which is passed to the TCO_Calculator object.</span>
+<span class="sd">                            First int to define projection periode, second int to define the evaluation period.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">drivingallowance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">drivingallowance</span> <span class="o">=</span> <span class="n">DrivingAllowance</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeframe</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">simulation</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+            <span class="n">simulation</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+        <span class="p">]</span>
+        <span class="n">days</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeframe</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeframe</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3600</span> <span class="o">/</span> <span class="mi">24</span>
+        <span class="k">if</span> <span class="n">days</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># we have to assume that there&#39;s at least one day worth of data</span>
+            <span class="n">days</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">calculate_this</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="p">{</span><span class="n">val</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_keys</span><span class="p">}</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+        <span class="p">}</span>
+
+        <span class="n">vehicles_used</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">roundtrip</span> <span class="ow">in</span> <span class="n">simulation</span><span class="o">.</span><span class="n">trips</span><span class="p">:</span>
+            <span class="c1"># co2 udledning</span>
+            <span class="c1"># record the vehicle and how much it spent</span>
+            <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">roundtrip</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">roundtrip</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vehicles_used</span><span class="p">[</span><span class="n">state</span><span class="p">]:</span>
+                    <span class="n">co2_pr_km</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="mi">0</span>
+                        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">roundtrip</span><span class="p">[</span><span class="n">state</span><span class="p">]</span><span class="o">.</span><span class="n">co2_pr_km</span><span class="p">)</span>
+                        <span class="k">else</span> <span class="n">roundtrip</span><span class="p">[</span><span class="n">state</span><span class="p">]</span><span class="o">.</span><span class="n">co2_pr_km</span>
+                    <span class="p">)</span>
+                    <span class="n">vehicles_used</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="nb">getattr</span><span class="p">(</span><span class="n">roundtrip</span><span class="p">,</span> <span class="n">state</span><span class="p">)]</span> <span class="o">=</span> <span class="n">roundtrip</span><span class="o">.</span><span class="n">distance</span>
+                    <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;CO2-udledning [kg]&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span>
+                        <span class="n">co2_pr_km</span> <span class="o">*</span> <span class="n">roundtrip</span><span class="o">.</span><span class="n">distance</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">co2_pr_km</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="mi">0</span>
+                        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">roundtrip</span><span class="p">[</span><span class="n">state</span><span class="p">]</span><span class="o">.</span><span class="n">co2_pr_km</span><span class="p">)</span>
+                        <span class="k">else</span> <span class="n">roundtrip</span><span class="p">[</span><span class="n">state</span><span class="p">]</span><span class="o">.</span><span class="n">co2_pr_km</span>
+                    <span class="p">)</span>
+                    <span class="n">vehicles_used</span><span class="p">[</span><span class="n">state</span><span class="p">][</span>
+                        <span class="nb">getattr</span><span class="p">(</span><span class="n">roundtrip</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+                    <span class="p">]</span> <span class="o">+=</span> <span class="n">roundtrip</span><span class="o">.</span><span class="n">distance</span>
+                    <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;CO2-udledning [kg]&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span>
+                        <span class="n">co2_pr_km</span> <span class="o">*</span> <span class="n">roundtrip</span><span class="o">.</span><span class="n">distance</span>
+                    <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="n">c_name</span> <span class="o">=</span> <span class="n">state</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+
+            <span class="c1"># antal ture uden køretøj</span>
+            <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;Antal ture uden køretøj&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">simulation</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+            <span class="c1"># straf ukørte ture</span>
+            <span class="n">undriven</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span>
+                <span class="n">simulation</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="p">]</span>
+            <span class="n">undriven_km</span> <span class="o">=</span> <span class="n">undriven</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">undriven_yearly</span> <span class="o">=</span> <span class="n">undriven_km</span> <span class="o">/</span> <span class="n">days</span> <span class="o">*</span> <span class="mi">365</span>
+
+            <span class="c1"># udbetalte kørepenge</span>
+            <span class="n">allowance</span> <span class="o">=</span> <span class="n">drivingallowance</span><span class="o">.</span><span class="n">calculate_allowance</span><span class="p">(</span><span class="n">undriven_yearly</span><span class="p">)</span>
+
+            <span class="c1"># udledning</span>
+            <span class="n">undriven_tco</span> <span class="o">=</span> <span class="n">TCOCalculator</span><span class="p">(</span>
+                <span class="n">koerselsforbrug</span><span class="o">=</span><span class="n">undriven_yearly</span><span class="p">,</span>
+                <span class="n">drivmiddel</span><span class="o">=</span><span class="s2">&quot;benzin&quot;</span><span class="p">,</span>
+                <span class="n">bil_type</span><span class="o">=</span><span class="s2">&quot;benzin&quot;</span><span class="p">,</span>
+                <span class="n">antal</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">evalueringsperiode</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">fremskrivnings_aar</span><span class="o">=</span><span class="n">tco_period</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">braendstofforbrug</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">co2e_undriven</span><span class="p">,</span> <span class="n">samfund_undriven</span> <span class="o">=</span> <span class="n">undriven_tco</span><span class="o">.</span><span class="n">ekstern_miljoevirkning</span><span class="p">(</span>
+                <span class="n">sum_it</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span>
+                <span class="s2">&quot;POGI CO2-ækvivalent udledning [CO2e]&quot;</span>
+            <span class="p">]</span> <span class="o">+=</span> <span class="n">co2e_undriven</span>
+            <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span>
+                <span class="s2">&quot;POGI samfundsøkonomiske omkostninger [kr/år]&quot;</span>
+            <span class="p">]</span> <span class="o">+=</span> <span class="n">samfund_undriven</span>
+
+            <span class="c1"># årlig gns. omkostning</span>
+            <span class="n">yearly_cost</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">omkostning_aar</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">simulation</span><span class="o">.</span><span class="n">fleet_manager</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_fleet&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;Årlig gns. omkostning [kr/år]&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">yearly_cost</span>
+
+            <span class="c1"># pogi årlig brændstofforbrug</span>
+            <span class="c1"># pogi co2-ækvivalent udledning</span>
+            <span class="c1"># pogi samfundsøkonomiske omkostninger</span>
+            <span class="k">for</span> <span class="n">vehicle</span><span class="p">,</span> <span class="n">distance</span> <span class="ow">in</span> <span class="n">vehicles_used</span><span class="p">[</span><span class="n">state</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">distance_yearly</span> <span class="o">=</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">days</span> <span class="o">*</span> <span class="mi">365</span>
+                <span class="n">vehicle_tco</span> <span class="o">=</span> <span class="n">TCOCalculator</span><span class="p">(</span>
+                    <span class="n">koerselsforbrug</span><span class="o">=</span><span class="n">distance_yearly</span><span class="p">,</span>
+                    <span class="n">drivmiddel</span><span class="o">=</span><span class="n">vehicle</span><span class="o">.</span><span class="n">fuel</span><span class="p">,</span>
+                    <span class="n">bil_type</span><span class="o">=</span><span class="n">vehicle</span><span class="o">.</span><span class="n">fuel</span><span class="p">,</span>
+                    <span class="n">antal</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">evalueringsperiode</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># tco_period[1],</span>
+                    <span class="n">fremskrivnings_aar</span><span class="o">=</span><span class="n">tco_period</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">braendstofforbrug</span><span class="o">=</span><span class="n">vehicle</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">,</span>
+                    <span class="n">elforbrug</span><span class="o">=</span><span class="n">vehicle</span><span class="o">.</span><span class="n">wltp_el</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">co2e</span><span class="p">,</span> <span class="n">samfund</span> <span class="o">=</span> <span class="n">vehicle_tco</span><span class="o">.</span><span class="n">ekstern_miljoevirkning</span><span class="p">(</span><span class="n">sum_it</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">driftsomkostning</span> <span class="o">=</span> <span class="n">vehicle_tco</span><span class="o">.</span><span class="n">driftsomkostning</span>
+                <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span>
+                    <span class="s2">&quot;POGI årlig brændstofforbrug [kr/år]&quot;</span>
+                <span class="p">]</span> <span class="o">+=</span> <span class="n">driftsomkostning</span>
+                <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span>
+                    <span class="s2">&quot;POGI samfundsøkonomiske omkostninger [kr/år]&quot;</span>
+                <span class="p">]</span> <span class="o">+=</span> <span class="n">samfund</span>
+                <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;POGI CO2-ækvivalent udledning [CO2e]&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">co2e</span>
+
+            <span class="c1"># compute capacity</span>
+            <span class="c1"># for each day, compute number of trips</span>
+            <span class="n">sub</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span>
+                <span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_type&quot;</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">]</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">sub</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">c_name</span><span class="si">}</span><span class="s2">_unassigned&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">resampled</span> <span class="o">=</span> <span class="n">sub</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;start_time&quot;</span><span class="p">)[</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">c_name</span><span class="si">}</span><span class="s2">_unassigned&quot;</span><span class="p">]</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timeframe</span> <span class="o">=</span> <span class="n">resampled</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeframe</span><span class="p">)</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_capacity&quot;</span><span class="p">)[</span><span class="s2">&quot;unassigned_trips&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">resampled</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">c_name</span><span class="si">}</span><span class="s2">_unassigned&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_capacity&quot;</span><span class="p">)[</span><span class="s2">&quot;trip_capacity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;Samlet omkostning [kr/år]&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">allowance</span>
+                <span class="o">+</span> <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;Årlig gns. omkostning [kr/år]&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;POGI årlig brændstofforbrug [kr/år]&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">)[</span><span class="n">c_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">calculate_this</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_keys</span>
+            <span class="p">]</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">)[</span><span class="n">c_name</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">allowance</span>
+
+        <span class="c1"># update sources for frontend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_consequence_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_capacity_source</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConsequenceCalculator.get_html_information"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.ConsequenceCalculator.get_html_information">[docs]</a>    <span class="k">def</span> <span class="nf">get_html_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Function for producing html used on infromation panel&quot;&quot;&quot;</span>
+
+        <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;h2&gt;Konsekvensberegning&lt;/h2&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;table &gt;&lt;tr&gt;&lt;th&gt;Konsekvensmål&lt;/th&gt;&lt;th&gt;Nuværende værdi&lt;/th&gt;&lt;th&gt;Simuleret værdi&lt;/th&gt;&lt;/tr&gt;&quot;</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_vals</span><span class="p">):</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;tr&gt;&lt;td&gt;</span><span class="si">{</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.02f</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">.02f</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;/tr&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/table&gt;&quot;</span>
+        <span class="k">return</span> <span class="n">html</span></div></div>
+
+
+<div class="viewcode-block" id="FleetManager"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.FleetManager">[docs]</a><span class="k">class</span> <span class="nc">FleetManager</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;FleetManager class keeps track of the fleets and the booking.</span>
+
+<span class="sd">    parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    options: options of type model.OptionsFile</span>
+
+<span class="sd">    attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vehicle_factory : types of vehicles in fleet of type vehicle.VehicleFactory</span>
+<span class="sd">    simulation_fleet : simulation fleet of type vehicle.FleetInventory</span>
+<span class="sd">    current_fleet : current fleet of type vehicle.FleetInventory</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># set the available vehicles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_factory</span> <span class="o">=</span> <span class="n">vehicle</span><span class="o">.</span><span class="n">VehicleFactory</span><span class="p">()</span>
+
+        <span class="c1"># initialise empty fleets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span> <span class="o">=</span> <span class="n">vehicle</span><span class="o">.</span><span class="n">FleetInventory</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;simulation&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span> <span class="o">=</span> <span class="n">vehicle</span><span class="o">.</span><span class="n">FleetInventory</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;current&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="FleetManager.set_timestamps"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.FleetManager.set_timestamps">[docs]</a>    <span class="k">def</span> <span class="nf">set_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set timestamps of fleets&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="o">.</span><span class="n">set_timestamps</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">set_timestamps</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FleetManager.set_current_fleet"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.FleetManager.set_current_fleet">[docs]</a>    <span class="k">def</span> <span class="nf">set_current_fleet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bikes</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ebikes</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ecars</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cars</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set current fleet composition&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">bikes</span> <span class="o">=</span> <span class="n">bikes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">ebikes</span> <span class="o">=</span> <span class="n">ebikes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">ecars</span> <span class="o">=</span> <span class="n">ecars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">cars</span> <span class="o">=</span> <span class="n">cars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">initialise_fleet</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FleetManager.set_simulation_fleet"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.FleetManager.set_simulation_fleet">[docs]</a>    <span class="k">def</span> <span class="nf">set_simulation_fleet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bikes</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ebikes</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ecars</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cars</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set simulation fleet composition&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="o">.</span><span class="n">bikes</span> <span class="o">=</span> <span class="n">bikes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="o">.</span><span class="n">ebikes</span> <span class="o">=</span> <span class="n">ebikes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="o">.</span><span class="n">ecars</span> <span class="o">=</span> <span class="n">ecars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="o">.</span><span class="n">cars</span> <span class="o">=</span> <span class="n">cars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="o">.</span><span class="n">initialise_fleet</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FleetManager.get_html_information"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.FleetManager.get_html_information">[docs]</a>    <span class="k">def</span> <span class="nf">get_html_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Function for producing html used on infromation panel&quot;&quot;&quot;</span>
+
+        <span class="n">cars</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle_</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="p">,</span> <span class="n">vehicle_</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">vehicle_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">vehicle_types</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">vehicle_</span><span class="p">]</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">}</span>
+        <span class="n">ecars</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle_</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="p">,</span> <span class="n">vehicle_</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">vehicle_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">vehicle_types</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">vehicle_</span><span class="p">]</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="p">}</span>
+        <span class="n">ebikes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle_</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="p">,</span> <span class="n">vehicle_</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">vehicle_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">vehicle_types</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">vehicle_</span><span class="p">]</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="p">}</span>
+        <span class="n">bikes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle_</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="p">,</span> <span class="n">vehicle_</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">vehicle_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">vehicle_types</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">vehicle_</span><span class="p">]</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="p">}</span>
+        <span class="n">sim_cars</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle_</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="p">,</span> <span class="n">vehicle_</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">vehicle_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="o">.</span><span class="n">vehicle_types</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">vehicle_</span><span class="p">]</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">}</span>
+        <span class="n">sim_ecars</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle_</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="p">,</span> <span class="n">vehicle_</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">vehicle_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="o">.</span><span class="n">vehicle_types</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">vehicle_</span><span class="p">]</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="p">}</span>
+        <span class="n">sim_ebikes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle_</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="p">,</span> <span class="n">vehicle_</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">vehicle_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="o">.</span><span class="n">vehicle_types</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">vehicle_</span><span class="p">]</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="p">}</span>
+        <span class="n">sim_bikes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle_</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="p">,</span> <span class="n">vehicle_</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">vehicle_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="o">.</span><span class="n">vehicle_types</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">vehicle_</span><span class="p">]</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="p">}</span>
+
+        <span class="n">tmapper</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Car&quot;</span><span class="p">:</span> <span class="s2">&quot;Fossilbil&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ElectricCar&quot;</span><span class="p">:</span> <span class="s2">&quot;Elbil&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Bike&quot;</span><span class="p">:</span> <span class="s2">&quot;Cykel&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ElectricBike&quot;</span><span class="p">:</span> <span class="s2">&quot;Elcykel&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;h2&gt;Flådeinformation&lt;/h2&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;dl&gt;&lt;dt&gt;Flådesammensætning, nuværende&lt;/dt&gt;&lt;dd&gt;Fossilbiler: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">cars</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">&lt;/dd&gt;&lt;dd&gt;Elbiler: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">ecars</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">&lt;/dd&gt;&lt;dd&gt;Cykler: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">bikes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">&lt;/dd&gt;&lt;dd&gt;Elcykler: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">ebikes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">&lt;/dd&gt;&lt;/dl&gt;&quot;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">vtype</span><span class="p">,</span> <span class="n">vehicles</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;Car&quot;</span><span class="p">,</span> <span class="n">cars</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;ElectricCar&quot;</span><span class="p">,</span> <span class="n">ecars</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Bike&quot;</span><span class="p">,</span> <span class="n">bikes</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;ElectricBike&quot;</span><span class="p">,</span> <span class="n">ebikes</span><span class="p">),</span>
+        <span class="p">):</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;dl&gt;&lt;dt&gt;Køretøjstype: </span><span class="si">{</span><span class="n">tmapper</span><span class="p">[</span><span class="n">vtype</span><span class="p">]</span><span class="si">}</span><span class="s2">:&lt;/dt&gt;&quot;</span>
+
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">vehicles</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;dd&gt;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&lt;/dd&gt;&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;dl/&gt;&quot;</span>
+
+        <span class="n">html</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;br&gt;&lt;br&gt;&lt;dl&gt;&lt;dt&gt;Flådesammensætning, simuleret&lt;/dt&gt;&lt;dd&gt;Fossilbiler: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">sim_cars</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">&lt;/dd&gt;&lt;dd&gt;Elbiler: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">sim_ecars</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">&lt;/dd&gt;&lt;dd&gt;Cykler: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">sim_bikes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">&lt;/dd&gt;&lt;dd&gt;Elcykler: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">sim_ebikes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">&lt;/dd&gt;&lt;/dl&gt;&lt;br&gt;&quot;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">vtype</span><span class="p">,</span> <span class="n">vehicles</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;Car&quot;</span><span class="p">,</span> <span class="n">sim_cars</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;ElectricCar&quot;</span><span class="p">,</span> <span class="n">sim_ecars</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Bike&quot;</span><span class="p">,</span> <span class="n">sim_bikes</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;ElectricBike&quot;</span><span class="p">,</span> <span class="n">sim_ebikes</span><span class="p">),</span>
+        <span class="p">):</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;dl&gt;&lt;dt&gt;Køretøjstype: </span><span class="si">{</span><span class="n">tmapper</span><span class="p">[</span><span class="n">vtype</span><span class="p">]</span><span class="si">}</span><span class="s2">:&lt;/dt&gt;&quot;</span>
+
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">vehicles</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;dd&gt;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&lt;/dd&gt;&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;dl/&gt;&quot;</span>
+        <span class="k">return</span> <span class="n">html</span></div></div>
+
+
+<div class="viewcode-block" id="Simulation"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Simulation">[docs]</a><span class="k">class</span> <span class="nc">Simulation</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The major Simulation class for performing simulation on trips.</span>
+
+<span class="sd">    parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trips : trips for simulation of type modelTrips</span>
+<span class="sd">    fleet_manager : fleet manager for handling fleets of type model.FleetManager</span>
+<span class="sd">    progress_callback : None</span>
+<span class="sd">    tabu    :   bool - to let the simulation know if it&#39;s a tabu simulation. If so, only the simulation setup will be</span>
+<span class="sd">                simulated, and not the current.</span>
+<span class="sd">    intelligent_simulation  :   bool - should intelligent simulation be used, i.e. Qampo algorithm to allocate trips.</span>
+<span class="sd">    timestamp_set   :   bool -  whether the simulation trips already have generated timeslots</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">trips</span><span class="p">,</span>
+        <span class="n">fleet_manager</span><span class="p">,</span>
+        <span class="n">progress_callback</span><span class="p">,</span>
+        <span class="n">tabu</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">intelligent_simulation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">timestamps_set</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span> <span class="o">=</span> <span class="n">trips</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fleet_manager</span> <span class="o">=</span> <span class="n">fleet_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_callback</span> <span class="o">=</span> <span class="n">progress_callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabu</span> <span class="o">=</span> <span class="n">tabu</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">useQampo</span> <span class="o">=</span> <span class="n">intelligent_simulation</span>
+
+        <span class="k">if</span> <span class="n">timestamps_set</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_resolution</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">start_day</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+            <span class="n">end_day</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start_day</span><span class="p">,</span> <span class="n">end_day</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time_resolution</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">set_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="p">)</span>
+
+        <span class="c1"># dummy vehicle for unassigned trips</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unassigned_vehicle</span> <span class="o">=</span> <span class="n">vehicle</span><span class="o">.</span><span class="n">Unassigned</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Unassigned&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Simulation.run"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Simulation.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs simulation of current and simulation fleet&quot;&quot;&quot;</span>
+        <span class="c1"># push timetable to vehicle fleet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fleet_manager</span><span class="o">.</span><span class="n">set_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">useQampo</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabu</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_single_qampo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fleet_manager</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_single_qampo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fleet_manager</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_single</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fleet_manager</span><span class="o">.</span><span class="n">current_fleet</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabu</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_single</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fleet_manager</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_single</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fleet_manager</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_single</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fleet_manager</span><span class="o">.</span><span class="n">current_fleet</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulation.run_single_qampo"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Simulation.run_single_qampo">[docs]</a>    <span class="k">def</span> <span class="nf">run_single_qampo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fleet_inventory</span><span class="p">,</span> <span class="n">algorithm_type</span><span class="o">=</span><span class="s2">&quot;exact_mip&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convenience function for running simualtion on a single fleet through qampo api.</span>
+
+<span class="sd">        parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fleet_inventory : fleet inventory to run simualtion on. Type model.FleetInventory.</span>
+<span class="sd">        algorithm_type : the algorithm the qampo api uses. must be either &#39;exact_mip&#39;, &#39;greedy&#39; or &#39;exact_cp&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># setting up api parameters</span>
+        <span class="c1"># Helper function: Changes start day to be 00:00 of end day if more time is spend driving in end day</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+                <span class="s2">&quot;Some initial trips were falsely filtered after re-indexing.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">bike_fleet</span> <span class="o">=</span> <span class="n">fleet_inventory</span><span class="o">.</span><span class="n">copy_bike_fleet</span><span class="p">(</span><span class="s2">&quot;bike_fleet&quot;</span><span class="p">)</span>
+        <span class="n">bike_fleet</span><span class="o">.</span><span class="n">set_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_single</span><span class="p">(</span><span class="n">bike_fleet</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">set_start_times</span><span class="p">(</span><span class="n">trip</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">trip</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span> <span class="o">!=</span> <span class="n">trip</span><span class="p">[</span><span class="s2">&quot;end_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">normalize</span><span class="p">():</span>
+                <span class="n">time_in_start_day</span> <span class="o">=</span> <span class="n">trip</span><span class="p">[</span><span class="s2">&quot;end_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span> <span class="o">-</span> <span class="n">trip</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">]</span>
+                <span class="n">time_in_end_day</span> <span class="o">=</span> <span class="n">trip</span><span class="p">[</span><span class="s2">&quot;end_time&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">trip</span><span class="p">[</span><span class="s2">&quot;end_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">time_in_start_day</span> <span class="o">&lt;</span> <span class="n">time_in_end_day</span><span class="p">:</span>
+                    <span class="n">trip</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trip</span><span class="p">[</span><span class="s2">&quot;end_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">trip</span>
+
+        <span class="n">trips_day_fixed</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">trip</span><span class="p">:</span> <span class="n">set_start_times</span><span class="p">(</span><span class="n">trip</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">bike_fleet_type</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;records&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">trips_day_fixed</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">trips_day_fixed</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;start_time&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Splitting trips into distinct days as the api can only work on a single day at a time</span>
+
+        <span class="n">trips_pr_day</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span>
+            <span class="n">trips_day_fixed</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">trip</span><span class="p">:</span> <span class="n">trip</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="n">trips_pr_day</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">trips_single_day</span> <span class="ow">in</span> <span class="n">trips_pr_day</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_qampo_data</span><span class="p">(</span><span class="n">fleet_inventory</span><span class="p">,</span> <span class="n">trips_single_day</span><span class="p">)</span>
+            <span class="n">fleet</span> <span class="o">=</span> <span class="n">qampo_fleet</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;fleet&quot;</span><span class="p">])</span>
+            <span class="n">trips</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">T</span><span class="p">:</span> <span class="n">qampo_trip</span><span class="p">(</span><span class="o">**</span><span class="n">T</span><span class="p">),</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;trips&quot;</span><span class="p">]))</span>
+            <span class="n">simulation</span> <span class="o">=</span> <span class="n">qampo_simulation</span><span class="o">.</span><span class="n">optimize_single_day</span><span class="p">(</span>
+                <span class="n">fleet</span><span class="p">,</span> <span class="n">trips</span><span class="p">,</span> <span class="n">AlgorithmType</span><span class="o">.</span><span class="n">EXACT_MIP</span>
+            <span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span>
+
+        <span class="c1"># Booking vehicles in accordance to the result from qampo api</span>
+        <span class="n">trip_vehicle</span> <span class="o">=</span> <span class="p">[[]]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">)</span>
+        <span class="n">trip_vehicle_type</span> <span class="o">=</span> <span class="p">[[]]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">assignment</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">assignments</span><span class="p">:</span>
+                <span class="nb">id</span> <span class="o">=</span> <span class="n">assignment</span><span class="o">.</span><span class="n">vehicle</span><span class="o">.</span><span class="n">id</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">vehicle_id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">,</span> <span class="n">fleet_inventory</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">assignment</span><span class="o">.</span><span class="n">route</span><span class="o">.</span><span class="n">trips</span><span class="p">:</span>
+                    <span class="n">trip</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tt</span><span class="p">:</span> <span class="n">tt</span><span class="p">[</span><span class="s2">&quot;tripid&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">t</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">))</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">book_trip</span><span class="p">(</span><span class="n">trip</span><span class="p">)</span>
+                    <span class="n">trip_vehicle</span><span class="p">[</span><span class="n">trip</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                    <span class="n">trip_vehicle_type</span><span class="p">[</span><span class="n">trip</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">vehicle_type_number</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trip_vehicle</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">trip_vehicle</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">trip_vehicle</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">bike_fleet</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">trip_vehicle_type</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">bike_fleet_type</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="n">fleet_inventory</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">trip_vehicle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="n">fleet_inventory</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trip_vehicle_type</span></div>
+
+<div class="viewcode-block" id="Simulation.generate_qampo_data"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Simulation.generate_qampo_data">[docs]</a>    <span class="k">def</span> <span class="nf">generate_qampo_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fleet_inventory</span><span class="p">,</span> <span class="n">trips</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convenience function for converting fleet inventory and trips data to json format</span>
+<span class="sd">        required by qampo api.</span>
+
+<span class="sd">        parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fleet_inventory : fleet inventory to run simualtion on. Type model.FleetInventory.</span>
+<span class="sd">        trips: trip data to run simulation on.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;fleet&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;vehicles&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="c1"># Needs to not be hard coded</span>
+                <span class="s2">&quot;employee_car&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;variable_cost_per_kilometer&quot;</span><span class="p">:</span> <span class="mf">20.0</span><span class="p">,</span>
+                    <span class="s2">&quot;co2_emission_gram_per_kilometer&quot;</span><span class="p">:</span> <span class="mf">400.0</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;emission_cost_per_ton_co2&quot;</span><span class="p">:</span> <span class="mf">5000.0</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;trips&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">fleet_inventory</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
+                <span class="c1"># skip the bikes as we handle those</span>
+                <span class="k">continue</span>
+            <span class="n">vehicle</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">vehicle_id</span><span class="p">),</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;range_in_kilometers&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">max_distance_per_day</span><span class="p">),</span>
+                <span class="s2">&quot;variable_cost_per_kilometer&quot;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">vcprkm</span><span class="p">,</span>
+                <span class="s2">&quot;maximum_driving_in_minutes&quot;</span><span class="p">:</span> <span class="mi">1440</span>
+                <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">sleep</span><span class="p">)</span>
+                <span class="k">else</span> <span class="p">(</span><span class="mi">24</span> <span class="o">-</span> <span class="n">v</span><span class="o">.</span><span class="n">sleep</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
+                <span class="s2">&quot;co2_emission_gram_per_kilometer&quot;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">qampo_gr</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;fleet&quot;</span><span class="p">][</span><span class="s2">&quot;vehicles&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vehicle</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trips</span><span class="p">:</span>
+            <span class="n">trip</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s2">&quot;tripid&quot;</span><span class="p">]),</span>
+                <span class="s2">&quot;start_time&quot;</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;end_time&quot;</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="s2">&quot;end_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;length_in_kilometers&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">],</span> <span class="mi">2</span><span class="p">)),</span>
+            <span class="p">}</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;trips&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trip</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="Simulation.run_single"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Simulation.run_single">[docs]</a>    <span class="k">def</span> <span class="nf">run_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fleet_inventory</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convenience function for running simualtion on a single fleet</span>
+
+<span class="sd">        Takes the fleet and iterates over the trips to see which, if any, vehicle is available for booking.</span>
+<span class="sd">        If the fleet_inventory name is current, the vehicles are booked according to its recorded trips.</span>
+<span class="sd">        This will overwrite any rules implied by the simulation, e.g. vehicle cannot be booked for a trip on the</span>
+<span class="sd">        same minute stamp as it ends a trips, sleep rules for electrical cars etc.</span>
+
+<span class="sd">        The vehicles should be sorted according to the desired priority (defaults to co2 emission). For every trip the</span>
+<span class="sd">        first available vehicle is booked for the trips.</span>
+
+<span class="sd">        parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fleet_inventory : fleet inventory to run simualtion on. Type model.FleetInventory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># loop over trips</span>
+        <span class="n">trip_vehicle</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">trip_vehicle_type</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">flagged</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">:</span>
+            <span class="n">booked_real</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">fleet_inventory</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;current&quot;</span><span class="p">:</span>
+                <span class="c1"># overwrites the simulated booking to reflect &quot;reality&quot;</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">car_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">fleet_inventory</span><span class="p">]):</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">fleet_inventory</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">car_id</span><span class="p">):</span>
+                            <span class="n">booked</span><span class="p">,</span> <span class="n">acc</span><span class="p">,</span> <span class="n">avail</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">bypass_book</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>  <span class="c1"># v.book_trip(t)</span>
+
+                            <span class="k">if</span> <span class="n">booked</span><span class="p">:</span>
+                                <span class="n">trip_vehicle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                                <span class="n">trip_vehicle_type</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">vehicle_type_number</span><span class="p">)</span>
+                                <span class="n">booked_real</span> <span class="o">=</span> <span class="kc">True</span>
+                                <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># the car that drove the trip in real life is not part of the selected &quot;current&quot; fleet.</span>
+                    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">car_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flagged</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;********** car id from trips not in </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">car_id</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="n">flagged</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">car_id</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">booked_real</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># loop over vehicles and check for availability</span>
+            <span class="n">booked</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">fleet_inventory</span><span class="p">:</span>
+                <span class="n">booked</span><span class="p">,</span> <span class="n">acc</span><span class="p">,</span> <span class="n">avail</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">book_trip</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">booked</span><span class="p">:</span>
+                    <span class="n">trip_vehicle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="n">trip_vehicle_type</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">vehicle_type_number</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">booked</span><span class="p">:</span>
+                <span class="n">trip_vehicle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unassigned_vehicle</span><span class="p">)</span>
+                <span class="n">trip_vehicle_type</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unassigned_vehicle</span><span class="o">.</span><span class="n">vehicle_type_number</span><span class="p">)</span>
+
+        <span class="c1"># add vehicles to trips</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="n">fleet_inventory</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">trip_vehicle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="n">fleet_inventory</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trip_vehicle_type</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DrivingAllowance"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.DrivingAllowance">[docs]</a><span class="k">class</span> <span class="nc">DrivingAllowance</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class for containing and manipulating driving allowance.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowance</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;low&quot;</span><span class="p">:</span> <span class="mf">3.44</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">:</span> <span class="mf">1.90</span><span class="p">}</span>
+        <span class="c1"># TODO: make a this editable in ui</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance_threshold</span> <span class="o">=</span> <span class="mi">840</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Driving allowance </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allowance</span><span class="si">}</span><span class="se">\n</span><span class="s2">  Dist: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">distance_threshold</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="DrivingAllowance.calculate_allowance"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.DrivingAllowance.calculate_allowance">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_allowance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yearly_distance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for calculating the driving allowance for unallocated trips. Defines a threshold of 840 km which is</span>
+<span class="sd">        eligible to get the high allowance fee, from which the fee drops to the low allowance. Especially useful in</span>
+<span class="sd">        tabu search in order not to favor unallocated trips because it is cheap.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        yearly_distance :   int - sum of kilometers without an allocated vehicle</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        driving allowance   :   int - sum of money paid out in driving allowance to attribute the unallocated trips</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">yearly_distance</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_threshold</span><span class="p">:</span>
+            <span class="n">allowance_to_pay</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">distance_threshold</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowance</span><span class="p">[</span><span class="s2">&quot;low&quot;</span><span class="p">],</span>
+                    <span class="p">(</span><span class="n">yearly_distance</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_threshold</span><span class="p">)</span>
+                    <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowance</span><span class="p">[</span><span class="s2">&quot;high&quot;</span><span class="p">],</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">allowance_to_pay</span> <span class="o">=</span> <span class="n">yearly_distance</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowance</span><span class="p">[</span><span class="s2">&quot;low&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">allowance_to_pay</span></div></div>
+
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Model class for MVC pattern of the simulation tool.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    location    :   int - id of the location selected for the simulation</span>
+<span class="sd">    dates   :   list of datetime - the selected time frame for the trips to simulated - i.e. [start time, end time]</span>
+<span class="sd">                will define the period from which the trips will be pulled.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dates</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tco_period</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for handling all interacting classes.</span>
+<span class="sd">        Essential elements to be loaded are:</span>
+<span class="sd">        trips   :   Trips class - holding all information on the trips from defined filters (location, dates)</span>
+<span class="sd">        fleet_manager   :   FleetManager class - to hold the current - and simulation fleet will initialise vehicle</span>
+<span class="sd">                                objects</span>
+<span class="sd">        consequence_calculator  :   ConsequenceCalculator class - to associate the simulation with</span>
+<span class="sd">                                    the simulation results</span>
+<span class="sd">        drivingallowance    :   DrivingAllowance class - to attribute unallocated trips with associated inventory_type</span>
+<span class="sd">                                value -1</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        location    :   int - id of the location selected for the simulation</span>
+<span class="sd">        dates   :   list of datetime - the selected time frame for the trips to simulated - i.e. [start time, end time]</span>
+<span class="sd">                    will define the period from which the trips will be pulled.</span>
+<span class="sd">        tco_period  : tuple or list of two ints defining the projection period and evaluation period of the</span>
+<span class="sd">                        TCO calculation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># todo make dates a controllable entry parameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span> <span class="o">=</span> <span class="n">Trips</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span> <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fleet_manager</span> <span class="o">=</span> <span class="n">FleetManager</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">consequence_calculator</span> <span class="o">=</span> <span class="n">ConsequenceCalculator</span><span class="p">()</span>
+
+        <span class="c1"># static references to data sources needed by the view</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consequence_source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consequence_calculator</span><span class="o">.</span><span class="n">consequence_table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capacity_source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consequence_calculator</span><span class="o">.</span><span class="n">capacity_source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_source</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">],</span> <span class="s2">&quot;progress&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_callback</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulér (</span><span class="si">{</span><span class="mi">100</span> <span class="o">*</span> <span class="n">x</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># update histogram sources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_hist_datasource</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_hist_datasource</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_histogram</span><span class="p">()</span>
+
+        <span class="c1"># driving allowance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drivingallowance</span> <span class="o">=</span> <span class="n">DrivingAllowance</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tco_period</span> <span class="o">=</span> <span class="n">tco_period</span>
+
+    <span class="k">def</span> <span class="nf">_update_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tester function for updating progress of simualtion&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_source</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">],</span> <span class="s2">&quot;progress&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">progress</span><span class="p">]}</span>
+        <span class="k">if</span> <span class="n">progress</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-12</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress_callback</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress_callback</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_progress_stdout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Model.run_simulation"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Model.run_simulation">[docs]</a>    <span class="k">def</span> <span class="nf">run_simulation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">intelligent_simulation</span><span class="p">,</span>
+        <span class="n">bike_max_distance</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">bike_time_slots</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_bike_time_slot</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">bike_percentage</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">km_aar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create and run a simulation. Updates histograms and consequence information.</span>
+<span class="sd">        Sets up the simulation and initialises the fleets and runs the simulation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+<span class="sd">        intelligent_simulation  :   bool - to be passed to the simulation object</span>
+<span class="sd">        bike_max_distance   :   int - to define bike configuration, max allowed distance for a bike trip</span>
+<span class="sd">        bike_time_slots :   bike configuration time slot, when are bike vehicles allowed to accept trips</span>
+<span class="sd">        max_bike_time_slot  :   bike configuration, how many bike slots are available for bikes</span>
+<span class="sd">        bike_percentage :   how many percentage of the trips that qualifies for bike trip should be accepted</span>
+<span class="sd">        km_aar  :   bool - should the vehicles associated km_aar constrain the vehicle from accepting trips when the</span>
+<span class="sd">                        yearly capacity is reached. Only available on intelligent_simulation = False</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bike_time_slots</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bike_time_slots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fleet_manager</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_progress</span><span class="p">,</span>
+            <span class="n">intelligent_simulation</span><span class="o">=</span><span class="n">intelligent_simulation</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">Bike</span><span class="o">.</span><span class="n">max_distance_pr_trip</span> <span class="o">=</span> <span class="n">bike_max_distance</span>
+        <span class="n">ElectricBike</span><span class="o">.</span><span class="n">max_distance_pr_trip</span> <span class="o">=</span> <span class="n">bike_max_distance</span>
+        <span class="n">Bike</span><span class="o">.</span><span class="n">allowed_driving_time_slots</span> <span class="o">=</span> <span class="n">bike_time_slots</span>
+        <span class="n">ElectricBike</span><span class="o">.</span><span class="n">allowed_driving_time_slots</span> <span class="o">=</span> <span class="n">bike_time_slots</span>
+        <span class="n">Bike</span><span class="o">.</span><span class="n">max_time_slot</span> <span class="o">=</span> <span class="n">max_bike_time_slot</span>
+        <span class="n">ElectricBike</span><span class="o">.</span><span class="n">max_time_slot</span> <span class="o">=</span> <span class="n">max_bike_time_slot</span>
+        <span class="n">Bike</span><span class="o">.</span><span class="n">percentage</span> <span class="o">=</span> <span class="n">bike_percentage</span>
+        <span class="n">ElectricBike</span><span class="o">.</span><span class="n">percentage</span> <span class="o">=</span> <span class="n">bike_percentage</span>
+
+        <span class="c1"># collect data from frontend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">fleet_manager</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">initialise_fleet</span><span class="p">(</span><span class="n">km_aar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">fleet_manager</span><span class="o">.</span><span class="n">simulation_fleet</span><span class="o">.</span><span class="n">initialise_fleet</span><span class="p">(</span><span class="n">km_aar</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+        <span class="c1"># update data sources for frontend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_histogram</span><span class="p">()</span>
+
+        <span class="c1"># update consequence sources for frontend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consequence_calculator</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivingallowance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tco_period</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.compute_histogram"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.model.Model.compute_histogram">[docs]</a>    <span class="k">def</span> <span class="nf">compute_histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mindist</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxdist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute histograms for current and simulation</span>
+
+<span class="sd">        parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mindist : defaults to 0. Minimum distance to use for histograms</span>
+<span class="sd">        maxdist : Maximum distance to use for histograms. If None, use the maximum distance of the trips</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">maxdist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">maxdist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+        <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">maxdist</span> <span class="o">-</span> <span class="n">mindist</span><span class="p">)</span> <span class="o">/</span> <span class="mf">20.0</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
+        <span class="n">distance_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">mindist</span><span class="p">,</span> <span class="n">maxdist</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_hist</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;edges&quot;</span><span class="p">:</span> <span class="n">distance_edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_hist</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;edges&quot;</span><span class="p">:</span> <span class="n">distance_edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]}</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="c1"># current</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">distance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">current_type</span> <span class="o">==</span> <span class="n">i</span><span class="p">]</span>
+            <span class="n">counts</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">distance_edges</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_hist</span><span class="p">[</span><span class="n">vehicle</span><span class="o">.</span><span class="n">vehicle_mapping</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">counts</span>
+
+            <span class="c1"># simulation</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">distance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">simulation_type</span> <span class="o">==</span> <span class="n">i</span><span class="p">]</span>
+            <span class="n">counts</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">distance_edges</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simulation_hist</span><span class="p">[</span><span class="n">vehicle</span><span class="o">.</span><span class="n">vehicle_mapping</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">counts</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_hist_datasource</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_hist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_hist_datasource</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_hist</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

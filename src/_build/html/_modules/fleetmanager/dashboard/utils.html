@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.dashboard.utils &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>fleetmanager.dashboard.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fleetmanager.dashboard.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">dash_bootstrap_components</span> <span class="k">as</span> <span class="nn">dbc</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">html</span>
+
+
+<div class="viewcode-block" id="card"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.card">[docs]</a><span class="k">def</span> <span class="nf">card</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">card_body</span> <span class="o">=</span> <span class="p">[</span><span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span><span class="n">body</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">card_body</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dbc</span><span class="o">.</span><span class="n">CardHeader</span><span class="p">(</span><span class="n">header</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span><span class="n">card_body</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="input_table"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.input_table">[docs]</a><span class="k">def</span> <span class="nf">input_table</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">col_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fn_input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fn_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">total_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fn_input_value</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">table_header</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">table_header</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Thead</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">([</span><span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">header</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="n">fn_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fn_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">col_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">col_style</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">([{}])</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">total0</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">cstyle</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">col_style</span><span class="p">)):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">cstyle</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">total0</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="n">fn_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">},</span>
+                <span class="c1"># Name isn&#39;t used for anything else so we use it to store id&#39;s</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">fn_input_value</span><span class="p">,</span>
+                <span class="s2">&quot;persistence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">fn_params</span><span class="p">)</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span>
+                    <span class="n">fn_input</span><span class="p">(</span>
+                        <span class="o">**</span><span class="n">params</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="p">[</span><span class="n">table_header</span><span class="p">,</span> <span class="n">html</span><span class="o">.</span><span class="n">Tbody</span><span class="p">(</span><span class="n">rows</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">total_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">html</span><span class="o">.</span><span class="n">Thead</span><span class="p">(</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">B</span><span class="p">(</span><span class="s2">&quot;Total&quot;</span><span class="p">))]</span>
+                    <span class="o">+</span> <span class="p">[</span><span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">()]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">-</span> <span class="mi">3</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="p">[</span><span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">B</span><span class="p">(</span><span class="n">total0</span><span class="p">)),</span> <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">B</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">total_id</span><span class="p">))]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">dbc</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="distance_histogram_from"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.distance_histogram_from">[docs]</a><span class="k">def</span> <span class="nf">distance_histogram_from</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">bins</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;edges&quot;</span><span class="p">)</span>
+    <span class="n">bins</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">color</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;#52575C&quot;</span><span class="p">,</span> <span class="s2">&quot;#FF6760&quot;</span><span class="p">,</span> <span class="s2">&quot;#109CF1&quot;</span><span class="p">,</span> <span class="s2">&quot;#FFBC1F&quot;</span><span class="p">,</span> <span class="s2">&quot;#40DD7F&quot;</span><span class="p">],</span> <span class="n">source</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">):</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">marker_color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">bargap</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">barmode</span><span class="o">=</span><span class="s2">&quot;stack&quot;</span><span class="p">,</span>
+        <span class="n">xaxis_title</span><span class="o">=</span><span class="n">xlabel</span><span class="p">,</span>
+        <span class="n">yaxis_title</span><span class="o">=</span><span class="n">ylabel</span><span class="p">,</span>
+        <span class="n">title_text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="capacity_plot_from"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.capacity_plot_from">[docs]</a><span class="k">def</span> <span class="nf">capacity_plot_from</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;#109CF1&quot;</span><span class="p">,</span> <span class="s2">&quot;#FF6760&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;Nuværende&quot;</span><span class="p">,</span> <span class="s2">&quot;Simulation&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;cur_unassigned_trips&quot;</span><span class="p">,</span> <span class="s2">&quot;sim_unassigned_trips&quot;</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_scatter</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;timeframe&quot;</span><span class="p">],</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">xaxis_title</span><span class="o">=</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">yaxis_title</span><span class="o">=</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">title_text</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">rangemode</span><span class="o">=</span><span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span> <span class="n">dtick</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="consequence_table_from"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.consequence_table_from">[docs]</a><span class="k">def</span> <span class="nf">consequence_table_from</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+    <span class="n">table_header</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Konsekvens&quot;</span><span class="p">),</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Nuværende værdi&quot;</span><span class="p">),</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Simuleret værdi&quot;</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">,</span> <span class="n">col3</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">source</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;keys&quot;</span><span class="p">],</span> <span class="n">source</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cur_values&quot;</span><span class="p">],</span> <span class="n">source</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;sim_values&quot;</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="n">col1</span><span class="p">),</span>
+                    <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col2</span><span class="p">)),</span>
+                    <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col3</span><span class="p">)),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">table_body</span> <span class="o">=</span> <span class="p">[</span><span class="n">html</span><span class="o">.</span><span class="n">Tbody</span><span class="p">(</span><span class="n">rows</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">table_header</span> <span class="o">+</span> <span class="n">table_body</span></div>
+
+
+<div class="viewcode-block" id="prepare_trip_store"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.prepare_trip_store">[docs]</a><span class="k">def</span> <span class="nf">prepare_trip_store</span><span class="p">(</span><span class="n">trips</span><span class="p">,</span> <span class="n">location_name</span><span class="p">):</span>
+    <span class="c1"># storing the trips</span>
+    <span class="n">save</span> <span class="o">=</span> <span class="n">trips</span><span class="p">[[</span><span class="s2">&quot;start_time&quot;</span><span class="p">,</span> <span class="s2">&quot;end_time&quot;</span><span class="p">,</span> <span class="s2">&quot;distance&quot;</span><span class="p">,</span> <span class="s2">&quot;current&quot;</span><span class="p">,</span> <span class="s2">&quot;simulation&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">save</span><span class="p">[</span><span class="s2">&quot;Nuværende&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">save</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">make</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">model</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">plate</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;Unassigned&quot;</span>
+        <span class="k">else</span> <span class="s2">&quot;Ikke allokeret&quot;</span>
+    <span class="p">)</span>
+    <span class="n">save</span><span class="p">[</span><span class="s2">&quot;Simulering&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">save</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">make</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">model</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">plate</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;Unassigned&quot;</span>
+        <span class="k">else</span> <span class="s2">&quot;Ikke allokeret&quot;</span>
+    <span class="p">)</span>
+    <span class="n">save</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;current&quot;</span><span class="p">,</span> <span class="s2">&quot;simulation&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">save</span><span class="p">[</span><span class="s2">&quot;Adresse&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">location_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">save</span><span class="p">)</span>
+    <span class="n">trip_store</span> <span class="o">=</span> <span class="n">save</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>  <span class="c1"># pickle.dumps(save)</span>
+    <span class="k">return</span> <span class="n">trip_store</span></div>
+
+
+<div class="viewcode-block" id="get_emission"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.get_emission">[docs]</a><span class="k">def</span> <span class="nf">get_emission</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">wltp_fossil</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">entry</span><span class="o">.</span><span class="n">wltp_el</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">)</span> <span class="ow">and</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">wltp_el</span><span class="p">)),</span>
+        <span class="p">]</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;0&quot;</span>
+
+    <span class="n">udledning</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">wltp_el</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> Wh/km&quot;</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">)</span> <span class="ow">or</span> <span class="n">entry</span><span class="o">.</span><span class="n">wltp_fossil</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> km/l&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">udledning</span></div>
+
+
+<div class="viewcode-block" id="goal_bar_plot"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.goal_bar_plot">[docs]</a><span class="k">def</span> <span class="nf">goal_bar_plot</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">([</span><span class="n">go</span><span class="o">.</span><span class="n">Bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">keys</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">values</span><span class="p">)])</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">title_x</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">xaxis_title</span><span class="o">=</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">yaxis_title</span><span class="o">=</span><span class="n">ylabel</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="unix_time_millis"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.unix_time_millis">[docs]</a><span class="k">def</span> <span class="nf">unix_time_millis</span><span class="p">(</span><span class="n">dt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert datetime to unix timestamp&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">mktime</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="unix_to_datetime"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.unix_to_datetime">[docs]</a><span class="k">def</span> <span class="nf">unix_to_datetime</span><span class="p">(</span><span class="n">unix</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert unix timestamp to datetime.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">unix</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="accordian_table"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.accordian_table">[docs]</a><span class="k">def</span> <span class="nf">accordian_table</span><span class="p">(</span><span class="n">fleet_header</span><span class="p">,</span> <span class="n">fleet</span><span class="p">,</span> <span class="n">current_expense</span><span class="p">,</span> <span class="n">simulation_expense</span><span class="p">,</span> <span class="n">savings</span><span class="p">,</span> <span class="n">current_emission</span><span class="p">,</span> <span class="n">simulation_emission</span><span class="p">,</span> <span class="n">emission_savings</span><span class="p">):</span>
+    <span class="n">accordian</span> <span class="o">=</span> <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">html</span><span class="o">.</span><span class="n">B</span><span class="p">(</span><span class="s2">&quot;Flådesammensætning&quot;</span><span class="p">),</span>
+                    <span class="n">dbc</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">fleet_header</span><span class="p">,</span> <span class="n">html</span><span class="o">.</span><span class="n">Tbody</span><span class="p">(</span><span class="n">fleet</span><span class="p">)],</span>
+                    <span class="p">),</span>
+                <span class="p">],</span>
+                <span class="n">className</span><span class="o">=</span><span class="s2">&quot;solution-fleet&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">html</span><span class="o">.</span><span class="n">B</span><span class="p">(</span><span class="s2">&quot;Simuleringsdetaljer&quot;</span><span class="p">),</span>
+                    <span class="n">dbc</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="n">html</span><span class="o">.</span><span class="n">Thead</span><span class="p">(</span>
+                                <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                                    <span class="p">[</span>
+                                        <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Type&quot;</span><span class="p">),</span>
+                                        <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Enhed&quot;</span><span class="p">),</span>
+                                    <span class="p">]</span>
+                                <span class="p">)</span>
+                            <span class="p">),</span>
+                            <span class="n">html</span><span class="o">.</span><span class="n">Tbody</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="s2">&quot;Nuværende total omkostning&quot;</span><span class="p">),</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span>
+                                                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">current_expense</span><span class="p">)</span><span class="si">}</span><span class="s2"> DKK/år&quot;</span>
+                                            <span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="s2">&quot;Simuleret total omkostning&quot;</span><span class="p">),</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span>
+                                                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">simulation_expense</span><span class="p">)</span><span class="si">}</span><span class="s2"> DKK/år&quot;</span>
+                                            <span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span>
+                                                <span class="n">html</span><span class="o">.</span><span class="n">B</span><span class="p">(</span><span class="s2">&quot;Besparelse i omkostning&quot;</span><span class="p">)</span>
+                                            <span class="p">),</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">B</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">savings</span><span class="si">}</span><span class="s2"> DKK/år&quot;</span><span class="p">)),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="s2">&quot;Nuværende udledning&quot;</span><span class="p">),</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span>
+                                                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">current_emission</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> Ton CO2e/år&quot;</span>
+                                            <span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="s2">&quot;Simuleret udledning&quot;</span><span class="p">),</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span>
+                                                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">simulation_emission</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> Ton CO2e/år&quot;</span>
+                                            <span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span>
+                                                <span class="n">html</span><span class="o">.</span><span class="n">B</span><span class="p">(</span><span class="s2">&quot;Reduktion i udledning&quot;</span><span class="p">)</span>
+                                            <span class="p">),</span>
+                                            <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span>
+                                                <span class="n">html</span><span class="o">.</span><span class="n">B</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">emission_savings</span><span class="si">}</span><span class="s2"> Ton CO2e/år&quot;</span><span class="p">)</span>
+                                            <span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                <span class="p">]</span>
+                            <span class="p">),</span>
+                        <span class="p">],</span>
+                    <span class="p">),</span>
+                <span class="p">],</span>
+                <span class="n">className</span><span class="o">=</span><span class="s2">&quot;solution-results&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">accordian</span></div>
+
+
+<div class="viewcode-block" id="toggle_all"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.utils.toggle_all">[docs]</a><span class="k">def</span> <span class="nf">toggle_all</span><span class="p">(</span><span class="n">vehicle_view</span><span class="p">,</span> <span class="n">change_to</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">copied</span> <span class="o">=</span> <span class="n">vehicle_view</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">copied</span><span class="p">[</span><span class="s1">&#39;props&#39;</span><span class="p">][</span><span class="s1">&#39;children&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;props&#39;</span><span class="p">][</span><span class="s1">&#39;children&#39;</span><span class="p">]:</span>
+        <span class="n">vehicle</span><span class="p">[</span><span class="s1">&#39;props&#39;</span><span class="p">][</span><span class="s1">&#39;children&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;props&#39;</span><span class="p">][</span><span class="s1">&#39;children&#39;</span><span class="p">][</span><span class="s1">&#39;props&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">change_to</span>
+    <span class="k">return</span> <span class="n">copied</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

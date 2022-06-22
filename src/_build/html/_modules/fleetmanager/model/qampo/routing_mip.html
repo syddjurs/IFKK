@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.model.qampo.routing_mip &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>fleetmanager.model.qampo.routing_mip</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fleetmanager.model.qampo.routing_mip</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; This file contains code that optimizes a single day routing given a fixed fleet in an optimal manner using the MIP solver from ortools</span>
+<span class="sd">(utilizing SCIP).&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">ortools.linear_solver</span> <span class="kn">import</span> <span class="n">pywraplp</span>
+
+<span class="kn">from</span> <span class="nn">.classes</span> <span class="kn">import</span> <span class="n">BaseVehicle</span><span class="p">,</span> <span class="n">RoutePlan</span><span class="p">,</span> <span class="n">RoutingAlgorithm</span><span class="p">,</span> <span class="n">Trip</span><span class="p">,</span> <span class="n">Vehicle</span>
+<span class="kn">from</span> <span class="nn">.cost_calculator</span> <span class="kn">import</span> <span class="n">calculate_co2_emission_cost_per_kilometer_for_vehicle</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">NoSolutionFoundException</span>
+<span class="kn">from</span> <span class="nn">.routeplan_factory</span> <span class="kn">import</span> <span class="n">route_plan_from_vehicle_trip_map</span>
+<span class="kn">from</span> <span class="nn">.validation</span> <span class="kn">import</span> <span class="n">check_trips_only_has_single_date</span>
+
+<span class="c1"># Initialize logger.</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RoutingMip"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.routing_mip.RoutingMip">[docs]</a><span class="k">class</span> <span class="nc">RoutingMip</span><span class="p">(</span><span class="n">RoutingAlgorithm</span><span class="p">):</span>
+<div class="viewcode-block" id="RoutingMip.optimize_single_day"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.routing_mip.RoutingMip.optimize_single_day">[docs]</a>    <span class="k">def</span> <span class="nf">optimize_single_day</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">trips</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Trip</span><span class="p">],</span>
+        <span class="n">vehicles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vehicle</span><span class="p">],</span>
+        <span class="n">employee_car</span><span class="p">:</span> <span class="n">BaseVehicle</span><span class="p">,</span>
+        <span class="n">emission_cost_per_ton_co2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">,</span>
+        <span class="n">time_limit_in_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RoutePlan</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        An exact MIP algorithm that will assign trips to vehicles based on a weight of the variable cost per kilometer and the CO2 emission.</span>
+<span class="sd">        time_limit_in_seconds specifies for how long, the algorithm is allowed to be run.</span>
+<span class="sd">        :param trips: List of trips in the route plan.</span>
+<span class="sd">        :param vehicles: List of vehicles in the route plan.</span>
+<span class="sd">        :param employee_car: Employee car a trip can be assigned to.</span>
+<span class="sd">        :param emission_cost_per_ton_co2: CO2 emission cost per ton for the entire route plan.</span>
+<span class="sd">        :param time_limit_in_seconds: Time limit for the running time of the algorithm.</span>
+<span class="sd">        :return Routing plan created after optimization has been performed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running exact MIP formulation of single day optimization.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check the trips. If any issues occur, throw an exception.</span>
+        <span class="n">check_trips_only_has_single_date</span><span class="p">(</span><span class="n">trips</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Checked trips input for being single day.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create the mip solver with the SCIP backend.</span>
+        <span class="n">solver</span> <span class="o">=</span> <span class="n">pywraplp</span><span class="o">.</span><span class="n">Solver</span><span class="o">.</span><span class="n">CreateSolver</span><span class="p">(</span><span class="s2">&quot;SCIP&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Variables related to the normal vehicles.</span>
+        <span class="n">vehicles_var</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">vehicles</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">trip</span> <span class="ow">in</span> <span class="n">trips</span><span class="p">:</span>
+                <span class="c1"># Binary variable that is 1 if the trip is assigned to the vehicle, otherwise 0.</span>
+                <span class="n">vehicles_var</span><span class="p">[(</span><span class="n">vehicle</span><span class="p">,</span> <span class="n">trip</span><span class="p">)]</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">BoolVar</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;vehicle_</span><span class="si">{</span><span class="n">vehicle</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_trip_</span><span class="si">{</span><span class="n">trip</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created variables for normal vehicles.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Variables related to the employee car as this has some special logic later on.</span>
+        <span class="n">employee_car_var</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">trip</span> <span class="ow">in</span> <span class="n">trips</span><span class="p">:</span>
+            <span class="c1"># Binary variable that is 1 if the trip is assigned to the employee car, otherwise 0.</span>
+            <span class="n">employee_car_var</span><span class="p">[</span><span class="n">trip</span><span class="p">]</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">BoolVar</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;employee_car_trip_</span><span class="si">{</span><span class="n">trip</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created variables for employee car.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create constraints to ensure, a vehicle cannot serve overlapping trips.</span>
+        <span class="k">for</span> <span class="n">first_trip</span> <span class="ow">in</span> <span class="n">trips</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">second_trip</span> <span class="ow">in</span> <span class="n">trips</span><span class="p">:</span>
+                <span class="c1"># Do nothing if the trips are the same.</span>
+                <span class="k">if</span> <span class="n">first_trip</span> <span class="o">==</span> <span class="n">second_trip</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># Check if the two trips overlap in time.</span>
+                <span class="c1"># See https://stackoverflow.com/questions/325933/determine-whether-two-date-ranges-overlap</span>
+                <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">first_trip</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="n">second_trip</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="p">(</span>
+                    <span class="n">first_trip</span><span class="o">.</span><span class="n">end_time</span><span class="p">,</span> <span class="n">second_trip</span><span class="o">.</span><span class="n">end_time</span>
+                <span class="p">):</span>
+                    <span class="c1"># An overlap is found. Add a constraint for each normal vehicle.</span>
+                    <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">vehicles</span><span class="p">:</span>
+                        <span class="n">solver</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span>
+                            <span class="n">vehicles_var</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">vehicle</span><span class="p">,</span> <span class="n">first_trip</span><span class="p">))</span>
+                            <span class="o">+</span> <span class="n">vehicles_var</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">vehicle</span><span class="p">,</span> <span class="n">second_trip</span><span class="p">))</span>
+                            <span class="o">&lt;=</span> <span class="mi">1</span>
+                        <span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Created constraints to ensure, overlapping trips are not assigned to the same vehicle.&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create constraints to ensure, all trips are assigned to a vehicle (normal or employee car).</span>
+        <span class="k">for</span> <span class="n">trip</span> <span class="ow">in</span> <span class="n">trips</span><span class="p">:</span>
+            <span class="n">solver</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span>
+                <span class="nb">sum</span><span class="p">(</span><span class="n">vehicles_var</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">vehicle</span><span class="p">,</span> <span class="n">trip</span><span class="p">))</span> <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">vehicles</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">employee_car_var</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">trip</span><span class="p">)</span>
+                <span class="o">==</span> <span class="mi">1</span>
+            <span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Created constraints to ensure, each trip is assigned to a vehicle or employee car.&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create a constraint on the maximum range and the maximum uptime  for a vehicle.</span>
+        <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">vehicles</span><span class="p">:</span>
+            <span class="c1"># Constraint for maximum range.</span>
+            <span class="n">solver</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span>
+                <span class="nb">sum</span><span class="p">(</span>
+                    <span class="n">trip</span><span class="o">.</span><span class="n">length_in_kilometers</span> <span class="o">*</span> <span class="n">vehicles_var</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">vehicle</span><span class="p">,</span> <span class="n">trip</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">trip</span> <span class="ow">in</span> <span class="n">trips</span>
+                <span class="p">)</span>
+                <span class="o">&lt;=</span> <span class="n">vehicle</span><span class="o">.</span><span class="n">range_in_kilometers</span>
+            <span class="p">)</span>
+            <span class="c1"># Constraint for maximum uptime.</span>
+            <span class="n">solver</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span>
+                <span class="nb">sum</span><span class="p">(</span>
+                    <span class="n">trip</span><span class="o">.</span><span class="n">get_trip_length_in_minutes</span><span class="p">()</span>
+                    <span class="o">*</span> <span class="n">vehicles_var</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">vehicle</span><span class="p">,</span> <span class="n">trip</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">trip</span> <span class="ow">in</span> <span class="n">trips</span>
+                <span class="p">)</span>
+                <span class="o">&lt;=</span> <span class="n">vehicle</span><span class="o">.</span><span class="n">maximum_driving_in_minutes</span>
+            <span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created range constraints for each vehicle.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># All objective terms.</span>
+        <span class="n">objective_terms</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">trip</span> <span class="ow">in</span> <span class="n">trips</span><span class="p">:</span>
+            <span class="c1"># Add the terms for the employee car.</span>
+            <span class="n">objective_terms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">trip</span><span class="o">.</span><span class="n">length_in_kilometers</span>
+                <span class="o">*</span> <span class="p">(</span>
+                    <span class="n">employee_car</span><span class="o">.</span><span class="n">variable_cost_per_kilometer</span>
+                    <span class="o">+</span> <span class="n">calculate_co2_emission_cost_per_kilometer_for_vehicle</span><span class="p">(</span>
+                        <span class="n">employee_car</span><span class="p">,</span> <span class="n">emission_cost_per_ton_co2</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="o">*</span> <span class="n">employee_car_var</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">trip</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Add the terms for all the other vehicles.</span>
+            <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">vehicles</span><span class="p">:</span>
+                <span class="n">objective_terms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">trip</span><span class="o">.</span><span class="n">length_in_kilometers</span>
+                    <span class="o">*</span> <span class="p">(</span>
+                        <span class="n">vehicle</span><span class="o">.</span><span class="n">variable_cost_per_kilometer</span>
+                        <span class="o">+</span> <span class="n">calculate_co2_emission_cost_per_kilometer_for_vehicle</span><span class="p">(</span>
+                            <span class="n">vehicle</span><span class="p">,</span> <span class="n">emission_cost_per_ton_co2</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="o">*</span> <span class="n">vehicles_var</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">vehicle</span><span class="p">,</span> <span class="n">trip</span><span class="p">))</span>
+                <span class="p">)</span>
+
+        <span class="n">solver</span><span class="o">.</span><span class="n">Minimize</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">objective_terms</span><span class="p">))</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created objective function.&quot;</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;About to solve the optimization problem using the MIP solver.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># This check is performed because 0 is treated as infinity in the C++ wrapper.</span>
+        <span class="k">if</span> <span class="n">time_limit_in_seconds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoSolutionFoundException</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">solver</span><span class="o">.</span><span class="n">set_time_limit</span><span class="p">(</span><span class="n">time_limit_in_seconds</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+
+        <span class="n">status</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">Solve</span><span class="p">()</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimization terminated with status </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Store for each vehicle and employee car the trips assigned to it. Initialized by empty list.</span>
+        <span class="n">assignments</span><span class="p">:</span> <span class="p">{</span><span class="n">Vehicle</span><span class="p">:</span> <span class="nb">list</span><span class="p">}</span> <span class="o">=</span> <span class="p">{</span><span class="n">vehicle</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">vehicles</span><span class="p">}</span>
+        <span class="n">assignments</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">employee_car</span><span class="p">:</span> <span class="p">[]})</span>
+
+        <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="n">pywraplp</span><span class="o">.</span><span class="n">Solver</span><span class="o">.</span><span class="n">OPTIMAL</span> <span class="ow">or</span> <span class="n">status</span> <span class="o">==</span> <span class="n">pywraplp</span><span class="o">.</span><span class="n">Solver</span><span class="o">.</span><span class="n">FEASIBLE</span><span class="p">:</span>
+
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objective value was </span><span class="si">{</span><span class="n">solver</span><span class="o">.</span><span class="n">Objective</span><span class="p">()</span><span class="o">.</span><span class="n">Value</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">trip</span> <span class="ow">in</span> <span class="n">trips</span><span class="p">:</span>
+
+                <span class="c1"># Check if trip was assigned to the employee car.</span>
+                <span class="k">if</span> <span class="n">employee_car_var</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">trip</span><span class="p">)</span><span class="o">.</span><span class="n">solution_value</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.990</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Trip with id </span><span class="si">{</span><span class="n">trip</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> was assigned to the employee car.&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="n">assignments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">employee_car</span><span class="p">)</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trip</span><span class="p">)</span>
+                    <span class="c1"># Go to next trip in the loop.</span>
+                    <span class="k">continue</span>
+
+                <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">vehicles</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">vehicles_var</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">vehicle</span><span class="p">,</span> <span class="n">trip</span><span class="p">))</span><span class="o">.</span><span class="n">solution_value</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.990</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Trip with id </span><span class="si">{</span><span class="n">trip</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> was assigned to vehicle with id </span><span class="si">{</span><span class="n">vehicle</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.&quot;</span>
+                        <span class="p">)</span>
+
+                        <span class="n">assignments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">vehicle</span><span class="p">)</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trip</span><span class="p">)</span>
+                        <span class="c1"># Go to next trip.</span>
+                        <span class="k">break</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;The problem does not seem to have an optimal solution.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NoSolutionFoundException</span><span class="p">()</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Solution extracted from MIP and being returned.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">route_plan_from_vehicle_trip_map</span><span class="p">(</span><span class="n">assignments</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

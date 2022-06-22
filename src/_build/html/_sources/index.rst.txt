@@ -1,0 +1,30 @@
+.. Intelligent Flådestyring og Klimasmarte Kørselsmønstre documentation master file, created by
+   sphinx-quickstart on Wed Jun 22 10:08:46 2022.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Intelligent Flådestyring og Klimasmarte Kørselsmønstre's documentation!
+==================================================================================
+
+-----------
+Readme
+-----------
+.. mdinclude:: ../README.md
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   source/readme.rst
+   source/fleetmanager.data_access.rst
+   source/fleetmanager.model.rst
+   source/fleetmanager.model.qampo.rst
+   source/fleetmanager.dashboard.rst
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

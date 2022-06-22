@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.dashboard.page_goal &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>fleetmanager.dashboard.page_goal</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fleetmanager.dashboard.page_goal</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="kn">import</span> <span class="nn">dash_bootstrap_components</span> <span class="k">as</span> <span class="nn">dbc</span>
+<span class="kn">import</span> <span class="nn">dash_daq</span> <span class="k">as</span> <span class="nn">daq</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">ALL</span><span class="p">,</span> <span class="n">MATCH</span><span class="p">,</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">State</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span>
+<span class="kn">from</span> <span class="nn">dash.exceptions</span> <span class="kn">import</span> <span class="n">PreventUpdate</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">func</span><span class="p">,</span> <span class="n">or_</span><span class="p">,</span> <span class="n">and_</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">Query</span>
+
+<span class="kn">import</span> <span class="nn">fleetmanager.data_access.db_engine</span> <span class="k">as</span> <span class="nn">db</span>
+<span class="kn">from</span> <span class="nn">..data_access</span> <span class="kn">import</span> <span class="n">Cars</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">accordian_table</span><span class="p">,</span>
+    <span class="n">card</span><span class="p">,</span>
+    <span class="n">get_emission</span><span class="p">,</span>
+    <span class="n">goal_bar_plot</span><span class="p">,</span>
+    <span class="n">unix_time_millis</span><span class="p">,</span>
+    <span class="n">unix_to_datetime</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.tabu</span> <span class="kn">import</span> <span class="n">TabuSearch</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.vehicle_optimisation</span> <span class="kn">import</span> <span class="n">FleetOptimisation</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+
+<span class="kn">from</span> <span class="nn">.view</span> <span class="kn">import</span> <span class="n">app</span>
+
+<span class="n">Session</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">session_factory</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">engine_creator</span><span class="p">())</span>
+
+<span class="n">description_header</span> <span class="o">=</span> <span class="n">dbc</span><span class="o">.</span><span class="n">Toast</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">P</span><span class="p">(</span>
+            <span class="s2">&quot;På denne side kan man som bruger anmode AI modulet om at komme med forslag til nye flådesammensætninger&quot;</span><span class="p">,</span>
+            <span class="n">className</span><span class="o">=</span><span class="s2">&quot;mb-0&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">],</span>
+    <span class="n">header</span><span class="o">=</span><span class="s2">&quot;Flådesammensætning&quot;</span><span class="p">,</span>
+    <span class="n">className</span><span class="o">=</span><span class="s2">&quot;description-header&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">description_header</span><span class="p">,</span>
+        <span class="c1"># dbc.Label(id=&quot;longcallback&quot;),</span>
+        <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">H3</span><span class="p">(</span><span class="s2">&quot;Optimeringsindstillinger&quot;</span><span class="p">),</span>
+                        <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span>
+                                    <span class="p">[</span>
+                                        <span class="n">dbc</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span>
+                                            <span class="p">[</span>
+                                                <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                                    <span class="p">[</span>
+                                                        <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+                                                            <span class="s2">&quot;Ekstra årligt beløb&quot;</span><span class="p">,</span>
+                                                            <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                                                        <span class="p">),</span>
+                                                        <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                                            <span class="p">[</span>
+                                                                <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span>
+                                                                    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;number&quot;</span><span class="p">,</span>
+                                                                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;ekstra_omkostning&quot;</span><span class="p">,</span>
+                                                                <span class="p">),</span>
+                                                                <span class="n">dbc</span><span class="o">.</span><span class="n">FormText</span><span class="p">(</span>
+                                                                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;eksisterende_omkostninger&quot;</span>
+                                                                <span class="p">),</span>
+                                                            <span class="p">],</span>
+                                                            <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                                                        <span class="p">),</span>
+                                                    <span class="p">],</span>
+                                                    <span class="n">className</span><span class="o">=</span><span class="s2">&quot;mb-3&quot;</span><span class="p">,</span>
+                                                <span class="p">),</span>
+                                                <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                                    <span class="p">[</span>
+                                                        <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+                                                            <span class="s2">&quot;Besparelse i CO2e&quot;</span><span class="p">,</span>
+                                                            <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                                                        <span class="p">),</span>
+                                                        <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                                            <span class="p">[</span>
+                                                                <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span>
+                                                                    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;number&quot;</span><span class="p">,</span>
+                                                                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;reduktion_co2e&quot;</span><span class="p">,</span>
+                                                                <span class="p">),</span>
+                                                                <span class="n">dbc</span><span class="o">.</span><span class="n">FormText</span><span class="p">(</span>
+                                                                    <span class="s2">&quot;Den ønskede procentvise CO2e besparelse&quot;</span>
+                                                                <span class="p">),</span>
+                                                            <span class="p">],</span>
+                                                            <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                                                        <span class="p">),</span>
+                                                    <span class="p">],</span>
+                                                    <span class="n">className</span><span class="o">=</span><span class="s2">&quot;mb-3&quot;</span><span class="p">,</span>
+                                                <span class="p">),</span>
+                                                <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                                    <span class="p">[</span>
+                                                        <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+                                                            <span class="s2">&quot;Prioritér CO2e besparelser&quot;</span><span class="p">,</span>
+                                                            <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                                                        <span class="p">),</span>
+                                                        <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                                            <span class="p">[</span>
+                                                                <span class="n">dcc</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span>
+                                                                    <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                                    <span class="nb">max</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                                                                    <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                                                    <span class="n">value</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                                                    <span class="n">marks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                                    <span class="n">tooltip</span><span class="o">=</span><span class="p">{</span>
+                                                                        <span class="s2">&quot;placement&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+                                                                        <span class="s2">&quot;always_visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                                                                    <span class="p">},</span>
+                                                                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;co2e_prioritization&quot;</span><span class="p">,</span>
+                                                                <span class="p">),</span>
+                                                                <span class="n">dbc</span><span class="o">.</span><span class="n">FormText</span><span class="p">(</span>
+                                                                    <span class="s2">&quot;Antal kroner du er villig til at betale for at spare X ton CO2e&quot;</span>
+                                                                <span class="p">),</span>
+                                                            <span class="p">],</span>
+                                                            <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                                                        <span class="p">),</span>
+                                                    <span class="p">],</span>
+                                                    <span class="n">className</span><span class="o">=</span><span class="s2">&quot;mb-3&quot;</span><span class="p">,</span>
+                                                <span class="p">),</span>
+                                                <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                                    <span class="p">[</span>
+                                                        <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+                                                            <span class="s2">&quot;Vælg leasingperiode&quot;</span><span class="p">,</span>
+                                                            <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                                                        <span class="p">),</span>
+                                                        <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                                            <span class="p">[</span>
+                                                                <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+                                                                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;leasingperiode&quot;</span>
+                                                                <span class="p">),</span>
+                                                                <span class="n">dbc</span><span class="o">.</span><span class="n">FormText</span><span class="p">(</span>
+                                                                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;leasing_text&quot;</span>
+                                                                <span class="p">),</span>
+                                                            <span class="p">],</span>
+                                                            <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                                                        <span class="p">),</span>
+                                                    <span class="p">],</span>
+                                                    <span class="n">className</span><span class="o">=</span><span class="s2">&quot;mb-4&quot;</span><span class="p">,</span>
+                                                <span class="p">),</span>
+                                            <span class="p">]</span>
+                                        <span class="p">),</span>
+                                        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+                                            <span class="p">[</span>
+                                                <span class="n">daq</span><span class="o">.</span><span class="n">BooleanSwitch</span><span class="p">(</span>
+                                                    <span class="n">on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                    <span class="n">label</span><span class="o">=</span><span class="p">{</span>
+                                                        <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Intelligent Allokering&quot;</span><span class="p">,</span>
+                                                        <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;font-size&quot;</span><span class="p">:</span> <span class="s2">&quot;16px&quot;</span><span class="p">},</span>
+                                                    <span class="p">},</span>
+                                                    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#32CD32&quot;</span><span class="p">,</span>
+                                                    <span class="n">labelPosition</span><span class="o">=</span><span class="s2">&quot;top&quot;</span><span class="p">,</span>
+                                                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;intelligent_simulation_op&quot;</span><span class="p">,</span>
+                                                <span class="p">),</span>
+                                                <span class="n">daq</span><span class="o">.</span><span class="n">BooleanSwitch</span><span class="p">(</span>
+                                                    <span class="n">on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                    <span class="n">label</span><span class="o">=</span><span class="p">{</span>
+                                                        <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Begræns km/år&quot;</span><span class="p">,</span>
+                                                        <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;font-size&quot;</span><span class="p">:</span> <span class="s2">&quot;16px&quot;</span><span class="p">},</span>
+                                                    <span class="p">},</span>
+                                                    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#32CD32&quot;</span><span class="p">,</span>
+                                                    <span class="n">labelPosition</span><span class="o">=</span><span class="s2">&quot;top&quot;</span><span class="p">,</span>
+                                                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;km_aar_op&quot;</span><span class="p">,</span>
+                                                <span class="p">),</span>
+                                            <span class="p">],</span>
+                                            <span class="n">className</span><span class="o">=</span><span class="s2">&quot;left-column-elements&quot;</span><span class="p">,</span>
+                                        <span class="p">),</span>
+                                        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+                                            <span class="p">[</span>
+                                                <span class="n">dbc</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+                                                    <span class="s2">&quot;Optimér&quot;</span><span class="p">,</span>
+                                                    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+                                                    <span class="n">className</span><span class="o">=</span><span class="s2">&quot;right-btn&quot;</span><span class="p">,</span>
+                                                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;optimer&quot;</span><span class="p">,</span>
+                                                    <span class="c1"># disabled=True,</span>
+                                                <span class="p">)</span>
+                                            <span class="p">],</span>
+                                            <span class="n">className</span><span class="o">=</span><span class="s2">&quot;right-column-elements&quot;</span><span class="p">,</span>
+                                        <span class="p">),</span>
+                                        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([],</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;vehicle-list&quot;</span><span class="p">),</span>
+                                    <span class="p">],</span>
+                                <span class="p">)</span>
+                            <span class="p">]</span>
+                        <span class="p">),</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">H3</span><span class="p">(</span><span class="s2">&quot;Fremtidig flådesammensætning&quot;</span><span class="p">),</span>
+                        <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span>
+                                                <span class="p">[</span>
+                                                    <span class="n">html</span><span class="o">.</span><span class="n">H4</span><span class="p">(</span><span class="s2">&quot;Total omkostning pr. år&quot;</span><span class="p">),</span>
+                                                    <span class="n">html</span><span class="o">.</span><span class="n">P</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;solution_omkostning&quot;</span><span class="p">),</span>
+                                                <span class="p">],</span>
+                                                <span class="n">className</span><span class="o">=</span><span class="s2">&quot;metric-card&quot;</span><span class="p">,</span>
+                                            <span class="p">)</span>
+                                        <span class="p">]</span>
+                                    <span class="p">)</span>
+                                <span class="p">),</span>
+                                <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span>
+                                                <span class="p">[</span>
+                                                    <span class="n">html</span><span class="o">.</span><span class="n">H4</span><span class="p">(</span><span class="s2">&quot;CO2e-udledning pr. år&quot;</span><span class="p">),</span>
+                                                    <span class="n">html</span><span class="o">.</span><span class="n">P</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;solution_udledning&quot;</span><span class="p">),</span>
+                                                <span class="p">],</span>
+                                                <span class="n">className</span><span class="o">=</span><span class="s2">&quot;metric-card&quot;</span><span class="p">,</span>
+                                            <span class="p">)</span>
+                                        <span class="p">]</span>
+                                    <span class="p">)</span>
+                                <span class="p">),</span>
+                            <span class="p">],</span>
+                            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;margin-bottom&quot;</span><span class="p">:</span> <span class="s2">&quot;10px&quot;</span><span class="p">},</span>
+                        <span class="p">),</span>
+                        <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span>
+                                    <span class="p">[</span>
+                                        <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                            <span class="p">[</span>
+                                                <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                                    <span class="n">card</span><span class="p">(</span>
+                                                        <span class="n">dcc</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span>
+                                                            <span class="n">figure</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
+                                                            <span class="nb">id</span><span class="o">=</span><span class="p">{</span>
+                                                                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;goal_fig&quot;</span><span class="p">,</span>
+                                                                <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                                                            <span class="p">},</span>
+                                                        <span class="p">),</span>
+                                                    <span class="p">),</span>
+                                                <span class="p">),</span>
+                                                <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span>
+                                                        <span class="p">[</span>
+                                                            <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span>
+                                                                <span class="n">dcc</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span>
+                                                                    <span class="n">figure</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
+                                                                    <span class="nb">id</span><span class="o">=</span><span class="p">{</span>
+                                                                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;goal_fig&quot;</span><span class="p">,</span>
+                                                                        <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                                                                    <span class="p">},</span>
+                                                                <span class="p">)</span>
+                                                            <span class="p">)</span>
+                                                        <span class="p">]</span>
+                                                    <span class="p">),</span>
+                                                <span class="p">),</span>
+                                            <span class="p">],</span>
+                                        <span class="p">),</span>
+                                        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;accordinan_solution&quot;</span><span class="p">),</span>
+                                        <span class="n">dcc</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;long_callback_optim&quot;</span><span class="p">),</span>
+                                        <span class="n">dbc</span><span class="o">.</span><span class="n">Spinner</span><span class="p">(</span>
+                                            <span class="n">fullscreen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                            <span class="n">spinner_class_name</span><span class="o">=</span><span class="s2">&quot;large_spinner&quot;</span><span class="p">,</span>
+                                            <span class="n">fullscreen_class_name</span><span class="o">=</span><span class="s2">&quot;fullscreen_spinner&quot;</span><span class="p">,</span>
+                                            <span class="n">fullscreen_style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;visibility&quot;</span><span class="p">:</span> <span class="s2">&quot;hidden&quot;</span><span class="p">},</span>
+                                            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;optim_spinner&quot;</span><span class="p">,</span>
+                                            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;grow&quot;</span><span class="p">,</span>
+                                        <span class="p">),</span>
+                                    <span class="p">]</span>
+                                <span class="p">),</span>
+                            <span class="p">]</span>
+                        <span class="p">),</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="enable_int_op"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_goal.enable_int_op">[docs]</a><span class="nd">@callback</span><span class="p">(</span><span class="n">Output</span><span class="p">(</span><span class="s2">&quot;intelligent_simulation_op&quot;</span><span class="p">,</span> <span class="s2">&quot;disabled&quot;</span><span class="p">),</span> <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;km_aar_op&quot;</span><span class="p">,</span> <span class="s2">&quot;on&quot;</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">enable_int_op</span><span class="p">(</span><span class="n">on</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">on</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="enable_km_op"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_goal.enable_km_op">[docs]</a><span class="nd">@callback</span><span class="p">(</span><span class="n">Output</span><span class="p">(</span><span class="s2">&quot;km_aar_op&quot;</span><span class="p">,</span> <span class="s2">&quot;disabled&quot;</span><span class="p">),</span> <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;intelligent_simulation_op&quot;</span><span class="p">,</span> <span class="s2">&quot;on&quot;</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">enable_km_op</span><span class="p">(</span><span class="n">on</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">on</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="persistent_goal_figure"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_goal.persistent_goal_figure">[docs]</a><span class="nd">@callback</span><span class="p">(</span>
+    <span class="n">Output</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;goal_fig_store&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">MATCH</span><span class="p">},</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;goal_fig&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">MATCH</span><span class="p">},</span> <span class="s2">&quot;figure&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">persistent_goal_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="long_callback_optim"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_goal.long_callback_optim">[docs]</a><span class="nd">@callback</span><span class="p">(</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;long_callback_optim&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;optimer&quot;</span><span class="p">,</span> <span class="s2">&quot;n_clicks&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;vehicle_sel_store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;vehicle-list&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;location_store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;date_store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;goal_fig_store&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">ALL</span><span class="p">},</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;solution_omkostning&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;solution_udledning&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;ekstra_omkostning&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;reduktion_co2e&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;co2e_prioritization&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;intelligent_simulation_op&quot;</span><span class="p">,</span> <span class="s2">&quot;on&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;km_aar_op&quot;</span><span class="p">,</span> <span class="s2">&quot;on&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">long_callback_optim</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">args</span></div>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">long_callback</span><span class="p">(</span>
+    <span class="n">Output</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;goal_fig&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="s2">&quot;figure&quot;</span><span class="p">),</span>
+    <span class="n">Output</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;goal_fig&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="s2">&quot;figure&quot;</span><span class="p">),</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;accordinan_solution&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;solution_udledning&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;solution_udledning&quot;</span><span class="p">,</span> <span class="s2">&quot;style&quot;</span><span class="p">),</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;solution_omkostning&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;solution_omkostning&quot;</span><span class="p">,</span> <span class="s2">&quot;style&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;long_callback_optim&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">running</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span>
+            <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;optim_spinner&quot;</span><span class="p">,</span> <span class="s2">&quot;fullscreen_style&quot;</span><span class="p">),</span>
+            <span class="p">{</span><span class="s2">&quot;visibility&quot;</span><span class="p">:</span> <span class="s2">&quot;visible&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;visibility&quot;</span><span class="p">:</span> <span class="s2">&quot;hidden&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="p">],</span>
+    <span class="n">interval</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span>
+    <span class="n">prevent_initial_call</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">optim</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">fig</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="p">[],</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="p">(</span>
+        <span class="n">n_clicks</span><span class="p">,</span>
+        <span class="n">selected_vehicles</span><span class="p">,</span>
+        <span class="n">frame</span><span class="p">,</span>
+        <span class="n">location_id</span><span class="p">,</span>
+        <span class="n">dates</span><span class="p">,</span>
+        <span class="n">figs</span><span class="p">,</span>
+        <span class="n">omkostning</span><span class="p">,</span>
+        <span class="n">udledning</span><span class="p">,</span>
+        <span class="n">ekstra_omkostning</span><span class="p">,</span>
+        <span class="n">reduktion_co2e</span><span class="p">,</span>
+        <span class="n">co2e_prioritization</span><span class="p">,</span>
+        <span class="n">intelligent_simulation</span><span class="p">,</span>
+        <span class="n">km_aar</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="c1"># todo persist figures</span>
+    <span class="c1"># todo persist accordions</span>
+    <span class="c1"># todo persist values</span>
+    <span class="k">if</span> <span class="n">n_clicks</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">frame</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">omk_value</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">omkostning</span><span class="p">)</span> <span class="k">else</span> <span class="n">omkostning</span>
+        <span class="n">udl_value</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">udledning</span><span class="p">)</span> <span class="k">else</span> <span class="n">udledning</span>
+        <span class="k">return</span> <span class="p">[</span><span class="o">*</span><span class="n">figs</span><span class="p">,</span> <span class="p">[],</span> <span class="o">*</span><span class="n">udl_value</span><span class="p">,</span> <span class="o">*</span><span class="n">omk_value</span><span class="p">]</span>
+    <span class="n">active_vehicles</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">frame</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">vehicle</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">active_vehicles</span><span class="p">:</span>
+            <span class="n">active_vehicles</span><span class="p">[</span><span class="n">vehicle</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">active_vehicles</span><span class="p">[</span><span class="n">vehicle</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">vehicle</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">location_id</span><span class="p">,</span>
+        <span class="s2">&quot;dates&quot;</span><span class="p">:</span> <span class="n">dates</span><span class="p">,</span>
+        <span class="s2">&quot;active_vehicles&quot;</span><span class="p">:</span> <span class="n">active_vehicles</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">fo</span> <span class="o">=</span> <span class="n">FleetOptimisation</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">km_aar</span><span class="o">=</span><span class="n">km_aar</span><span class="p">)</span>
+
+    <span class="n">tb</span> <span class="o">=</span> <span class="n">TabuSearch</span><span class="p">(</span>
+        <span class="n">fo</span><span class="p">,</span>
+        <span class="n">location_id</span><span class="p">,</span>
+        <span class="n">dates</span><span class="p">,</span>
+        <span class="n">co2e_goal</span><span class="o">=</span><span class="mi">0</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">reduktion_co2e</span><span class="p">)</span> <span class="k">else</span> <span class="n">reduktion_co2e</span><span class="p">,</span>
+        <span class="n">expense_goal</span><span class="o">=</span><span class="mi">0</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">ekstra_omkostning</span><span class="p">)</span> <span class="k">else</span> <span class="n">ekstra_omkostning</span><span class="p">,</span>
+        <span class="n">weight</span><span class="o">=</span><span class="n">co2e_prioritization</span><span class="p">,</span>
+        <span class="n">intelligent</span><span class="o">=</span><span class="n">intelligent_simulation</span><span class="p">,</span>
+        <span class="n">km_aar</span><span class="o">=</span><span class="n">km_aar</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tb</span><span class="o">.</span><span class="n">dummy_trips</span><span class="o">.</span><span class="n">trips</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">tb</span><span class="o">.</span><span class="n">report</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tb</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tb</span><span class="o">.</span><span class="n">report</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">omk_value</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">omkostning</span><span class="p">)</span> <span class="k">else</span> <span class="n">omkostning</span>
+        <span class="n">udl_value</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">udledning</span><span class="p">)</span> <span class="k">else</span> <span class="n">udledning</span>
+        <span class="k">return</span> <span class="p">[</span><span class="o">*</span><span class="n">figs</span><span class="p">,</span> <span class="p">[],</span> <span class="o">*</span><span class="n">udl_value</span><span class="p">,</span> <span class="o">*</span><span class="n">omk_value</span><span class="p">]</span>
+
+    <span class="n">omkostning</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">co2e</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">co2e_reduktioner</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">omkostning_besparelse</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">accordians</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Thead</span><span class="p">(</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Biltype&quot;</span><span class="p">),</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Årlig omk. (DKK)&quot;</span><span class="p">),</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Drivmiddel forbrug&quot;</span><span class="p">),</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Antal&quot;</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># walk through the solutions</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">solution</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tb</span><span class="o">.</span><span class="n">report</span><span class="p">):</span>
+        <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Løsning </span><span class="si">{</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># save the solution details and generate accordian title</span>
+        <span class="n">omk</span> <span class="o">=</span> <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;omkostning&quot;</span><span class="p">]</span>
+        <span class="n">omkostning</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">omk</span><span class="p">)</span>
+        <span class="n">udl</span> <span class="o">=</span> <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;co2e&quot;</span><span class="p">]</span>
+        <span class="n">co2e</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">udl</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Løsning </span><span class="si">{</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">: Årlig omkostning: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">omk</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> DKK, Årlig ton CO2e: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">udl</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;omkostning&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">tb</span><span class="o">.</span><span class="n">expense_goal</span> <span class="ow">or</span> <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;co2e&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">tb</span><span class="o">.</span><span class="n">co2e_goal</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;omkostning&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">tb</span><span class="o">.</span><span class="n">expense_goal</span>
+                <span class="ow">and</span> <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;co2e&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">tb</span><span class="o">.</span><span class="n">co2e_goal</span>
+            <span class="p">):</span>
+                <span class="n">title</span> <span class="o">+=</span> <span class="s2">&quot;. Overskredet omkostnings - og CO2e mål.&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="s2">&quot;. Overskedet omkostningsmål.&quot;</span>
+                    <span class="k">if</span> <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;omkostning&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">tb</span><span class="o">.</span><span class="n">expense_goal</span>
+                    <span class="k">else</span> <span class="s2">&quot;. Overskredet CO2e mål.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">fleet</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># generate accordian vehicle table</span>
+        <span class="k">for</span> <span class="n">solution_vehicle</span> <span class="ow">in</span> <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;flåde&quot;</span><span class="p">]:</span>
+            <span class="n">fleet</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">solution_vehicle</span><span class="p">[</span><span class="s2">&quot;class_name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="n">solution_vehicle</span><span class="p">[</span><span class="s2">&quot;omkostning_aar&quot;</span><span class="p">]),</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="n">solution_vehicle</span><span class="p">[</span><span class="s2">&quot;stringified_emission&quot;</span><span class="p">]),</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="n">solution_vehicle</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]),</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># details for the &quot;Simuleringsdetaljer&quot; table</span>
+        <span class="n">besparelse</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">tb</span><span class="o">.</span><span class="n">cur_result</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="n">solution</span><span class="p">[</span><span class="s2">&quot;omkostning&quot;</span><span class="p">])</span>
+        <span class="n">omkostning_besparelse</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">besparelse</span><span class="p">)</span>
+        <span class="n">reduktion</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">tb</span><span class="o">.</span><span class="n">cur_result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;co2e&quot;</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">co2e_reduktioner</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reduktion</span><span class="p">)</span>
+        <span class="n">reduktion</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">reduktion</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">solution_table</span> <span class="o">=</span> <span class="n">accordian_table</span><span class="p">(</span>
+            <span class="n">header</span><span class="p">,</span>
+            <span class="n">fleet</span><span class="p">,</span>
+            <span class="n">tb</span><span class="o">.</span><span class="n">cur_result</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;omkostning&quot;</span><span class="p">],</span>
+            <span class="n">besparelse</span><span class="p">,</span>
+            <span class="n">tb</span><span class="o">.</span><span class="n">cur_result</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;co2e&quot;</span><span class="p">],</span>
+            <span class="n">reduktion</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">accordians</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dbc</span><span class="o">.</span><span class="n">AccordionItem</span><span class="p">(</span><span class="n">solution_table</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">))</span>
+
+    <span class="n">accordian_card</span> <span class="o">=</span> <span class="n">dbc</span><span class="o">.</span><span class="n">Accordion</span><span class="p">(</span><span class="n">accordians</span><span class="p">,</span> <span class="n">always_open</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">omkostning_bar</span> <span class="o">=</span> <span class="n">goal_bar_plot</span><span class="p">(</span>
+        <span class="n">keys</span><span class="p">,</span>
+        <span class="n">omkostning</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Årlig omkostning i kr.&quot;</span><span class="p">,</span>
+        <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Løsninger&quot;</span><span class="p">,</span>
+        <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;kr. pr. år&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">co2e_bar</span> <span class="o">=</span> <span class="n">goal_bar_plot</span><span class="p">(</span>
+        <span class="n">keys</span><span class="p">,</span>
+        <span class="n">co2e</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Årlig udledning ton CO2e&quot;</span><span class="p">,</span>
+        <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Løsninger&quot;</span><span class="p">,</span>
+        <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Ton CO2e pr. år&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">omkostning_bar</span><span class="p">,</span>
+        <span class="n">co2e_bar</span><span class="p">,</span>
+        <span class="n">accordian_card</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">co2e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> Ton CO2e&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span> <span class="k">if</span> <span class="n">co2e_reduktioner</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;green&quot;</span><span class="p">},</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">omkostning</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2"> DKK&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span> <span class="k">if</span> <span class="n">omkostning_besparelse</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;green&quot;</span><span class="p">},</span>
+    <span class="p">]</span>
+
+
+<div class="viewcode-block" id="make_vehicle_list"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_goal.make_vehicle_list">[docs]</a><span class="nd">@callback</span><span class="p">(</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;leasingperiode&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;eksisterende_omkostninger&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;date_store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;location_store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;pathname&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;vehicle_sel_store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">make_vehicle_list</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">selected_vehicles</span><span class="p">):</span>
+    <span class="c1"># todo ensure to pull the bikes</span>
+    <span class="k">if</span> <span class="n">url</span> <span class="o">!=</span> <span class="s2">&quot;/page_goal&quot;</span> <span class="ow">or</span> <span class="n">selected_vehicles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">PreventUpdate</span>
+    <span class="n">omkostninger</span> <span class="o">=</span> <span class="s2">&quot;Det ekstra årlige beløb du vil betale.&quot;</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">current_expense</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="n">expense_query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="n">func</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">omkostning_aar</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;total_expense&quot;</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">Cars</span><span class="o">.</span><span class="n">location</span> <span class="o">==</span> <span class="n">location</span><span class="p">,</span>
+            <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">,</span> <span class="n">dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="n">dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">expense_query</span><span class="p">:</span>
+            <span class="n">current_expense</span> <span class="o">+=</span> <span class="n">a</span><span class="o">.</span><span class="n">total_expense</span>
+
+        <span class="n">omkostninger</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; Nuværende faste omkostninger: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">current_expense</span><span class="p">)</span><span class="si">}</span><span class="s2"> DKK, eksl. brændstofforbrug&quot;</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;end_leasing&quot;</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">selected_vehicles</span><span class="p">))</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dates</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">all_dates</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">365</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sorted_dates</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span>
+        <span class="n">all_dates</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()]</span>
+            <span class="o">+</span> <span class="p">[</span>
+                <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">date</span>
+                <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sorted_dates</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="o">+</span> <span class="p">[</span>
+                <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">sorted_dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">sorted_dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">str</span>
+                <span class="k">else</span> <span class="n">sorted_dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">all_dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">unix_time_millis</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">all_dates</span><span class="p">]</span>
+    <span class="n">marks</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">a</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">date</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="n">all_dates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">all_dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="p">}</span>
+    <span class="n">mind</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">maxd</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="n">date_slider</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">dcc</span><span class="o">.</span><span class="n">RangeSlider</span><span class="p">(</span>
+            <span class="nb">min</span><span class="o">=</span><span class="n">mind</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="n">maxd</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">marks</span><span class="o">=</span><span class="n">marks</span><span class="p">,</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;always_visible&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;slids&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">date_slider</span><span class="p">,</span> <span class="n">omkostninger</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="update_view"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_goal.update_view">[docs]</a><span class="nd">@callback</span><span class="p">(</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;vehicle-list&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;vehicle-list&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;leasing_text&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;slids&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;vehicle_sel_store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">update_view</span><span class="p">(</span><span class="n">unix_times</span><span class="p">,</span> <span class="n">selected_vehicles</span><span class="p">):</span>
+    <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="p">[</span><span class="n">unix_to_datetime</span><span class="p">(</span><span class="n">va</span><span class="p">)</span> <span class="k">for</span> <span class="n">va</span> <span class="ow">in</span> <span class="n">unix_times</span><span class="p">]</span>
+    <span class="n">leasing_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Juster leasingperioden hvis du ønsker at frigøre køretøjer til udskiftning. Valgt periode: </span><span class="si">{</span><span class="n">start</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="si">}</span><span class="s2"> til </span><span class="si">{</span><span class="n">end</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="n">fake_end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">subq</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">make</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">),</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">omkostning_aar</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;omkostning_aar&quot;</span><span class="p">),</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">co2_pr_km</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;co2_pr_km&quot;</span><span class="p">),</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">km_aar</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;km_aar&quot;</span><span class="p">),</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">sleep</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;sleep&quot;</span><span class="p">),</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">range</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;range&quot;</span><span class="p">),</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">wltp_el</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;wltp_el&quot;</span><span class="p">),</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;wltp_fossil&quot;</span><span class="p">),</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">capacity_decrease</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">label</span><span class="p">(</span>
+                    <span class="s2">&quot;capacity_decrease&quot;</span>
+                <span class="p">),</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">make</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">),</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">,</span> <span class="n">fake_end</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;end_leasing&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">selected_vehicles</span><span class="p">),</span>
+                <span class="n">or_</span><span class="p">(</span>
+                    <span class="n">Cars</span><span class="o">.</span><span class="n">end_leasing</span> <span class="o">==</span> <span class="n">fake_end</span><span class="p">,</span>
+                    <span class="n">and_</span><span class="p">(</span>
+                        <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">,</span>
+                        <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">group_by</span><span class="p">(</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">make</span><span class="p">,</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">omkostning_aar</span><span class="p">,</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">co2_pr_km</span><span class="p">,</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">km_aar</span><span class="p">,</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">sleep</span><span class="p">,</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">range</span><span class="p">,</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">wltp_el</span><span class="p">,</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">,</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">capacity_decrease</span><span class="p">,</span>
+                <span class="n">Cars</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">subquery</span><span class="p">()</span>
+        <span class="n">cte</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">subq</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">selected_vehicles</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">Cars</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">make</span> <span class="o">==</span> <span class="n">subq</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">make</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">subq</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">omkostning_aar</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">subq</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">omkostning_aar</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">,</span> <span class="n">fake_end</span><span class="p">)</span> <span class="o">==</span> <span class="n">subq</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">co2_pr_km</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">subq</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">co2_pr_km</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">km_aar</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">subq</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">km_aar</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">sleep</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">subq</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">sleep</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">range</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">subq</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">range</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">wltp_el</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="n">subq</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">wltp_el</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="n">subq</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span>
+                    <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">capacity_decrease</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                    <span class="o">==</span> <span class="n">subq</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">capacity_decrease</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">cte</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">first_id</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">selected_vehicles</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">group_by</span><span class="p">(</span>
+                <span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">make</span><span class="p">,</span>
+                <span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">omkostning_aar</span><span class="p">,</span>
+                <span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">co2_pr_km</span><span class="p">,</span>
+                <span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">km_aar</span><span class="p">,</span>
+                <span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">sleep</span><span class="p">,</span>
+                <span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">range</span><span class="p">,</span>
+                <span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">wltp_el</span><span class="p">,</span>
+                <span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">,</span>
+                <span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">capacity_decrease</span><span class="p">,</span>
+                <span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cte</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">cte</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">first_id</span><span class="p">))</span>
+        <span class="n">vehicle_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">vehicle_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="s2">&quot;make&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">make</span><span class="p">,</span>
+                    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                    <span class="s2">&quot;omkostning_aar&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">omkostning_aar</span><span class="p">,</span>
+                    <span class="s2">&quot;co2_pr_km&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">co2_pr_km</span><span class="p">,</span>
+                    <span class="s2">&quot;km_aar&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">km_aar</span><span class="p">,</span>
+                    <span class="s2">&quot;sleep&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">sleep</span><span class="p">,</span>
+                    <span class="s2">&quot;range&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">range</span><span class="p">,</span>
+                    <span class="s2">&quot;wltp_el&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">wltp_el</span><span class="p">,</span>
+                    <span class="s2">&quot;wltp_fossil&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">,</span>
+                    <span class="s2">&quot;capacity_decrease&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">capacity_decrease</span><span class="p">,</span>
+                    <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">count</span><span class="p">,</span>
+                    <span class="s2">&quot;end_leasing&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+            <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">make</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">model</span><span class="p">)),</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">omkostning_aar</span><span class="p">)),</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="n">get_emission</span><span class="p">(</span><span class="n">row</span><span class="p">)),</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">count</span><span class="p">),</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">Td</span><span class="p">(</span>
+                            <span class="s2">&quot;Ejet&quot;</span>
+                            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">fake_end</span><span class="p">)</span>
+                            <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">end_leasing</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="p">),</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Thead</span><span class="p">(</span>
+            <span class="n">html</span><span class="o">.</span><span class="n">Tr</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Biltype&quot;</span><span class="p">),</span>
+                    <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Årlig omk. (DKK)&quot;</span><span class="p">),</span>
+                    <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Drivmiddel forbrug&quot;</span><span class="p">),</span>
+                    <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Antal i beholdning&quot;</span><span class="p">),</span>
+                    <span class="n">html</span><span class="o">.</span><span class="n">Th</span><span class="p">(</span><span class="s2">&quot;Slut leasing&quot;</span><span class="p">),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">header</span><span class="p">,</span> <span class="n">html</span><span class="o">.</span><span class="n">Tbody</span><span class="p">(</span><span class="n">body</span><span class="p">)],</span>
+            <span class="p">),</span>
+            <span class="n">vehicle_data</span><span class="p">,</span>
+            <span class="n">leasing_text</span><span class="p">,</span>
+        <span class="p">]</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

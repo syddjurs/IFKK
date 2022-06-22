@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.data_access package &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fleetmanager.model package" href="fleetmanager.model.html" />
+    <link rel="prev" title="Intelligent Flådestyring og Klimasmarte Kørselsmønstre’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">fleetmanager.data_access package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.data_access.db_engine">fleetmanager.data_access.db_engine module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.data_access.dbschema">fleetmanager.data_access.dbschema module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.data_access">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.model.html">fleetmanager.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.model.qampo.html">fleetmanager.model.qampo package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.dashboard.html">fleetmanager.dashboard package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>fleetmanager.data_access package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/fleetmanager.data_access.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fleetmanager-data-access-package">
+<h1>fleetmanager.data_access package<a class="headerlink" href="#fleetmanager-data-access-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-fleetmanager.data_access.db_engine">
+<span id="fleetmanager-data-access-db-engine-module"></span><h2>fleetmanager.data_access.db_engine module<a class="headerlink" href="#module-fleetmanager.data_access.db_engine" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.data_access.db_engine.create_defaults">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.data_access.db_engine.</span></span><span class="sig-name descname"><span class="pre">create_defaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/data_access/db_engine.html#create_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.data_access.db_engine.create_defaults" title="Permalink to this definition"></a></dt>
+<dd><p>Function to load in the defaults defined in dbschema</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.data_access.db_engine.engine_creator">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.data_access.db_engine.</span></span><span class="sig-name descname"><span class="pre">engine_creator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_server</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Engine</span></span></span><a class="reference internal" href="../_modules/fleetmanager/data_access/db_engine.html#engine_creator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.data_access.db_engine.engine_creator" title="Permalink to this definition"></a></dt>
+<dd><p>Generic db engine creator. Loads env variables, e.g. in .env otherwise could be passed with click.
+Ensures that tables according to dbschema is created before returning</p>
+<p>db_name
+db_password
+db_user
+db_url</p>
+<p>sqlalchemy.engine</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.data_access.db_engine.session_factory">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.data_access.db_engine.</span></span><span class="sig-name descname"><span class="pre">session_factory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_engine</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/data_access/db_engine.html#session_factory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.data_access.db_engine.session_factory" title="Permalink to this definition"></a></dt>
+<dd><p>Generating sessions used all over the project by feeding in a sqlalchemy engine.
+Handles rollback if a connection issue or the like occurs.</p>
+<p>db_engine   :   sqlalchemy.engine, the database connection</p>
+<p>ManagedSession</p>
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.data_access.dbschema">
+<span id="fleetmanager-data-access-dbschema-module"></span><h2>fleetmanager.data_access.dbschema module<a class="headerlink" href="#module-fleetmanager.data_access.dbschema" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.AllowedStarts">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.data_access.dbschema.</span></span><span class="sig-name descname"><span class="pre">AllowedStarts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/data_access/dbschema.html#AllowedStarts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.data_access.dbschema.AllowedStarts" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.AllowedStarts.address">
+<span class="sig-name descname"><span class="pre">address</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.AllowedStarts.address" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.AllowedStarts.cars">
+<span class="sig-name descname"><span class="pre">cars</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.AllowedStarts.cars" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.AllowedStarts.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.AllowedStarts.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.AllowedStarts.latitude">
+<span class="sig-name descname"><span class="pre">latitude</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.AllowedStarts.latitude" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.AllowedStarts.longitude">
+<span class="sig-name descname"><span class="pre">longitude</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.AllowedStarts.longitude" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.data_access.dbschema.</span></span><span class="sig-name descname"><span class="pre">Cars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/data_access/dbschema.html#Cars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.capacity_decrease">
+<span class="sig-name descname"><span class="pre">capacity_decrease</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.capacity_decrease" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.co2_pr_km">
+<span class="sig-name descname"><span class="pre">co2_pr_km</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.co2_pr_km" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.end_leasing">
+<span class="sig-name descname"><span class="pre">end_leasing</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.end_leasing" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.fuel">
+<span class="sig-name descname"><span class="pre">fuel</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.fuel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.km_aar">
+<span class="sig-name descname"><span class="pre">km_aar</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.km_aar" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.leasing_type">
+<span class="sig-name descname"><span class="pre">leasing_type</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.leasing_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.location">
+<span class="sig-name descname"><span class="pre">location</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.location" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.make">
+<span class="sig-name descname"><span class="pre">make</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.make" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.omkostning_aar">
+<span class="sig-name descname"><span class="pre">omkostning_aar</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.omkostning_aar" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.plate">
+<span class="sig-name descname"><span class="pre">plate</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.plate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.range">
+<span class="sig-name descname"><span class="pre">range</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.range" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.sleep">
+<span class="sig-name descname"><span class="pre">sleep</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.sleep" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.start_leasing">
+<span class="sig-name descname"><span class="pre">start_leasing</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.start_leasing" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.wltp_el">
+<span class="sig-name descname"><span class="pre">wltp_el</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.wltp_el" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Cars.wltp_fossil">
+<span class="sig-name descname"><span class="pre">wltp_fossil</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Cars.wltp_fossil" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.FuelTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.data_access.dbschema.</span></span><span class="sig-name descname"><span class="pre">FuelTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/data_access/dbschema.html#FuelTypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.data_access.dbschema.FuelTypes" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.FuelTypes.cars">
+<span class="sig-name descname"><span class="pre">cars</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.FuelTypes.cars" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.FuelTypes.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.FuelTypes.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.FuelTypes.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.FuelTypes.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.FuelTypes.refers_to">
+<span class="sig-name descname"><span class="pre">refers_to</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.FuelTypes.refers_to" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.LeasingTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.data_access.dbschema.</span></span><span class="sig-name descname"><span class="pre">LeasingTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/data_access/dbschema.html#LeasingTypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.data_access.dbschema.LeasingTypes" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.LeasingTypes.cars">
+<span class="sig-name descname"><span class="pre">cars</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.LeasingTypes.cars" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.LeasingTypes.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.LeasingTypes.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.LeasingTypes.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.LeasingTypes.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.data_access.dbschema.</span></span><span class="sig-name descname"><span class="pre">RoundTrips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/data_access/dbschema.html#RoundTrips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips.car_id">
+<span class="sig-name descname"><span class="pre">car_id</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips.car_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips.distance">
+<span class="sig-name descname"><span class="pre">distance</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips.distance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips.driver_name">
+<span class="sig-name descname"><span class="pre">driver_name</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips.driver_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips.end_latitude">
+<span class="sig-name descname"><span class="pre">end_latitude</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips.end_latitude" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips.end_longitude">
+<span class="sig-name descname"><span class="pre">end_longitude</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips.end_longitude" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips.end_time">
+<span class="sig-name descname"><span class="pre">end_time</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips.end_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips.start_latitude">
+<span class="sig-name descname"><span class="pre">start_latitude</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips.start_latitude" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips.start_location_id">
+<span class="sig-name descname"><span class="pre">start_location_id</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips.start_location_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips.start_longitude">
+<span class="sig-name descname"><span class="pre">start_longitude</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips.start_longitude" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.RoundTrips.start_time">
+<span class="sig-name descname"><span class="pre">start_time</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.RoundTrips.start_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.data_access.dbschema.</span></span><span class="sig-name descname"><span class="pre">Trips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/data_access/dbschema.html#Trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.car_id">
+<span class="sig-name descname"><span class="pre">car_id</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.car_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.department">
+<span class="sig-name descname"><span class="pre">department</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.department" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.distance">
+<span class="sig-name descname"><span class="pre">distance</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.distance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.driver_name">
+<span class="sig-name descname"><span class="pre">driver_name</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.driver_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.end_latitude">
+<span class="sig-name descname"><span class="pre">end_latitude</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.end_latitude" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.end_longitude">
+<span class="sig-name descname"><span class="pre">end_longitude</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.end_longitude" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.end_time">
+<span class="sig-name descname"><span class="pre">end_time</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.end_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.start_latitude">
+<span class="sig-name descname"><span class="pre">start_latitude</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.start_latitude" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.start_location">
+<span class="sig-name descname"><span class="pre">start_location</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.start_location" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.start_longitude">
+<span class="sig-name descname"><span class="pre">start_longitude</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.start_longitude" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.Trips.start_time">
+<span class="sig-name descname"><span class="pre">start_time</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.Trips.start_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.VehicleTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.data_access.dbschema.</span></span><span class="sig-name descname"><span class="pre">VehicleTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/data_access/dbschema.html#VehicleTypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.data_access.dbschema.VehicleTypes" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.VehicleTypes.cars">
+<span class="sig-name descname"><span class="pre">cars</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.VehicleTypes.cars" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.VehicleTypes.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.VehicleTypes.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.VehicleTypes.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.VehicleTypes.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.data_access.dbschema.VehicleTypes.refers_to">
+<span class="sig-name descname"><span class="pre">refers_to</span></span><a class="headerlink" href="#fleetmanager.data_access.dbschema.VehicleTypes.refers_to" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.data_access">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fleetmanager.data_access" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Intelligent Flådestyring og Klimasmarte Kørselsmønstre’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fleetmanager.model.html" class="btn btn-neutral float-right" title="fleetmanager.model package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

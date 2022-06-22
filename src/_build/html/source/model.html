@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model package &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">model package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#model-model-module">model.model module</a></li>
+<li><a class="reference internal" href="#model-roundtripgenerator-module">model.roundtripgenerator module</a></li>
+<li><a class="reference internal" href="#model-tabu-module">model.tabu module</a></li>
+<li><a class="reference internal" href="#model-tco-calculator-module">model.tco_calculator module</a></li>
+<li><a class="reference internal" href="#model-trip-generator-module">model.trip_generator module</a></li>
+<li><a class="reference internal" href="#module-model.vehicle">model.vehicle module</a></li>
+<li><a class="reference internal" href="#model-vehicle-optimisation-module">model.vehicle_optimisation module</a></li>
+<li><a class="reference internal" href="#module-model">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>model package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/model.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="model-package">
+<h1>model package<a class="headerlink" href="#model-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="model.qampo.html">model.qampo package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-classes-module">model.qampo.classes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-cost-calculator-module">model.qampo.cost_calculator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-exceptions-module">model.qampo.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-helper-functions-module">model.qampo.helper_functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-instance-generator-module">model.qampo.instance_generator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-main-module">model.qampo.main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-qampo-simulation-module">model.qampo.qampo_simulation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-routeplan-factory-module">model.qampo.routeplan_factory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-routeplan-tester-module">model.qampo.routeplan_tester module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-routing-cp-module">model.qampo.routing_cp module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-routing-greedy-module">model.qampo.routing_greedy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-routing-mip-module">model.qampo.routing_mip module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#model-qampo-validation-module">model.qampo.validation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.qampo.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="model-model-module">
+<h2>model.model module<a class="headerlink" href="#model-model-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="model-roundtripgenerator-module">
+<h2>model.roundtripgenerator module<a class="headerlink" href="#model-roundtripgenerator-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="model-tabu-module">
+<h2>model.tabu module<a class="headerlink" href="#model-tabu-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="model-tco-calculator-module">
+<h2>model.tco_calculator module<a class="headerlink" href="#model-tco-calculator-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="model-trip-generator-module">
+<h2>model.trip_generator module<a class="headerlink" href="#model-trip-generator-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-model.vehicle">
+<span id="model-vehicle-module"></span><h2>model.vehicle module<a class="headerlink" href="#module-model.vehicle" title="Permalink to this heading"></a></h2>
+</section>
+<section id="model-vehicle-optimisation-module">
+<h2>model.vehicle_optimisation module<a class="headerlink" href="#model-vehicle-optimisation-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-model">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-model" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.ConsequenceCalculator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">ConsequenceCalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeframe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#ConsequenceCalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.ConsequenceCalculator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>ConsequenceCalculator class for computing economical, transport and emission consequences of a simulation</p>
+<p>Attributes</p>
+<p>capacity_source : bokeh ColumnDataSource for containing capacity computed by the simulation</p>
+<p>consequence_table : bokeh ColumnDataSource for containing consequences computed by the simulation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.ConsequenceCalculator.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drivingallowance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tco_period</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#ConsequenceCalculator.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.ConsequenceCalculator.compute" title="Permalink to this definition"></a></dt>
+<dd><p>The compute function that calculate the consequences;
+1) explicit CO2 emission,</p>
+<blockquote>
+<div><p>Calculated by taking the product of each vehicle’s allocated km to a yearly approximation
+and the vehicle’s explict noted gram CO2-emission pr. kilometer. Since this is only relevant
+for fossile vehicles, we don’t report this number because it would always show the electrical vehicles
+to have 0 emission. Hence, we refer to 6) yearly CO2-e.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>number of trips without vehicle,</dt><dd><p>Sum of all trips that have no vehicle assigned. Displayed in the simulation.trips.[inventory_type_column]
+with a value of -1.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>pay out in driving allowance,</dt><dd><p>In order to punish the unallocated trips driving allowance is simulated. All unallocated trips are summed
+to a yearly approximation. The driving allowance is paid in rates; 3.44 kr. pr. km. under 840 kilometer
+threshold and 1.90 kr. pr. km. above 840 kilometer threshold.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>yearly average expense on hardware</dt><dd><p>Is calculated by taking the sum of the reported “omkostning_aar” for all vehicles</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>yearly expense on fuel</dt><dd><p>Is calculated through the tco_calcluate.TCOCalculator, which is based on the tool
+“tco-vaerktoej-motorkoeretoejer” from POGI. Check the details on the class.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>yearly CO2-e expense (implicit CO2 emission)</dt><dd><p>Is calculated through the tco_calcluate.TCOCalculator, which is based on the tool
+“tco-vaerktoej-motorkoeretoejer” from POGI. Check the details on the class.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>total yearly expense</dt><dd><p>Is calculated by taking the sum of driving allowance, yearly average expense on hardware and yearly expense
+on fuel.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<dl class="simple">
+<dt>simulation<span class="classifier">model.Simulation class - the simulation class with it’s associated trips. The inventory - and distance columns of the</span></dt><dd><p>simulation.trips frame holds the necessary data to calculate the aforementioned values.</p>
+</dd>
+</dl>
+<p>drivingallowance    :   model.DrivingAllowance - a DrivingAllowance class or None.
+tco_period  :   list of two ints ([0, 1]) - the selected tco_period which is passed to the TCO_Calculator object.</p>
+<blockquote>
+<div><p>First int to define projection periode, second int to define the evaluation period.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.ConsequenceCalculator.get_html_information">
+<span class="sig-name descname"><span class="pre">get_html_information</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#ConsequenceCalculator.get_html_information"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.ConsequenceCalculator.get_html_information" title="Permalink to this definition"></a></dt>
+<dd><p>Function for producing html used on infromation panel</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.ConsequenceCalculator.update_capacity_source">
+<span class="sig-name descname"><span class="pre">update_capacity_source</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#ConsequenceCalculator.update_capacity_source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.ConsequenceCalculator.update_capacity_source" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.ConsequenceCalculator.update_consequence_table">
+<span class="sig-name descname"><span class="pre">update_consequence_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#ConsequenceCalculator.update_consequence_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.ConsequenceCalculator.update_consequence_table" title="Permalink to this definition"></a></dt>
+<dd><p>Update the consequence table</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.DrivingAllowance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">DrivingAllowance</span></span><a class="reference internal" href="../_modules/model.html#DrivingAllowance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.DrivingAllowance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for containing and manipulating driving allowance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.DrivingAllowance.calculate_allowance">
+<span class="sig-name descname"><span class="pre">calculate_allowance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yearly_distance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#DrivingAllowance.calculate_allowance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.DrivingAllowance.calculate_allowance" title="Permalink to this definition"></a></dt>
+<dd><p>Method for calculating the driving allowance for unallocated trips. Defines a threshold of 840 km which is
+eligible to get the high allowance fee, from which the fee drops to the low allowance. Especially useful in
+tabu search in order not to favor unallocated trips because it is cheap.</p>
+<p>yearly_distance :   int - sum of kilometers without an allocated vehicle</p>
+<p>driving allowance   :   int - sum of money paid out in driving allowance to attribute the unallocated trips</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.FleetManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">FleetManager</span></span><a class="reference internal" href="../_modules/model.html#FleetManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.FleetManager" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>FleetManager class keeps track of the fleets and the booking.</p>
+<p>options: options of type model.OptionsFile</p>
+<p>vehicle_factory : types of vehicles in fleet of type vehicle.VehicleFactory
+simulation_fleet : simulation fleet of type vehicle.FleetInventory
+current_fleet : current fleet of type vehicle.FleetInventory</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.FleetManager.get_html_information">
+<span class="sig-name descname"><span class="pre">get_html_information</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#FleetManager.get_html_information"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.FleetManager.get_html_information" title="Permalink to this definition"></a></dt>
+<dd><p>Function for producing html used on infromation panel</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.FleetManager.set_current_fleet">
+<span class="sig-name descname"><span class="pre">set_current_fleet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ebikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#FleetManager.set_current_fleet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.FleetManager.set_current_fleet" title="Permalink to this definition"></a></dt>
+<dd><p>Set current fleet composition</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.FleetManager.set_simulation_fleet">
+<span class="sig-name descname"><span class="pre">set_simulation_fleet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ebikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#FleetManager.set_simulation_fleet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.FleetManager.set_simulation_fleet" title="Permalink to this definition"></a></dt>
+<dd><p>Set simulation fleet composition</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.FleetManager.set_timestamps">
+<span class="sig-name descname"><span class="pre">set_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#FleetManager.set_timestamps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.FleetManager.set_timestamps" title="Permalink to this definition"></a></dt>
+<dd><p>Set timestamps of fleets</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.Model">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tco_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">1)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Model" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Model class for MVC pattern of the simulation tool.</p>
+<p>location    :   int - id of the location selected for the simulation
+dates   :   list of datetime - the selected time frame for the trips to simulated - i.e. [start time, end time]</p>
+<blockquote>
+<div><p>will define the period from which the trips will be pulled.</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.Model.compute_histogram">
+<span class="sig-name descname"><span class="pre">compute_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mindist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Model.compute_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Model.compute_histogram" title="Permalink to this definition"></a></dt>
+<dd><p>Compute histograms for current and simulation</p>
+<p>mindist : defaults to 0. Minimum distance to use for histograms
+maxdist : Maximum distance to use for histograms. If None, use the maximum distance of the trips</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.Model.run_simulation">
+<span class="sig-name descname"><span class="pre">run_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intelligent_simulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bike_max_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bike_time_slots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bike_time_slot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bike_percentage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">km_aar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Model.run_simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Model.run_simulation" title="Permalink to this definition"></a></dt>
+<dd><p>Create and run a simulation. Updates histograms and consequence information.
+Sets up the simulation and initialises the fleets and runs the simulation.</p>
+<p>intelligent_simulation  :   bool - to be passed to the simulation object
+bike_max_distance   :   int - to define bike configuration, max allowed distance for a bike trip
+bike_time_slots :   bike configuration time slot, when are bike vehicles allowed to accept trips
+max_bike_time_slot  :   bike configuration, how many bike slots are available for bikes
+bike_percentage :   how many percentage of the trips that qualifies for bike trip should be accepted
+km_aar  :   bool - should the vehicles associated km_aar constrain the vehicle from accepting trips when the</p>
+<blockquote>
+<div><p>yearly capacity is reached. Only available on intelligent_simulation = False</p>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.Simulation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">Simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fleet_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_callback</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tabu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intelligent_simulation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Simulation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The major Simulation class for performing simulation on trips.</p>
+<p>trips : trips for simulation of type modelTrips
+fleet_manager : fleet manager for handling fleets of type model.FleetManager
+progress_callback : None
+tabu    :   bool - to let the simulation know if it’s a tabu simulation. If so, only the simulation setup will be</p>
+<blockquote>
+<div><p>simulated, and not the current.</p>
+</div></blockquote>
+<p>intelligent_simulation  :   bool - should intelligent simulation be used, i.e. Qampo algorithm to allocate trips.
+timestamp_set   :   bool -  whether the simulation trips already have generated timeslots</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.Simulation.generate_qampo_data">
+<span class="sig-name descname"><span class="pre">generate_qampo_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fleet_inventory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trips</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Simulation.generate_qampo_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Simulation.generate_qampo_data" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience function for converting fleet inventory and trips data to json format
+required by qampo api.</p>
+<p>fleet_inventory : fleet inventory to run simualtion on. Type model.FleetInventory.
+trips: trip data to run simulation on.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.Simulation.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Simulation.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Simulation.run" title="Permalink to this definition"></a></dt>
+<dd><p>Runs simulation of current and simulation fleet</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.Simulation.run_single">
+<span class="sig-name descname"><span class="pre">run_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fleet_inventory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Simulation.run_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Simulation.run_single" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience function for running simualtion on a single fleet</p>
+<p>Takes the fleet and iterates over the trips to see which, if any, vehicle is available for booking.
+If the fleet_inventory name is current, the vehicles are booked according to its recorded trips.
+This will overwrite any rules implied by the simulation, e.g. vehicle cannot be booked for a trip on the
+same minute stamp as it ends a trips, sleep rules for electrical cars etc.</p>
+<p>The vehicles should be sorted according to the desired priority (defaults to co2 emission). For every trip the
+first available vehicle is booked for the trips.</p>
+<p>fleet_inventory : fleet inventory to run simualtion on. Type model.FleetInventory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.Simulation.run_single_qampo">
+<span class="sig-name descname"><span class="pre">run_single_qampo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fleet_inventory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exact_mip'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Simulation.run_single_qampo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Simulation.run_single_qampo" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience function for running simualtion on a single fleet through qampo api.</p>
+<p>fleet_inventory : fleet inventory to run simualtion on. Type model.FleetInventory.
+algorithm_type : the algorithm the qampo api uses. must be either ‘exact_mip’, ‘greedy’ or ‘exact_cp’</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.Trips">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">Trips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Trips" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Trips class for containing and manipulating trips of the simulation.</p>
+<p>dataset : name (string) of dummy dataset to load. If dataset is a pandas DataFrame it is loaded as trips.all_trips.</p>
+<p>all_trips : All trips in dataset (no filtering)
+trips : Trips in dataset applying date and department filter
+date_filter : boolean numpy array with same length as all_trips
+department_filter : boolean numpy array with same length as all_trips</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.Trips.get_dummy_trips">
+<span class="sig-name descname"><span class="pre">get_dummy_trips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Trips.get_dummy_trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Trips.get_dummy_trips" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to generate fake data for testing</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.Trips.set_assignment">
+<span class="sig-name descname"><span class="pre">set_assignment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Trips.set_assignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Trips.set_assignment" title="Permalink to this definition"></a></dt>
+<dd><p>Method for setting up necessary columns on the trips in order
+to book-keep the allocated vehicles on the trips.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.Trips.set_filtered_trips">
+<span class="sig-name descname"><span class="pre">set_filtered_trips</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Trips.set_filtered_trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Trips.set_filtered_trips" title="Permalink to this definition"></a></dt>
+<dd><p>Applies date and department filter and sets model.trips accordingly.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.Trips.set_timestamps">
+<span class="sig-name descname"><span class="pre">set_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/model.html#Trips.set_timestamps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.Trips.set_timestamps" title="Permalink to this definition"></a></dt>
+<dd><p>Set timestamps of Trips and mapped all trips to the corresponding timeslots.</p>
+<p>timestamps : pandas PeriodIndex</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+src
+===
+
+.. toctree::
+   :maxdepth: 4
+
+   fleetmanager.dashboard
+   fleetmanager.data_access
+   fleetmanager.model
+   fleetmanager.model.qampo

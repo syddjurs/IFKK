@@ -1,0 +1,77 @@
+fleetmanager.dashboard package
+==============================
+
+Submodules
+----------
+
+fleetmanager.dashboard.app module
+---------------------------------
+
+.. automodule:: fleetmanager.dashboard.app
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.dashboard.page\_config module
+------------------------------------------
+
+.. automodule:: fleetmanager.dashboard.page_config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.dashboard.page\_fleet module
+-----------------------------------------
+
+.. automodule:: fleetmanager.dashboard.page_fleet
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.dashboard.page\_goal module
+----------------------------------------
+
+.. automodule:: fleetmanager.dashboard.page_goal
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.dashboard.page\_setup module
+-----------------------------------------
+
+.. automodule:: fleetmanager.dashboard.page_setup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.dashboard.sidebar module
+-------------------------------------
+
+.. automodule:: fleetmanager.dashboard.sidebar
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.dashboard.utils module
+-----------------------------------
+
+.. automodule:: fleetmanager.dashboard.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.dashboard.view module
+----------------------------------
+
+.. automodule:: fleetmanager.dashboard.view
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: fleetmanager.dashboard
+   :members:
+   :undoc-members:
+   :show-inheritance:

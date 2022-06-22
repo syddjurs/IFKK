@@ -1,0 +1,77 @@
+model package
+=============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   model.qampo
+
+Submodules
+----------
+
+model.model module
+------------------
+
+.. automodule:: model.model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+model.roundtripgenerator module
+-------------------------------
+
+.. automodule:: model.roundtripgenerator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+model.tabu module
+-----------------
+
+.. automodule:: model.tabu
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+model.tco\_calculator module
+----------------------------
+
+.. automodule:: model.tco_calculator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+model.trip\_generator module
+----------------------------
+
+.. automodule:: model.trip_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+model.vehicle module
+--------------------
+
+.. automodule:: model.vehicle
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+model.vehicle\_optimisation module
+----------------------------------
+
+.. automodule:: model.vehicle_optimisation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: model
+   :members:
+   :undoc-members:
+   :show-inheritance:

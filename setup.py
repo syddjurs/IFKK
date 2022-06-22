@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="fleetmanager-droidsagency",
-    version="0.0.1",
+    version="1.0.0",
     author="Droids Agency",
     description="Fleet management",
     long_description=long_description,

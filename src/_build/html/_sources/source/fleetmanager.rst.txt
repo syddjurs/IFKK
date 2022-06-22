@@ -1,0 +1,20 @@
+fleetmanager package
+====================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   fleetmanager.dashboard
+   fleetmanager.data_access
+   fleetmanager.model
+
+Module contents
+---------------
+
+.. automodule:: fleetmanager
+   :members:
+   :undoc-members:
+   :show-inheritance:

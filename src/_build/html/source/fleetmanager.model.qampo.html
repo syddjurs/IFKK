@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.model.qampo package &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fleetmanager.dashboard package" href="fleetmanager.dashboard.html" />
+    <link rel="prev" title="fleetmanager.model package" href="fleetmanager.model.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.data_access.html">fleetmanager.data_access package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.model.html">fleetmanager.model package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">fleetmanager.model.qampo package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.classes">fleetmanager.model.qampo.classes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.cost_calculator">fleetmanager.model.qampo.cost_calculator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.exceptions">fleetmanager.model.qampo.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.helper_functions">fleetmanager.model.qampo.helper_functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.instance_generator">fleetmanager.model.qampo.instance_generator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.main">fleetmanager.model.qampo.main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.qampo_simulation">fleetmanager.model.qampo.qampo_simulation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.routeplan_factory">fleetmanager.model.qampo.routeplan_factory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.routeplan_tester">fleetmanager.model.qampo.routeplan_tester module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.routing_cp">fleetmanager.model.qampo.routing_cp module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.routing_greedy">fleetmanager.model.qampo.routing_greedy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.routing_mip">fleetmanager.model.qampo.routing_mip module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo.validation">fleetmanager.model.qampo.validation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.qampo">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.dashboard.html">fleetmanager.dashboard package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="fleetmanager.model.html">fleetmanager.model package</a> &raquo;</li>
+      <li>fleetmanager.model.qampo package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/fleetmanager.model.qampo.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fleetmanager-model-qampo-package">
+<h1>fleetmanager.model.qampo package<a class="headerlink" href="#fleetmanager-model-qampo-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-fleetmanager.model.qampo.classes">
+<span id="fleetmanager-model-qampo-classes-module"></span><h2>fleetmanager.model.qampo.classes module<a class="headerlink" href="#module-fleetmanager.model.qampo.classes" title="Permalink to this heading"></a></h2>
+<p>This file defines the different classes used in the solution.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.AlgorithmParameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.classes.</span></span><span class="sig-name descname"><span class="pre">AlgorithmParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_limit_in_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#AlgorithmParameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.AlgorithmParameters" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.AlgorithmParameters.time_limit_in_seconds">
+<span class="sig-name descname"><span class="pre">time_limit_in_seconds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.AlgorithmParameters.time_limit_in_seconds" title="Permalink to this definition"></a></dt>
+<dd><p>Defines for how long, an algorithm is allowed to be run.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.AlgorithmType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.classes.</span></span><span class="sig-name descname"><span class="pre">AlgorithmType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#AlgorithmType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.AlgorithmType" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>What type of algorithm to be used.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.AlgorithmType.EXACT_CP">
+<span class="sig-name descname"><span class="pre">EXACT_CP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'exact_cp'</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.AlgorithmType.EXACT_CP" title="Permalink to this definition"></a></dt>
+<dd><p>Exact constraint programming algorithm.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.AlgorithmType.EXACT_MIP">
+<span class="sig-name descname"><span class="pre">EXACT_MIP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'exact_mip'</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.AlgorithmType.EXACT_MIP" title="Permalink to this definition"></a></dt>
+<dd><p>Exact mixed-integer programming algorithm.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.AlgorithmType.GREEDY">
+<span class="sig-name descname"><span class="pre">GREEDY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'greedy'</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.AlgorithmType.GREEDY" title="Permalink to this definition"></a></dt>
+<dd><p>Greedy algorithm.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Assignment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.classes.</span></span><span class="sig-name descname"><span class="pre">Assignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">route</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trips" title="fleetmanager.model.qampo.classes.Trips"><span class="pre">Trips</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2_emission_in_tons</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#Assignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.Assignment" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>An assignment is trips assigned to a specific vehicle.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Assignment.co2_emission_in_tons">
+<span class="sig-name descname"><span class="pre">co2_emission_in_tons</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Assignment.co2_emission_in_tons" title="Permalink to this definition"></a></dt>
+<dd><p>The CO2 emission of the route measured in tons.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Assignment.route">
+<span class="sig-name descname"><span class="pre">route</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trips" title="fleetmanager.model.qampo.classes.Trips"><span class="pre">Trips</span></a></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Assignment.route" title="Permalink to this definition"></a></dt>
+<dd><p>Contains a list of trips. A new trip can start immediately, after the previous trip ends, thus, ending at 08:00 means, the next step can start at 08:00.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Assignment.variable_cost">
+<span class="sig-name descname"><span class="pre">variable_cost</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Assignment.variable_cost" title="Permalink to this definition"></a></dt>
+<dd><p>The variable cost for the route.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Assignment.vehicle">
+<span class="sig-name descname"><span class="pre">vehicle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Assignment.vehicle" title="Permalink to this definition"></a></dt>
+<dd><p>The vehicle, a route is assigned to.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.BaseVehicle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.classes.</span></span><span class="sig-name descname"><span class="pre">BaseVehicle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_cost_per_kilometer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2_emission_gram_per_kilometer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#BaseVehicle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>A base vehicle consists of a variable cost of kilometers and an amount of CO2 emission per kilometer measured in grams.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.BaseVehicle.Config">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Config</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#BaseVehicle.Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.BaseVehicle.Config" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.BaseVehicle.Config.allow_mutation">
+<span class="sig-name descname"><span class="pre">allow_mutation</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.BaseVehicle.Config.allow_mutation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.BaseVehicle.co2_emission_gram_per_kilometer">
+<span class="sig-name descname"><span class="pre">co2_emission_gram_per_kilometer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.BaseVehicle.co2_emission_gram_per_kilometer" title="Permalink to this definition"></a></dt>
+<dd><p>The CO2 emission per kilometer measured in grams.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.BaseVehicle.variable_cost_per_kilometer">
+<span class="sig-name descname"><span class="pre">variable_cost_per_kilometer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.BaseVehicle.variable_cost_per_kilometer" title="Permalink to this definition"></a></dt>
+<dd><p>The variable cost per kilometer.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Fleet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.classes.</span></span><span class="sig-name descname"><span class="pre">Fleet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Vehicle" title="fleetmanager.model.qampo.classes.Vehicle"><span class="pre">fleetmanager.model.qampo.classes.Vehicle</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">employee_car</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">emission_cost_per_ton_co2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#Fleet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.Fleet" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>A tradeoff between C02 and money for a list of vehicles.</p>
+<p>Official documents say, somewhere between 1500 and 5000 dkk/ton is an optional list for possible parameters for scenarios, otherwise, default values are set.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Fleet.emission_cost_per_ton_co2">
+<span class="sig-name descname"><span class="pre">emission_cost_per_ton_co2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Fleet.emission_cost_per_ton_co2" title="Permalink to this definition"></a></dt>
+<dd><p>The CO2 emission cost per ton. Default value will be 1000 dkk.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Fleet.employee_car">
+<span class="sig-name descname"><span class="pre">employee_car</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Fleet.employee_car" title="Permalink to this definition"></a></dt>
+<dd><p>An employee car.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Fleet.vehicles">
+<span class="sig-name descname"><span class="pre">vehicles</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Vehicle" title="fleetmanager.model.qampo.classes.Vehicle"><span class="pre">fleetmanager.model.qampo.classes.Vehicle</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Fleet.vehicles" title="Permalink to this definition"></a></dt>
+<dd><p>A list of vehicles.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.RoutePlan">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.classes.</span></span><span class="sig-name descname"><span class="pre">RoutePlan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Assignment" title="fleetmanager.model.qampo.classes.Assignment"><span class="pre">fleetmanager.model.qampo.classes.Assignment</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">employee_car</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.Assignment" title="fleetmanager.model.qampo.classes.Assignment"><span class="pre">Assignment</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_co2_emission_in_tons</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#RoutePlan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.RoutePlan" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>A route plan consists of a list of assignments, total cost and total CO2 emission.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.RoutePlan.assignments">
+<span class="sig-name descname"><span class="pre">assignments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Assignment" title="fleetmanager.model.qampo.classes.Assignment"><span class="pre">fleetmanager.model.qampo.classes.Assignment</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.RoutePlan.assignments" title="Permalink to this definition"></a></dt>
+<dd><p>A list of assignments.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.RoutePlan.employee_car">
+<span class="sig-name descname"><span class="pre">employee_car</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Assignment" title="fleetmanager.model.qampo.classes.Assignment"><span class="pre">Assignment</span></a></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.RoutePlan.employee_car" title="Permalink to this definition"></a></dt>
+<dd><p>The assignment for the employee car(s)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.RoutePlan.total_co2_emission_in_tons">
+<span class="sig-name descname"><span class="pre">total_co2_emission_in_tons</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.RoutePlan.total_co2_emission_in_tons" title="Permalink to this definition"></a></dt>
+<dd><p>The total amount of CO2 emission of the assignments measured in tons.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.RoutePlan.total_cost">
+<span class="sig-name descname"><span class="pre">total_cost</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.RoutePlan.total_cost" title="Permalink to this definition"></a></dt>
+<dd><p>The total cost of the routes.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.RoutingAlgorithm">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.classes.</span></span><span class="sig-name descname"><span class="pre">RoutingAlgorithm</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#RoutingAlgorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.RoutingAlgorithm" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>An ABC for doing a single day routing assignment.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.RoutingAlgorithm.optimize_single_day">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">optimize_single_day</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Vehicle" title="fleetmanager.model.qampo.classes.Vehicle"><span class="pre">fleetmanager.model.qampo.classes.Vehicle</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">employee_car</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">emission_cost_per_ton_co2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_limit_in_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#fleetmanager.model.qampo.classes.RoutePlan" title="fleetmanager.model.qampo.classes.RoutePlan"><span class="pre">RoutePlan</span></a></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#RoutingAlgorithm.optimize_single_day"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.RoutingAlgorithm.optimize_single_day" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Trip">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.classes.</span></span><span class="sig-name descname"><span class="pre">Trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_in_kilometers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#Trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.Trip" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>A trip consist of a start time, an end time and the length of the trip measured in kilometers.</p>
+<p>The starting location and ending location are assumed to be identical for this application.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Trip.Config">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Config</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#Trip.Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.Trip.Config" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Trip.Config.allow_mutation">
+<span class="sig-name descname"><span class="pre">allow_mutation</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Trip.Config.allow_mutation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Trip.end_time">
+<span class="sig-name descname"><span class="pre">end_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Trip.end_time" title="Permalink to this definition"></a></dt>
+<dd><p>The time for which the trip ends.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Trip.get_trip_length_in_minutes">
+<span class="sig-name descname"><span class="pre">get_trip_length_in_minutes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#Trip.get_trip_length_in_minutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.Trip.get_trip_length_in_minutes" title="Permalink to this definition"></a></dt>
+<dd><p>Get the trip duration in minutes (rounded up) of the trip
+&#64;:return duration in number of minutes (rounded up)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Trip.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Trip.id" title="Permalink to this definition"></a></dt>
+<dd><p>A unique id for the trip.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Trip.length_in_kilometers">
+<span class="sig-name descname"><span class="pre">length_in_kilometers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Trip.length_in_kilometers" title="Permalink to this definition"></a></dt>
+<dd><p>The length of the trip measured in kilometers.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Trip.start_time">
+<span class="sig-name descname"><span class="pre">start_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Trip.start_time" title="Permalink to this definition"></a></dt>
+<dd><p>The time for which the trip begins.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Trips">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.classes.</span></span><span class="sig-name descname"><span class="pre">Trips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#Trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.Trips" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>A list of trips.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Trips.trips">
+<span class="sig-name descname"><span class="pre">trips</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Trips.trips" title="Permalink to this definition"></a></dt>
+<dd><p>A list of trips.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Vehicle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.classes.</span></span><span class="sig-name descname"><span class="pre">Vehicle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_cost_per_kilometer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2_emission_gram_per_kilometer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_in_kilometers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_driving_in_minutes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#Vehicle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.Vehicle" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseVehicle</span></code></a></p>
+<p>A vehicle consists of a range of kilometers, a variable cost of kilometers, an amount of CO2 emission per kilometer measured in grams, and a name.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Vehicle.Config">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Config</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/classes.html#Vehicle.Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.classes.Vehicle.Config" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Vehicle.Config.allow_mutation">
+<span class="sig-name descname"><span class="pre">allow_mutation</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Vehicle.Config.allow_mutation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Vehicle.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Vehicle.id" title="Permalink to this definition"></a></dt>
+<dd><p>A unique id for the vehicle.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Vehicle.maximum_driving_in_minutes">
+<span class="sig-name descname"><span class="pre">maximum_driving_in_minutes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Vehicle.maximum_driving_in_minutes" title="Permalink to this definition"></a></dt>
+<dd><p>The number of minutes the vehicle can drive. Used to control e.g. electric cars recharge time in lieu of a proper battery management implementation e.g. an uptime of 16*60 minutes could model an 8 hour recharging time.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Vehicle.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Vehicle.name" title="Permalink to this definition"></a></dt>
+<dd><p>The name of the car, e.g. Toyota Yaris No. 1. Not used in the algorithm, but for easier debugging and information.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.classes.Vehicle.range_in_kilometers">
+<span class="sig-name descname"><span class="pre">range_in_kilometers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#fleetmanager.model.qampo.classes.Vehicle.range_in_kilometers" title="Permalink to this definition"></a></dt>
+<dd><p>The range in kilometers.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.cost_calculator">
+<span id="fleetmanager-model-qampo-cost-calculator-module"></span><h2>fleetmanager.model.qampo.cost_calculator module<a class="headerlink" href="#module-fleetmanager.model.qampo.cost_calculator" title="Permalink to this heading"></a></h2>
+<p>This file defines functions for calculating the CO2 emission and costs for a route plan.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.cost_calculator.calculate_co2_emission_cost_per_kilometer_for_vehicle">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.cost_calculator.</span></span><span class="sig-name descname"><span class="pre">calculate_co2_emission_cost_per_kilometer_for_vehicle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">emission_cost_per_ton_co2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/cost_calculator.html#calculate_co2_emission_cost_per_kilometer_for_vehicle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.cost_calculator.calculate_co2_emission_cost_per_kilometer_for_vehicle" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the CO2 emission cost per kilometer for a given vehicle.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.cost_calculator.calculate_co2_emission_gram_of_trips">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.cost_calculator.</span></span><span class="sig-name descname"><span class="pre">calculate_co2_emission_gram_of_trips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/cost_calculator.html#calculate_co2_emission_gram_of_trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.cost_calculator.calculate_co2_emission_gram_of_trips" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the CO2 emission (grams) of all trips combined.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.cost_calculator.calculate_co2_emission_ton_of_trips">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.cost_calculator.</span></span><span class="sig-name descname"><span class="pre">calculate_co2_emission_ton_of_trips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/cost_calculator.html#calculate_co2_emission_ton_of_trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.cost_calculator.calculate_co2_emission_ton_of_trips" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the CO2 emission (tons) of all trips combined.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.cost_calculator.calculate_total_length_of_trips">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.cost_calculator.</span></span><span class="sig-name descname"><span class="pre">calculate_total_length_of_trips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/cost_calculator.html#calculate_total_length_of_trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.cost_calculator.calculate_total_length_of_trips" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the length of all trips combined.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.cost_calculator.calculate_variable_cost_of_trips">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.cost_calculator.</span></span><span class="sig-name descname"><span class="pre">calculate_variable_cost_of_trips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/cost_calculator.html#calculate_variable_cost_of_trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.cost_calculator.calculate_variable_cost_of_trips" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the cost of all trips combined.</p>
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.exceptions">
+<span id="fleetmanager-model-qampo-exceptions-module"></span><h2>fleetmanager.model.qampo.exceptions module<a class="headerlink" href="#module-fleetmanager.model.qampo.exceptions" title="Permalink to this heading"></a></h2>
+<p>This file defines a number of custom exceptions.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.exceptions.MultipleDaysNotSupported">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.exceptions.</span></span><span class="sig-name descname"><span class="pre">MultipleDaysNotSupported</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/exceptions.html#MultipleDaysNotSupported"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.exceptions.MultipleDaysNotSupported" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Thrown, when multiple days are not supported (usually in the optimization).</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.exceptions.NoSolutionFoundException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.exceptions.</span></span><span class="sig-name descname"><span class="pre">NoSolutionFoundException</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/exceptions.html#NoSolutionFoundException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.exceptions.NoSolutionFoundException" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Thrown, when no solution can be found.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.exceptions.NumberOfTripsPlannedMismatchException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.exceptions.</span></span><span class="sig-name descname"><span class="pre">NumberOfTripsPlannedMismatchException</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/exceptions.html#NumberOfTripsPlannedMismatchException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.exceptions.NumberOfTripsPlannedMismatchException" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Thrown, when number of trips does not match number of trips assigned.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.exceptions.RangeExceededException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.exceptions.</span></span><span class="sig-name descname"><span class="pre">RangeExceededException</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/exceptions.html#RangeExceededException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.exceptions.RangeExceededException" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Thrown, when a vehicle is assigned more kilometers than its range.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.exceptions.UnsupportedAlgorithmType">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.exceptions.</span></span><span class="sig-name descname"><span class="pre">UnsupportedAlgorithmType</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/exceptions.html#UnsupportedAlgorithmType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.exceptions.UnsupportedAlgorithmType" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Thrown, when the provided algorithm is not supported.</p>
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.helper_functions">
+<span id="fleetmanager-model-qampo-helper-functions-module"></span><h2>fleetmanager.model.qampo.helper_functions module<a class="headerlink" href="#module-fleetmanager.model.qampo.helper_functions" title="Permalink to this heading"></a></h2>
+<p>This file defines various helper functions used throughout the code.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.helper_functions.prioritize_vehicles_according_to_weighted_variable_costs">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.helper_functions.</span></span><span class="sig-name descname"><span class="pre">prioritize_vehicles_according_to_weighted_variable_costs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vehicles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">fleetmanager.model.qampo.classes.BaseVehicle</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emission_cost_per_ton_co2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">fleetmanager.model.qampo.classes.BaseVehicle</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/helper_functions.html#prioritize_vehicles_according_to_weighted_variable_costs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.helper_functions.prioritize_vehicles_according_to_weighted_variable_costs" title="Permalink to this definition"></a></dt>
+<dd><p>This function weights the variable costs and CO2 emission of the vehicles and returns them in a sorted list in ascending order.
+:param vehicles: Vehicles to be listed.
+:param emission_cost_per_ton_co2: The cost of CO2 emission in dkk (or at least same currency as the variable cost on the vehicles).
+:return: Prioritized list of vehicles with the cheapest vehicle in position 0, second cheapest in position 1, etc.</p>
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.instance_generator">
+<span id="fleetmanager-model-qampo-instance-generator-module"></span><h2>fleetmanager.model.qampo.instance_generator module<a class="headerlink" href="#module-fleetmanager.model.qampo.instance_generator" title="Permalink to this heading"></a></h2>
+<p>This file defines functions for generating random test instances.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.instance_generator.generate_trips">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.instance_generator.</span></span><span class="sig-name descname"><span class="pre">generate_trips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">earliest_start_hour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latest_start_hour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_length_in_kilometers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_length_in_kilometers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trips" title="fleetmanager.model.qampo.classes.Trips"><span class="pre">Trips</span></a></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/instance_generator.html#generate_trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.instance_generator.generate_trips" title="Permalink to this definition"></a></dt>
+<dd><p>Generates the specified number of trips with a starting time within the earliest start hour and latest start hour within the specified range in kilometers.</p>
+<p>In general a uniform distribution is applied to the different fields.</p>
+<p>The trips will be generated to start at minute 00/60, 15, 30 or 45.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>earliest_start_hour</strong> – E.g. 6 meaning, the earliest start time would be 6:00. Must be &gt;= 0.</p></li>
+<li><p><strong>latest_start_hour</strong> – E.g. 23 meaning, the latest start time would be 23:00. Must be &lt;= 23.</p></li>
+<li><p><strong>number_of_trips</strong> – E.g. 100 meaning, 100 trips are generated.</p></li>
+<li><p><strong>minimum_length_in_kilometers</strong> – The minimum length of a trip.</p></li>
+<li><p><strong>maximum_length_in_kilometers</strong> – The maximum length of a trip.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A class of Trips.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.main">
+<span id="fleetmanager-model-qampo-main-module"></span><h2>fleetmanager.model.qampo.main module<a class="headerlink" href="#module-fleetmanager.model.qampo.main" title="Permalink to this heading"></a></h2>
+<p>This file defines the main functionality of the repository - a webservice that can be called to optimize routes a day/a fleet over a couple of days.
+FastAPI is used for handling different HTTP requests, for instance to post an optimization.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.main.optimize_single_day">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.main.</span></span><span class="sig-name descname"><span class="pre">optimize_single_day</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fleet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.Fleet" title="fleetmanager.model.qampo.classes.Fleet"><span class="pre">Fleet</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.AlgorithmType" title="fleetmanager.model.qampo.classes.AlgorithmType"><span class="pre">AlgorithmType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.AlgorithmParameters" title="fleetmanager.model.qampo.classes.AlgorithmParameters"><span class="pre">AlgorithmParameters</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">AlgorithmParameters(time_limit_in_seconds=60)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/main.html#optimize_single_day"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.main.optimize_single_day" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.qampo_simulation">
+<span id="fleetmanager-model-qampo-qampo-simulation-module"></span><h2>fleetmanager.model.qampo.qampo_simulation module<a class="headerlink" href="#module-fleetmanager.model.qampo.qampo_simulation" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.qampo_simulation.optimize_single_day">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.qampo_simulation.</span></span><span class="sig-name descname"><span class="pre">optimize_single_day</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fleet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.Fleet" title="fleetmanager.model.qampo.classes.Fleet"><span class="pre">Fleet</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.AlgorithmType" title="fleetmanager.model.qampo.classes.AlgorithmType"><span class="pre">AlgorithmType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.AlgorithmParameters" title="fleetmanager.model.qampo.classes.AlgorithmParameters"><span class="pre">AlgorithmParameters</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">AlgorithmParameters(time_limit_in_seconds=60)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/qampo_simulation.html#optimize_single_day"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.qampo_simulation.optimize_single_day" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.routeplan_factory">
+<span id="fleetmanager-model-qampo-routeplan-factory-module"></span><h2>fleetmanager.model.qampo.routeplan_factory module<a class="headerlink" href="#module-fleetmanager.model.qampo.routeplan_factory" title="Permalink to this heading"></a></h2>
+<p>This file defines route plan factory to be used for classes.py.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.routeplan_factory.route_plan_from_vehicle_trip_map">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.routeplan_factory.</span></span><span class="sig-name descname"><span class="pre">route_plan_from_vehicle_trip_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vehicle_assignments:</span> <span class="pre">{&lt;class</span> <span class="pre">'fleetmanager.model.qampo.classes.Vehicle'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list[fleetmanager.model.qampo.classes.Trip]}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#fleetmanager.model.qampo.classes.RoutePlan" title="fleetmanager.model.qampo.classes.RoutePlan"><span class="pre">RoutePlan</span></a></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/routeplan_factory.html#route_plan_from_vehicle_trip_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.routeplan_factory.route_plan_from_vehicle_trip_map" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a route plan from a dictionary of vehicle as key and list of trips as value.
+:param vehicle_assignments: Assignments for vehicle.
+:return: Route plan.</p>
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.routeplan_tester">
+<span id="fleetmanager-model-qampo-routeplan-tester-module"></span><h2>fleetmanager.model.qampo.routeplan_tester module<a class="headerlink" href="#module-fleetmanager.model.qampo.routeplan_tester" title="Permalink to this heading"></a></h2>
+<p>This file holds basic information for testing a solution for the small trips and 3 vehicles problem.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.routeplan_tester.check_solution_for_problem">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.routeplan_tester.</span></span><span class="sig-name descname"><span class="pre">check_solution_for_problem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.RoutePlan" title="fleetmanager.model.qampo.classes.RoutePlan"><span class="pre">RoutePlan</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/routeplan_tester.html#check_solution_for_problem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.routeplan_tester.check_solution_for_problem" title="Permalink to this definition"></a></dt>
+<dd><p>This function performs a number of checks to find possible issues and raises exceptions if any exists.
+&#64;param number_of_trips Number of trips.
+&#64;param solution The solution to be checked for issues.</p>
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.routing_cp">
+<span id="fleetmanager-model-qampo-routing-cp-module"></span><h2>fleetmanager.model.qampo.routing_cp module<a class="headerlink" href="#module-fleetmanager.model.qampo.routing_cp" title="Permalink to this heading"></a></h2>
+<p>This file contains code, that optimizes a single day routing given a fixed fleet in an optimal manner using the Constraint programming solver from ortools.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.routing_cp.RoutingCp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.routing_cp.</span></span><span class="sig-name descname"><span class="pre">RoutingCp</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/routing_cp.html#RoutingCp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.routing_cp.RoutingCp" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fleetmanager.model.qampo.classes.RoutingAlgorithm" title="fleetmanager.model.qampo.classes.RoutingAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">RoutingAlgorithm</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.routing_cp.RoutingCp.optimize_single_day">
+<span class="sig-name descname"><span class="pre">optimize_single_day</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Vehicle" title="fleetmanager.model.qampo.classes.Vehicle"><span class="pre">fleetmanager.model.qampo.classes.Vehicle</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">employee_car</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">emission_cost_per_ton_co2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_limit_in_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#fleetmanager.model.qampo.classes.RoutePlan" title="fleetmanager.model.qampo.classes.RoutePlan"><span class="pre">RoutePlan</span></a></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/routing_cp.html#RoutingCp.optimize_single_day"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.routing_cp.RoutingCp.optimize_single_day" title="Permalink to this definition"></a></dt>
+<dd><p>This is an exact SAT algorithm that assigns trips to vehicles based on a weight of the variable cost per kilometer and the CO2 emission. time_limit_in_seconds specifies for how long, the algorithm is allowed to be run.
+:param trips: List of trips in the route plan.
+:param vehicles: List of vehicles in the route plan.
+:param employee_car: Employee car a trip can be assigned to.
+:param emission_cost_per_ton_co2: CO2 emission cost per ton for the entire route plan.
+:param time_limit_in_seconds: Time limit for the running time of the algorithm.
+:return Routing plan created after optimization has been performed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.routing_greedy">
+<span id="fleetmanager-model-qampo-routing-greedy-module"></span><h2>fleetmanager.model.qampo.routing_greedy module<a class="headerlink" href="#module-fleetmanager.model.qampo.routing_greedy" title="Permalink to this heading"></a></h2>
+<p>This file contains code that optimizes a single day routing given a fixed fleet in a greedy manner. This is conceptually
+the same as the algorithm in the overall project (IFFK) that simulates car assignment previously.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.routing_greedy.RoutingGreedy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.routing_greedy.</span></span><span class="sig-name descname"><span class="pre">RoutingGreedy</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/routing_greedy.html#RoutingGreedy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.routing_greedy.RoutingGreedy" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fleetmanager.model.qampo.classes.RoutingAlgorithm" title="fleetmanager.model.qampo.classes.RoutingAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">RoutingAlgorithm</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.routing_greedy.RoutingGreedy.optimize_single_day">
+<span class="sig-name descname"><span class="pre">optimize_single_day</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Vehicle" title="fleetmanager.model.qampo.classes.Vehicle"><span class="pre">fleetmanager.model.qampo.classes.Vehicle</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">employee_car</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">emission_cost_per_ton_co2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_limit_in_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#fleetmanager.model.qampo.classes.RoutePlan" title="fleetmanager.model.qampo.classes.RoutePlan"><span class="pre">RoutePlan</span></a></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/routing_greedy.html#RoutingGreedy.optimize_single_day"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.routing_greedy.RoutingGreedy.optimize_single_day" title="Permalink to this definition"></a></dt>
+<dd><p>This is a simple greedy algorithm that assigns trips to vehicles based on a weight of the variable cost per kilometer and the CO2 emission. Greedily means that earliest trips are assigned first to the cheapest vehicle. time_limit_in_seconds specifies for how long, the algorithm is allowed to be run.
+:param trips: List of trips in the route plan.
+:param vehicles: List of vehicles in the route plan.
+:param employee_car: Employee car a trip can be assigned to.
+:param emission_cost_per_ton_co2: CO2 emission cost per ton for the entire route plan.
+:param time_limit_in_seconds: Time limit for the running time of the algorithm.
+:return Routing plan created after optimization has been performed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.routing_mip">
+<span id="fleetmanager-model-qampo-routing-mip-module"></span><h2>fleetmanager.model.qampo.routing_mip module<a class="headerlink" href="#module-fleetmanager.model.qampo.routing_mip" title="Permalink to this heading"></a></h2>
+<p>This file contains code that optimizes a single day routing given a fixed fleet in an optimal manner using the MIP solver from ortools
+(utilizing SCIP).</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.routing_mip.RoutingMip">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.routing_mip.</span></span><span class="sig-name descname"><span class="pre">RoutingMip</span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/routing_mip.html#RoutingMip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.routing_mip.RoutingMip" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fleetmanager.model.qampo.classes.RoutingAlgorithm" title="fleetmanager.model.qampo.classes.RoutingAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">RoutingAlgorithm</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.routing_mip.RoutingMip.optimize_single_day">
+<span class="sig-name descname"><span class="pre">optimize_single_day</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Vehicle" title="fleetmanager.model.qampo.classes.Vehicle"><span class="pre">fleetmanager.model.qampo.classes.Vehicle</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">employee_car</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fleetmanager.model.qampo.classes.BaseVehicle" title="fleetmanager.model.qampo.classes.BaseVehicle"><span class="pre">BaseVehicle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">emission_cost_per_ton_co2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_limit_in_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#fleetmanager.model.qampo.classes.RoutePlan" title="fleetmanager.model.qampo.classes.RoutePlan"><span class="pre">RoutePlan</span></a></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/routing_mip.html#RoutingMip.optimize_single_day"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.routing_mip.RoutingMip.optimize_single_day" title="Permalink to this definition"></a></dt>
+<dd><p>An exact MIP algorithm that will assign trips to vehicles based on a weight of the variable cost per kilometer and the CO2 emission.
+time_limit_in_seconds specifies for how long, the algorithm is allowed to be run.
+:param trips: List of trips in the route plan.
+:param vehicles: List of vehicles in the route plan.
+:param employee_car: Employee car a trip can be assigned to.
+:param emission_cost_per_ton_co2: CO2 emission cost per ton for the entire route plan.
+:param time_limit_in_seconds: Time limit for the running time of the algorithm.
+:return Routing plan created after optimization has been performed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo.validation">
+<span id="fleetmanager-model-qampo-validation-module"></span><h2>fleetmanager.model.qampo.validation module<a class="headerlink" href="#module-fleetmanager.model.qampo.validation" title="Permalink to this heading"></a></h2>
+<p>This file has functions for validating input data etc.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.qampo.validation.check_trips_only_has_single_date">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.qampo.validation.</span></span><span class="sig-name descname"><span class="pre">check_trips_only_has_single_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#fleetmanager.model.qampo.classes.Trip" title="fleetmanager.model.qampo.classes.Trip"><span class="pre">fleetmanager.model.qampo.classes.Trip</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/fleetmanager/model/qampo/validation.html#check_trips_only_has_single_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.qampo.validation.check_trips_only_has_single_date" title="Permalink to this definition"></a></dt>
+<dd><p>Checks if only one single start date is present in the list, or else raises an MultipleDaysNotSupported.
+:param trips: Trips.</p>
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.qampo">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fleetmanager.model.qampo" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fleetmanager.model.html" class="btn btn-neutral float-left" title="fleetmanager.model package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fleetmanager.dashboard.html" class="btn btn-neutral float-right" title="fleetmanager.dashboard package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

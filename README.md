@@ -1,44 +1,96 @@
 
+### Indledning
+Dette repositorie indeholder simuleringstoolet som er udviklet i løbet af AI-signaturprojektet Intelligent flådestyring og klimasmarte kørselsmønstre (https://ifkk.syddjurs.dk/forside/). 
 
-# Indledning
-Dette repositorie indeholder simuleringstoolet som er udviklet i løbet af fase 1 af AI-signaturprojektet Intelligent flådestyring og klimasmarte kørselsmønstre (https://ifkk.syddjurs.dk/forside/). 
-Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, https://github.com/syddjurs/IFKK/blob/master/dashboard/documentation/build/html/index.html. Den anvendelsesorienterede dokumentation findes i https://github.com/syddjurs/IFKK/blob/master/dashboard/documentation/simuleringstool_dokumentation_DA.docx.
-Simuleringstoolet er udviklet i fase 1 er ikke en færdig løsning, men en funktionel prototype af den endelige løsning. Den funktionelle prototype vil kunne anvendes som udgangspunkt for den videre udvikling af værktøjet i fase 2.
-# Formål
-Simuleringstoolet er udviklet med formål om at kunne tage en proaktiv tilgang til indkøb af køretøjsflåden i en kommune.
-I dag foretages indkøb af køretøjer med begrænset input fra data. Målet er at kunne anvende kommunens egne data i form af kørte ture og køretøjsflåde til at simulere scenarier med forskellig sammensætning af køretøjsflåden.
-Simuleringstoolet vil kunne sammenligne den nuværende flåde med en fremtidig simuleret og give informationer om kapaciteten i flåden og om forskelle i økonomiske, transportmæssige og udledningsmæssige-konsekvenser imellem de to flåder. 
-# Teknisk overblik
-Simuleringstoolet er udviklet i python på backenden og brugergrænsefladen er ligeledes opsat med python-biblioteket Bokeh. Python og Bokeh er valgt da man hurtigt har skulle udvikle en funktionel prototype.
+Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, https://github.com/syddjurs/IFKK/blob/master/src/_build/html/index.html. Den anvendelsesorienterede dokumentation findes i https://github.com/syddjurs/IFKK/master/src/_build/ifkk_dokumentation.pdf.
+
+
+### Repository oversigt
+```
+    ├───FleetCompleteExtractor  [Utilities til at trække data fra FleetComplete API - separat readme]
+    ├───SkyHostExtractor        [Utilities til at trække data fra SkyHost API - separat readme]
+    │   └───xml_templates
+    └───src                     [Applikationskode]
+        └───fleetmanager        [Applikationsmodul]
+            ├───dashboard       [Frontend]
+            │   ├───assets
+            │   └───Components
+            ├───data_access     [Backend data utilities]
+            └───model           [Backend]
+                ├───pogi        [Baggrund for CO2e]
+                └───qampo       [Backend - Optimeringsalgortimer]
+```
+
+
+### Formål
+Simuleringstoolet er udviklet med formål om at kunne tage en proaktiv tilgang til indkøb af køretøjsflåden for en flåde.
+I dag foretages indkøb af køretøjer med begrænset input fra data. Målet er at kunne anvende den konkrete flådes data i form af kørte ture og køretøjsflåde til at simulere scenarier med forskellig sammensætning af køretøjsflåden.
+Simuleringstoolet sammenligner den nuværende flåde med en fremtidig simuleret og giver informationer om kapaciteten i flåden og om forskelle i økonomiske, transportmæssige og udledningsmæssige-konsekvenser imellem de to flåder. <br>
+Specifikt, deles applikationen op 3 typer simulering:
+1. CO2e-orienteret simulering. En simulering, hvor køretøjer med lavere CO2e aftryk prioriteres. Giver ikke nødvendigs det absolutte lavest CO2e aftryk.
+2. Intelligent simulering. En optimal simulering, hvor køretøjets variable pris pr. km. afvejes med dets CO2e aftryk. Her vægtes på køretøjets attributter således turene allokeres biler på den mest optimale måde.
+3. Målsimulering. En optimering på flådesammensætning, hvor delflåden optimeres på både CO2e og omkostning, hvor flåden samtidig tilfredsstiller kørselsbehovet. 
+### Teknisk overblik
+![Package relationship](src/_build/ark.png)
+
+Simuleringstoolet er udviklet i python på backenden og brugergrænsefladen er ligeledes opsat med python-biblioteket Dash.
 Dokumentationen på de enkelte dele af koden er at finde i det tilhørende Github-projekt, https://github.com/syddjurs/IFKK.
-# Sådan kommer du i gang
-## Forudsætninger
-Applikationen er testet på Windows. Applikationen er afhængig af biblioteket ”xlwings” som ikke findes til Linux. Applikationen burde kunne eksekveres på OS X (Mac), men dette er ikke testet.
-Applikationen er testet med Python 3.8.5. Den installerede version af Python kan checkes ved at køre følgende kommando i kommandolinjen i Windows:
-```cmd
+#### Extractors
+I dette repository findes to moduler udviklet for at trække data fra flådestyringssystemerne; FleetComplete `FleetCompleteExtractor` og SkyHost `SkyHostExtractor`.
+De har hver deres readme og requirements filer. 
+#### Applikationen
+Selve applikationskoden findes under `src.fleetmanager`. Droids Agency har udviklet koden i dette repository i samarbejde med Qampo, der specifikt har udviklet optimeringsmodulet til "Intelligent simulering" - dette modul findes i `src/fleetmanager/model/qampo`.
+
+### Sådan kommer du i gang
+### Forudsætninger
+Applikationen er testet på Windows og Linux. Applikationen er afhængig af en række biblioteker der kan ses i `src/requirements.txt`
+Applikationen kræver Python >= 3.8. Den installerede version af Python kan checkes ved at køre følgende kommando i kommandolinjen i Windows:
+```
 C:\Users\user>python -V
 Python 3.8.5
 ```
-De nødvendige biblioteker (bokeh, numpy, pandas, xdg og sqlalchemy) som anvendes er testet med følgende versioner:
-```cmd
-C:\Users\user> python -c "import bokeh; print(bokeh.__version__)"
-2.2.3
-C:\Users\user> python -c "import numpy; print(numpy.__version__)"
-1.19.2
-C:\Users\user> python -c "import pandas; print(pandas.__version__)"
-1.1.3
-C:\Users\user> python -c "import xdg; print(xdg.__version__)"
-0.27
-C:\Users\user> python -c "import sqlalchemy; print(sqlalchemy.__version__)"
-1.3.20
+
+De nødvendige biblioteker kan installeres med pip:
 ```
-Det er nødvendigt at have en fil med baggrundsdata i /sourcefiles/options.xlsx. Der er et eksempel vedlagt kildekoden men det skal tilpasses den enkelte kommune, se eventuelt afsnit om baggrundsdata.
-## Opstart af applikation
-Opstart af applikationen sker ved at køre nedenstående kommando i rodmappen (den mappe der indeholder mappen dashboard/). Applikationen giver et link til localhost hvor det grafiske interface vises, i nedenstående eksempel er dette http://localhost:5006/dashboard. Åbnes linket i browseren kan det grafiske interface tilgås.
-```cmd
-C:\Users\user\rodmappe>bokeh serve dashboard
-2021-09-13 13:07:01,393 Starting Bokeh server version 2.2.3 (running on Tornado 6.0.4)
-2021-09-13 13:07:01,396 User authentication hooks NOT provided (default user enabled)
-2021-09-13 13:07:01,399 Bokeh app running at: http://localhost:5006/dashboard
-2021-09-13 13:07:01,400 Starting Bokeh server with process id: 19768
+pip install -r src/requirements.txt
 ```
+
+Det er tiltænkt at installere applikationen som et python module for at lette import af moduler, der sker på tværs i applikation. <br>
+Installation af modulerne fra rod med pip:
+```
+pip install -e
+```
+
+Applikationen forventer en database forbindelse, der trækkes fra environment variabler. Hvis de ikke findes, loades en SQLite database i memory med dummy data. <br>
+Der kan med fordel oprettes en `.env` fil med værdierne, hvorfra variablerne vil blive loaded. 
+```
+DB_NAME=<database navn>
+DB_PASSWORD=<database bruger password>
+DB_USER=<database brugernavn>
+DB_URL=<database url>
+DB_SERVER='mysql'
+```
+
+For at køre applikationen og tilgå den via http://127.0.0.1:8050/ køres følgende.
+```
+cd src
+python -m fleetmanager.dashboard
+
+Dash is running on http://127.0.0.1:8050/
+
+ * Serving Flask app 'fleetmanager.dashboard.app' (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://127.0.0.1:8050/ (Press CTRL+C to quit)
+```
+
+### Data
+Applikationen er afhængig af data på tilladte startsteder, biler (inkl. metadata) og ikke mindst rundture. I applikation run-time er alle tabeller påkrævet, 
+på-nær: `trips` og `leasing-types`. `RoundTrips` vil altid kun indeholde GPS-koordinater der er tæt på det tilladte startsted (+- x antal meter, den tilladte distance defineret i extractor'en).
+For at læse mere om hvor data stammer fra, hvilke forudsætninger der er og hvilke antagelser der laves, refereres til `FleetCompleteExtractor` eller `SkyhostExtractor` eller den fulde dokumentation på data og algortimer her:  
+
+![ER diagram](src/_build/er.png)
+
+
