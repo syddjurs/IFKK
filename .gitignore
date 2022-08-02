@@ -52,9 +52,10 @@ Thumbs.db
 dashboard/data/
 data/
 
+mkdocs.yml
+
 venv/
 
 .env
 
-build/
 src/fleetmanager_droidsagency.egg-info/
