@@ -50,25 +50,20 @@ C:\Users\user>python -V
 Python 3.9
 ```
 
-De nødvendige biblioteker kan installeres med pip:
-```
-pip install -r src/requirements.txt
-```
-
 Det er tiltænkt at installere applikationen som et python module for at lette import af moduler, der sker på tværs i applikation. <br>
-Installation af modulerne fra rod med pip:
+Installation af modulerne fra via setup:
 ```
-pip install -e
+python setup.py install
 ```
 
 Applikationen forventer en database forbindelse, der trækkes fra environment variabler. Hvis de ikke findes, loades en SQLite database i memory med dummy data. <br>
 Der kan med fordel oprettes en `.env` fil med værdierne, hvorfra variablerne vil blive loaded. 
-```
-DB_NAME=<database navn>
-DB_PASSWORD=<database bruger password>
-DB_USER=<database brugernavn>
-DB_URL=<database url>
-DB_SERVER='mysql'
+```python
+DB_NAME="<database navn>"
+DB_PASSWORD="<database bruger password>"
+DB_USER="<database brugernavn>"
+DB_URL="<database url>"
+DB_SERVER="mysql"
 ```
 
 For at køre applikationen og tilgå den via http://127.0.0.1:8050/ køres følgende.
@@ -84,6 +79,24 @@ Dash is running on http://127.0.0.1:8050/
    Use a production WSGI server instead.
  * Debug mode: off
  * Running on http://127.0.0.1:8050/ (Press CTRL+C to quit)
+```
+
+
+Ønsker man at køre applikationen i docker, kan følgende image bruges:
+```docker
+FROM python:3.9-buster
+RUN apt install -y git
+RUN git clone https://github.com/syddjurs/IFKK.git
+WORKDIR IFKK/
+RUN python setup.py install
+WORKDIR src/
+EXPOSE 8050
+CMD ["python", "-m", "fleetmanager.dashboard"]
+```
+
+For at køre applikationen med docker, og kunne tilgå den via lokal browser, kør følgende kommando:
+```
+docker run -p 8050:8050 -e HOST=0.0.0.0 <image-tag>
 ```
 
 ### Data
