@@ -44,10 +44,10 @@ Selve applikationskoden findes under `src.fleetmanager`. Droids Agency har udvik
 ### Sådan kommer du i gang
 ### Forudsætninger
 Applikationen er testet på Windows og Linux. Applikationen er afhængig af en række biblioteker der kan ses i `src/requirements.txt`
-Applikationen kræver Python >= 3.8. Den installerede version af Python kan checkes ved at køre følgende kommando i kommandolinjen i Windows:
+Applikationen kræver Python >= 3.9. Den installerede version af Python kan checkes ved at køre følgende kommando i kommandolinjen i Windows:
 ```
 C:\Users\user>python -V
-Python 3.8.5
+Python 3.9
 ```
 
 De nødvendige biblioteker kan installeres med pip:

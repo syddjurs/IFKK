@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.dashboard package &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="fleetmanager.model.qampo package" href="fleetmanager.model.qampo.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.data_access.html">fleetmanager.data_access package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.model.html">fleetmanager.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.model.qampo.html">fleetmanager.model.qampo package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">fleetmanager.dashboard package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.dashboard.app">fleetmanager.dashboard.app module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.dashboard.page_config">fleetmanager.dashboard.page_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.dashboard.page_fleet">fleetmanager.dashboard.page_fleet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.dashboard.page_goal">fleetmanager.dashboard.page_goal module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.dashboard.page_setup">fleetmanager.dashboard.page_setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.dashboard.sidebar">fleetmanager.dashboard.sidebar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.dashboard.utils">fleetmanager.dashboard.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.dashboard.view">fleetmanager.dashboard.view module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.dashboard">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>fleetmanager.dashboard package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/fleetmanager.dashboard.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fleetmanager-dashboard-package">
+<h1>fleetmanager.dashboard package<a class="headerlink" href="#fleetmanager-dashboard-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-fleetmanager.dashboard.app">
+<span id="fleetmanager-dashboard-app-module"></span><h2>fleetmanager.dashboard.app module<a class="headerlink" href="#module-fleetmanager.dashboard.app" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-fleetmanager.dashboard.page_config">
+<span id="fleetmanager-dashboard-page-config-module"></span><h2>fleetmanager.dashboard.page_config module<a class="headerlink" href="#module-fleetmanager.dashboard.page_config" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.add_vehicle">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">add_vehicle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plate_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fuel_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wltp_fossil_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wltp_el_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity_decrease_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2_pr_km_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omkostning_aar_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_leasing_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_leasing_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leasing_type_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">km_aar_in</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#add_vehicle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.add_vehicle" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.display_output">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">display_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_previous</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#display_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.display_output" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.download_cars_data">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">download_cars_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_clicks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#download_cars_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.download_cars_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.error_alert">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">error_alert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#error_alert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.error_alert" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.get_cars_rounded">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">get_cars_rounded</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#get_cars_rounded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.get_cars_rounded" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.init_new_car_modal">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">init_new_car_modal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#init_new_car_modal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.init_new_car_modal" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.init_table">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">init_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#init_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.init_table" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.success_alert">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">success_alert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#success_alert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.success_alert" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.toggle_modal">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">toggle_modal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_open</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#toggle_modal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.toggle_modal" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.update_cars">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">update_cars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#update_cars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.update_cars" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.update_db">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">update_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ub</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plate_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fuel_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wltp_fossil_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wltp_el_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity_decrease_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2_pr_km_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omkostning_aar_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_leasing_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_leasing_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leasing_type_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">km_aar_in</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#update_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.update_db" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.validate_capacity_decrease_is_percent">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">validate_capacity_decrease_is_percent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#validate_capacity_decrease_is_percent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.validate_capacity_decrease_is_percent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_config.warning_alert">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_config.</span></span><span class="sig-name descname"><span class="pre">warning_alert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">warning</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_config.html#warning_alert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_config.warning_alert" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-fleetmanager.dashboard.page_fleet">
+<span id="fleetmanager-dashboard-page-fleet-module"></span><h2>fleetmanager.dashboard.page_fleet module<a class="headerlink" href="#module-fleetmanager.dashboard.page_fleet" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.download">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_clicks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trip_store</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#download"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.download" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.download_csv">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">download_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_clicks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trip_store</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#download_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.download_csv" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.enable_int">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">enable_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">on</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#enable_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.enable_int" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.enable_km">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">enable_km</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">on</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#enable_km"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.enable_km" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.fleet_add">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">fleet_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_vehicles</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#fleet_add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.fleet_add" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.fleet_view">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">fleet_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checklist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_checklist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_vehicles</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#fleet_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.fleet_view" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.lcb_in">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">lcb_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#lcb_in"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.lcb_in" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.open_modal">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">open_modal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#open_modal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.open_modal" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.persistent_daterange">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">persistent_daterange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#persistent_daterange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.persistent_daterange" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.persistent_figures">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">persistent_figures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#persistent_figures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.persistent_figures" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.persistent_savings_pr_year">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">persistent_savings_pr_year</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#persistent_savings_pr_year"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.persistent_savings_pr_year" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.persistent_savings_pr_year_co2e">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">persistent_savings_pr_year_co2e</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#persistent_savings_pr_year_co2e"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.persistent_savings_pr_year_co2e" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.persistent_trips_without_vehicle">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">persistent_trips_without_vehicle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#persistent_trips_without_vehicle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.persistent_trips_without_vehicle" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.toggle_modal">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">toggle_modal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_open</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#toggle_modal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.toggle_modal" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_fleet.update_total_sim">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_fleet.</span></span><span class="sig-name descname"><span class="pre">update_total_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_vehicle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_fleet.html#update_total_sim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_fleet.update_total_sim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-fleetmanager.dashboard.page_goal">
+<span id="fleetmanager-dashboard-page-goal-module"></span><h2>fleetmanager.dashboard.page_goal module<a class="headerlink" href="#module-fleetmanager.dashboard.page_goal" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_goal.enable_int_op">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_goal.</span></span><span class="sig-name descname"><span class="pre">enable_int_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">on</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_goal.html#enable_int_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_goal.enable_int_op" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_goal.enable_km_op">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_goal.</span></span><span class="sig-name descname"><span class="pre">enable_km_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">on</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_goal.html#enable_km_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_goal.enable_km_op" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_goal.long_callback_optim">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_goal.</span></span><span class="sig-name descname"><span class="pre">long_callback_optim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_goal.html#long_callback_optim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_goal.long_callback_optim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_goal.make_vehicle_list">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_goal.</span></span><span class="sig-name descname"><span class="pre">make_vehicle_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_vehicles</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_goal.html#make_vehicle_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_goal.make_vehicle_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_goal.persistent_goal_figure">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_goal.</span></span><span class="sig-name descname"><span class="pre">persistent_goal_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_goal.html#persistent_goal_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_goal.persistent_goal_figure" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_goal.update_view">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_goal.</span></span><span class="sig-name descname"><span class="pre">update_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unix_times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_vehicles</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_goal.html#update_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_goal.update_view" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-fleetmanager.dashboard.page_setup">
+<span id="fleetmanager-dashboard-page-setup-module"></span><h2>fleetmanager.dashboard.page_setup module<a class="headerlink" href="#module-fleetmanager.dashboard.page_setup" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_setup.location_view">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_setup.</span></span><span class="sig-name descname"><span class="pre">location_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_setup.html#location_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_setup.location_view" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_setup.vehicle_selection">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_setup.</span></span><span class="sig-name descname"><span class="pre">vehicle_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_checklist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checklist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_setup.html#vehicle_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_setup.vehicle_selection" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.page_setup.vehicle_view">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.page_setup.</span></span><span class="sig-name descname"><span class="pre">vehicle_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choose_all</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choose_all_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_vehicles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/page_setup.html#vehicle_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.page_setup.vehicle_view" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-fleetmanager.dashboard.sidebar">
+<span id="fleetmanager-dashboard-sidebar-module"></span><h2>fleetmanager.dashboard.sidebar module<a class="headerlink" href="#module-fleetmanager.dashboard.sidebar" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.sidebar.render_page_content">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.sidebar.</span></span><span class="sig-name descname"><span class="pre">render_page_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pathname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fleet_page</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/sidebar.html#render_page_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.sidebar.render_page_content" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-fleetmanager.dashboard.utils">
+<span id="fleetmanager-dashboard-utils-module"></span><h2>fleetmanager.dashboard.utils module<a class="headerlink" href="#module-fleetmanager.dashboard.utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.accordian_table">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">accordian_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fleet_header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fleet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_expense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_expense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_emission</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_emission</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emission_savings</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#accordian_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.accordian_table" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.capacity_plot_from">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">capacity_plot_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#capacity_plot_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.capacity_plot_from" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.card">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">card</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#card"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.card" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.consequence_table_from">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">consequence_table_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#consequence_table_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.consequence_table_from" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.distance_histogram_from">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">distance_histogram_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#distance_histogram_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.distance_histogram_from" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.get_emission">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">get_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#get_emission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.get_emission" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.goal_bar_plot">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">goal_bar_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#goal_bar_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.goal_bar_plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.input_table">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">input_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn_input_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#input_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.input_table" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.prepare_trip_store">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">prepare_trip_store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#prepare_trip_store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.prepare_trip_store" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.toggle_all">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">toggle_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vehicle_view</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">change_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#toggle_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.toggle_all" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.unix_time_millis">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">unix_time_millis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#unix_time_millis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.unix_time_millis" title="Permalink to this definition"></a></dt>
+<dd><p>Convert datetime to unix timestamp</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.utils.unix_to_datetime">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.utils.</span></span><span class="sig-name descname"><span class="pre">unix_to_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/utils.html#unix_to_datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.utils.unix_to_datetime" title="Permalink to this definition"></a></dt>
+<dd><p>Convert unix timestamp to datetime.</p>
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.dashboard.view">
+<span id="fleetmanager-dashboard-view-module"></span><h2>fleetmanager.dashboard.view module<a class="headerlink" href="#module-fleetmanager.dashboard.view" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.dashboard.view.render_page_content">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.dashboard.view.</span></span><span class="sig-name descname"><span class="pre">render_page_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pathname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/dashboard/view.html#render_page_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.dashboard.view.render_page_content" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-fleetmanager.dashboard">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fleetmanager.dashboard" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fleetmanager.model.qampo.html" class="btn btn-neutral float-left" title="fleetmanager.model.qampo package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

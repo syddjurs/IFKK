@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.model.qampo.classes &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/readme.html">readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/fleetmanager.data_access.html">fleetmanager.data_access package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/fleetmanager.model.html">fleetmanager.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/fleetmanager.model.qampo.html">fleetmanager.model.qampo package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/fleetmanager.dashboard.html">fleetmanager.dashboard package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>fleetmanager.model.qampo.classes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fleetmanager.model.qampo.classes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; This file defines the different classes used in the solution.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+
+
+<div class="viewcode-block" id="Trip"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.Trip">[docs]</a><span class="k">class</span> <span class="nc">Trip</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A trip consist of a start time, an end time and the length of the trip measured in kilometers.\n</span>
+<span class="sd">    The starting location and ending location are assumed to be identical for this application.&quot;&quot;&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="sd">&quot;&quot;&quot;A unique id for the trip.&quot;&quot;&quot;</span>
+
+    <span class="n">start_time</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span>
+    <span class="sd">&quot;&quot;&quot;The time for which the trip begins.&quot;&quot;&quot;</span>
+
+    <span class="n">end_time</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span>
+    <span class="sd">&quot;&quot;&quot;The time for which the trip ends.&quot;&quot;&quot;</span>
+
+    <span class="n">length_in_kilometers</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="sd">&quot;&quot;&quot;The length of the trip measured in kilometers.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Makes it possible to make the Trip class hashable and used as key in map.</span>
+<div class="viewcode-block" id="Trip.Config"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.Trip.Config">[docs]</a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">allow_mutation</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Trip.get_trip_length_in_minutes"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.Trip.get_trip_length_in_minutes">[docs]</a>    <span class="k">def</span> <span class="nf">get_trip_length_in_minutes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get the trip duration in minutes (rounded up) of the trip</span>
+<span class="sd">        @:return duration in number of minutes (rounded up)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mf">60.0</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Trips"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.Trips">[docs]</a><span class="k">class</span> <span class="nc">Trips</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A list of trips.&quot;&quot;&quot;</span>
+
+    <span class="n">trips</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Trip</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;A list of trips.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="BaseVehicle"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.BaseVehicle">[docs]</a><span class="k">class</span> <span class="nc">BaseVehicle</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A base vehicle consists of a variable cost of kilometers and an amount of CO2 emission per kilometer measured in grams.&quot;&quot;&quot;</span>
+
+    <span class="n">variable_cost_per_kilometer</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="sd">&quot;&quot;&quot;The variable cost per kilometer.&quot;&quot;&quot;</span>
+
+    <span class="n">co2_emission_gram_per_kilometer</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="sd">&quot;&quot;&quot;The CO2 emission per kilometer measured in grams.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Makes it possible to make the Trip class hashable and used as key in map.</span>
+<div class="viewcode-block" id="BaseVehicle.Config"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.BaseVehicle.Config">[docs]</a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">allow_mutation</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Vehicle"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.Vehicle">[docs]</a><span class="k">class</span> <span class="nc">Vehicle</span><span class="p">(</span><span class="n">BaseVehicle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A vehicle consists of a range of kilometers, a variable cost of kilometers, an amount of CO2 emission per kilometer measured in grams, and a name.&quot;&quot;&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="sd">&quot;&quot;&quot;A unique id for the vehicle.&quot;&quot;&quot;</span>
+
+    <span class="n">range_in_kilometers</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="sd">&quot;&quot;&quot;The range in kilometers.&quot;&quot;&quot;</span>
+
+    <span class="n">maximum_driving_in_minutes</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="sd">&quot;&quot;&quot; The number of minutes the vehicle can drive. Used to control e.g. electric cars recharge time in lieu of a proper battery management implementation e.g. an uptime of 16*60 minutes could model an 8 hour recharging time.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;The name of the car, e.g. Toyota Yaris No. 1. Not used in the algorithm, but for easier debugging and information.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Makes it possible to make the Trip class hashable and used as key in map.</span>
+<div class="viewcode-block" id="Vehicle.Config"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.Vehicle.Config">[docs]</a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">allow_mutation</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Fleet"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.Fleet">[docs]</a><span class="k">class</span> <span class="nc">Fleet</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A tradeoff between C02 and money for a list of vehicles.\n</span>
+<span class="sd">    Official documents say, somewhere between 1500 and 5000 dkk/ton is an optional list for possible parameters for scenarios, otherwise, default values are set.&quot;&quot;&quot;</span>
+
+    <span class="n">vehicles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vehicle</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;A list of vehicles.&quot;&quot;&quot;</span>
+
+    <span class="n">employee_car</span><span class="p">:</span> <span class="n">BaseVehicle</span>
+    <span class="sd">&quot;&quot;&quot;An employee car.&quot;&quot;&quot;</span>
+
+    <span class="n">emission_cost_per_ton_co2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;The CO2 emission cost per ton. Default value will be 1000 dkk.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Assignment"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.Assignment">[docs]</a><span class="k">class</span> <span class="nc">Assignment</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An assignment is trips assigned to a specific vehicle.&quot;&quot;&quot;</span>
+
+    <span class="n">vehicle</span><span class="p">:</span> <span class="n">BaseVehicle</span>
+    <span class="sd">&quot;&quot;&quot;The vehicle, a route is assigned to.&quot;&quot;&quot;</span>
+
+    <span class="n">route</span><span class="p">:</span> <span class="n">Trips</span>
+    <span class="sd">&quot;&quot;&quot;Contains a list of trips. A new trip can start immediately, after the previous trip ends, thus, ending at 08:00 means, the next step can start at 08:00.&quot;&quot;&quot;</span>
+
+    <span class="n">variable_cost</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="sd">&quot;&quot;&quot;The variable cost for the route.&quot;&quot;&quot;</span>
+
+    <span class="n">co2_emission_in_tons</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="sd">&quot;&quot;&quot;The CO2 emission of the route measured in tons.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="RoutePlan"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.RoutePlan">[docs]</a><span class="k">class</span> <span class="nc">RoutePlan</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A route plan consists of a list of assignments, total cost and total CO2 emission.&quot;&quot;&quot;</span>
+
+    <span class="n">assignments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Assignment</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;A list of assignments.&quot;&quot;&quot;</span>
+
+    <span class="n">employee_car</span><span class="p">:</span> <span class="n">Assignment</span>
+    <span class="sd">&quot;&quot;&quot; The assignment for the employee car(s)&quot;&quot;&quot;</span>
+
+    <span class="n">total_cost</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="sd">&quot;&quot;&quot;The total cost of the routes.&quot;&quot;&quot;</span>
+
+    <span class="n">total_co2_emission_in_tons</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="sd">&quot;&quot;&quot;The total amount of CO2 emission of the assignments measured in tons.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="AlgorithmType"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.AlgorithmType">[docs]</a><span class="k">class</span> <span class="nc">AlgorithmType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;What type of algorithm to be used.&quot;&quot;&quot;</span>
+
+    <span class="n">GREEDY</span> <span class="o">=</span> <span class="s2">&quot;greedy&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Greedy algorithm.&quot;&quot;&quot;</span>
+
+    <span class="n">EXACT_MIP</span> <span class="o">=</span> <span class="s2">&quot;exact_mip&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Exact mixed-integer programming algorithm.&quot;&quot;&quot;</span>
+
+    <span class="n">EXACT_CP</span> <span class="o">=</span> <span class="s2">&quot;exact_cp&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Exact constraint programming algorithm.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="AlgorithmParameters"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.AlgorithmParameters">[docs]</a><span class="k">class</span> <span class="nc">AlgorithmParameters</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">time_limit_in_seconds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Defines for how long, an algorithm is allowed to be run.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="RoutingAlgorithm"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.RoutingAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">RoutingAlgorithm</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An ABC for doing a single day routing assignment.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RoutingAlgorithm.optimize_single_day"><a class="viewcode-back" href="../../../../source/fleetmanager.model.qampo.html#fleetmanager.model.qampo.classes.RoutingAlgorithm.optimize_single_day">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">optimize_single_day</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">trips</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Trip</span><span class="p">],</span>
+        <span class="n">vehicles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vehicle</span><span class="p">],</span>
+        <span class="n">employee_car</span><span class="p">:</span> <span class="n">BaseVehicle</span><span class="p">,</span>
+        <span class="n">emission_cost_per_ton_co2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">,</span>
+        <span class="n">time_limit_in_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RoutePlan</span><span class="p">:</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

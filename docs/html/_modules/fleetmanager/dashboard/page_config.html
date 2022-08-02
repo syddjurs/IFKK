@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.dashboard.page_config &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/readme.html">readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.data_access.html">fleetmanager.data_access package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.model.html">fleetmanager.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.model.qampo.html">fleetmanager.model.qampo package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.dashboard.html">fleetmanager.dashboard package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>fleetmanager.dashboard.page_config</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fleetmanager.dashboard.page_config</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span>
+
+<span class="kn">import</span> <span class="nn">dash</span>
+<span class="kn">import</span> <span class="nn">dash_bootstrap_components</span> <span class="k">as</span> <span class="nn">dbc</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">State</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">dash_table</span><span class="p">,</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span>
+<span class="kn">from</span> <span class="nn">dash.dash_table.Format</span> <span class="kn">import</span> <span class="n">Format</span><span class="p">,</span> <span class="n">Group</span><span class="p">,</span> <span class="n">Scheme</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">,</span> <span class="n">Trim</span>
+<span class="kn">from</span> <span class="nn">dash.exceptions</span> <span class="kn">import</span> <span class="n">PreventUpdate</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm.query</span> <span class="kn">import</span> <span class="n">Query</span>
+
+<span class="kn">from</span> <span class="nn">fleetmanager</span> <span class="kn">import</span> <span class="n">data_access</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.data_access</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AllowedStarts</span><span class="p">,</span>
+    <span class="n">Cars</span><span class="p">,</span>
+    <span class="n">FuelTypes</span><span class="p">,</span>
+    <span class="n">LeasingTypes</span><span class="p">,</span>
+    <span class="n">VehicleTypes</span><span class="p">,</span>
+    <span class="n">session_factory</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">engine</span> <span class="o">=</span> <span class="n">data_access</span><span class="o">.</span><span class="n">db_engine</span><span class="o">.</span><span class="n">engine_creator</span><span class="p">()</span>
+<span class="n">Session</span> <span class="o">=</span> <span class="n">session_factory</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_cars_rounded"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.get_cars_rounded">[docs]</a><span class="k">def</span> <span class="nf">get_cars_rounded</span><span class="p">():</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">Query</span><span class="p">([</span><span class="n">data_access</span><span class="o">.</span><span class="n">dbschema</span><span class="o">.</span><span class="n">Cars</span><span class="p">])</span><span class="o">.</span><span class="n">statement</span><span class="p">,</span> <span class="n">engine</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;start_leasing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;start_leasing&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;end_leasing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;end_leasing&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;records&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="init_table"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.init_table">[docs]</a><span class="k">def</span> <span class="nf">init_table</span><span class="p">():</span>
+
+    <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">VehicleTypes</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">fuel</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">FuelTypes</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">leasingtypes</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">LeasingTypes</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">locations</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">AllowedStarts</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="n">configuration_table</span> <span class="o">=</span> <span class="n">dash_table</span><span class="o">.</span><span class="n">DataTable</span><span class="p">(</span>
+        <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;config_table&quot;</span><span class="p">,</span>
+        <span class="n">style_as_list_view</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">get_cars_rounded</span><span class="p">(),</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Id&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;numeric&quot;</span><span class="p">,</span> <span class="s2">&quot;editable&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;plate&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Nummerplade&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;make&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Mærke&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Model&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="s2">&quot;presentation&quot;</span><span class="p">:</span> <span class="s2">&quot;dropdown&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;fuel&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Drivmiddel&quot;</span><span class="p">,</span> <span class="s2">&quot;presentation&quot;</span><span class="p">:</span> <span class="s2">&quot;dropdown&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;wltp_fossil&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Wltp (fossil)&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;numeric&quot;</span><span class="p">,},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;wltp_el&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Wltp (el)&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;numeric&quot;</span><span class="p">,},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;capacity_decrease&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Procentvis wltp&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;numeric&quot;</span><span class="p">,},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;co2_pr_km&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;CO2 (g/km)&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;numeric&quot;</span><span class="p">,},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;range&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Rækkevidde (km)&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;numeric&quot;</span><span class="p">,},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;omkostning_aar&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Omk./år&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;numeric&quot;</span><span class="p">,},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;location&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Lokation&quot;</span><span class="p">,</span> <span class="s2">&quot;presentation&quot;</span><span class="p">:</span> <span class="s2">&quot;dropdown&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;start_leasing&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Start leasing&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;datetime&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;end_leasing&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Slut leasing&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;datetime&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;leasing_type&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Leasingtype&quot;</span><span class="p">,</span> <span class="s2">&quot;presentation&quot;</span><span class="p">:</span> <span class="s2">&quot;dropdown&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;km_aar&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Tilladt km/år&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;numeric&quot;</span><span class="p">,},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;sleep&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Hviletid&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;numeric&quot;</span><span class="p">},</span>
+        <span class="p">],</span>
+        <span class="n">editable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">row_deletable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">page_current</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">page_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">dropdown</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">types</span><span class="p">]},</span>
+            <span class="s2">&quot;fuel&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fuel</span><span class="p">]},</span>
+            <span class="s2">&quot;leasing_type&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">leasingtypes</span><span class="p">]</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">locations</span><span class="p">]</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">configuration_table</span></div>
+
+
+<div class="viewcode-block" id="init_new_car_modal"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.init_new_car_modal">[docs]</a><span class="k">def</span> <span class="nf">init_new_car_modal</span><span class="p">():</span>
+
+    <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">VehicleTypes</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">fuel</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">FuelTypes</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">leasingtypes</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">LeasingTypes</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">locations</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">AllowedStarts</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="n">modal</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Modal</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">dbc</span><span class="o">.</span><span class="n">ModalHeader</span><span class="p">(</span><span class="n">dbc</span><span class="o">.</span><span class="n">ModalTitle</span><span class="p">(</span><span class="s2">&quot;Tilføj køretøj&quot;</span><span class="p">)),</span>
+                    <span class="n">dbc</span><span class="o">.</span><span class="n">ModalBody</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Nummerplade&quot;</span><span class="p">),</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;plate_in&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Mærke&quot;</span><span class="p">),</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;make_in&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Model&quot;</span><span class="p">),</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;model_in&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                <span class="p">]</span>
+                            <span class="p">),</span>
+                            <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Køretøjstype&quot;</span><span class="p">),</span>
+                                            <span class="n">dcc</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+                                                <span class="p">[</span>
+                                                    <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span><span class="p">,}</span>
+                                                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">types</span>
+                                                <span class="p">],</span>
+                                                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;type_in&quot;</span><span class="p">,</span>
+                                            <span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Drivmiddel&quot;</span><span class="p">),</span>
+                                            <span class="n">dcc</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+                                                <span class="p">[</span>
+                                                    <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span><span class="p">,}</span>
+                                                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fuel</span>
+                                                <span class="p">],</span>
+                                                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;fuel_in&quot;</span><span class="p">,</span>
+                                            <span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                <span class="p">]</span>
+                            <span class="p">),</span>
+                            <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;wltp_fosil&quot;</span><span class="p">),</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span>
+                                                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;wltp_fossil_in&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;number&quot;</span>
+                                            <span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;wltp_el&quot;</span><span class="p">),</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;wltp_el_in&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;number&quot;</span><span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                <span class="p">]</span>
+                            <span class="p">),</span>
+                            <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Procentvis wltp nedskrivning&quot;</span><span class="p">),</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span>
+                                                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;capacity_decrease_in&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;number&quot;</span>
+                                            <span class="p">),</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">FormFeedback</span><span class="p">(</span>
+                                                <span class="s2">&quot;Nedskrivning skal være et tal imellem 0 og 100&quot;</span><span class="p">,</span>
+                                                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;invalid&quot;</span><span class="p">,</span>
+                                            <span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;co2 pr km&quot;</span><span class="p">),</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;co2_pr_km_in&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;number&quot;</span><span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                <span class="p">]</span>
+                            <span class="p">),</span>
+                            <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Rækkevidde&quot;</span><span class="p">),</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;range_in&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;number&quot;</span><span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Omkostning / år&quot;</span><span class="p">),</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span>
+                                                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;omkostning_aar_in&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;number&quot;</span>
+                                            <span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                <span class="p">]</span>
+                            <span class="p">),</span>
+                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Lokation&quot;</span><span class="p">),</span>
+                            <span class="n">dcc</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span><span class="p">}</span>
+                                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">locations</span>
+                                <span class="p">],</span>
+                                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;location_in&quot;</span><span class="p">,</span>
+                            <span class="p">),</span>
+                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Leasingperiode&quot;</span><span class="p">),</span>
+                            <span class="n">html</span><span class="o">.</span><span class="n">Br</span><span class="p">(),</span>
+                            <span class="n">dcc</span><span class="o">.</span><span class="n">DatePickerRange</span><span class="p">(</span>
+                                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;leasing_period_in&quot;</span><span class="p">,</span>
+                                <span class="n">initial_visible_month</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                            <span class="p">),</span>
+                            <span class="n">html</span><span class="o">.</span><span class="n">Br</span><span class="p">(),</span>
+                            <span class="n">dbc</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Leasingtype&quot;</span><span class="p">),</span>
+                                            <span class="n">dcc</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+                                                <span class="p">[</span>
+                                                    <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span><span class="p">,}</span>
+                                                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">leasingtypes</span>
+                                                <span class="p">],</span>
+                                                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;leasing_type_in&quot;</span><span class="p">,</span>
+                                            <span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                    <span class="n">dbc</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+                                        <span class="p">[</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;km / år&quot;</span><span class="p">),</span>
+                                            <span class="n">dbc</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;km_aar_in&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;numeric&quot;</span><span class="p">),</span>
+                                        <span class="p">]</span>
+                                    <span class="p">),</span>
+                                <span class="p">]</span>
+                            <span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                    <span class="n">dbc</span><span class="o">.</span><span class="n">ModalFooter</span><span class="p">(</span>
+                        <span class="n">dbc</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+                            <span class="s2">&quot;Tilføj køretøj&quot;</span><span class="p">,</span>
+                            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+                            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">,</span>
+                            <span class="n">className</span><span class="o">=</span><span class="s2">&quot;ms-auto&quot;</span><span class="p">,</span>
+                            <span class="n">n_clicks</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">),</span>
+                <span class="p">],</span>
+                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;modal&quot;</span><span class="p">,</span>
+                <span class="n">is_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">modal</span></div>
+
+
+<span class="n">description_header</span> <span class="o">=</span> <span class="n">dbc</span><span class="o">.</span><span class="n">Toast</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">P</span><span class="p">(</span>
+            <span class="s2">&quot;På denne side kan man rette i oplysninger om indregistrerede køretøjer og tilføje nye køretøjer man&quot;</span>
+            <span class="s2">&quot; gerne vil bruge i simuleringsværktøjer. Vær observant på at kommatal skal skrives i engelsk format, dvs. punktum i stedet for komma.&quot;</span><span class="p">,</span>
+            <span class="n">className</span><span class="o">=</span><span class="s2">&quot;mb-0&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">],</span>
+    <span class="n">header</span><span class="o">=</span><span class="s2">&quot;Konfiguration&quot;</span><span class="p">,</span>
+    <span class="n">className</span><span class="o">=</span><span class="s2">&quot;description-header&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">description_header</span><span class="p">,</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+            <span class="p">[],</span>
+            <span class="c1"># for warnings</span>
+            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;alerts&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">H3</span><span class="p">(</span><span class="s2">&quot;Flådeoverblik&quot;</span><span class="p">),</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">A</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="n">html</span><span class="o">.</span><span class="n">I</span><span class="p">(</span>
+                                    <span class="n">className</span><span class="o">=</span><span class="s2">&quot;fas fa-download&quot;</span><span class="p">,</span>
+                                    <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vertical-align&quot;</span><span class="p">:</span> <span class="s2">&quot;middle&quot;</span><span class="p">},</span>
+                                <span class="p">),</span>
+                                <span class="n">html</span><span class="o">.</span><span class="n">Span</span><span class="p">(</span>
+                                    <span class="s2">&quot;Download til .xlsx&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;margin-left&quot;</span><span class="p">:</span> <span class="s2">&quot;5px&quot;</span><span class="p">}</span>
+                                <span class="p">),</span>
+                            <span class="p">],</span>
+                            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;download_button&quot;</span><span class="p">,</span>
+                            <span class="n">download</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">,</span>
+                            <span class="n">className</span><span class="o">=</span><span class="s2">&quot;download-link&quot;</span><span class="p">,</span>
+                        <span class="p">),</span>
+                    <span class="p">],</span>
+                    <span class="n">className</span><span class="o">=</span><span class="s2">&quot;flex-container&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">dcc</span><span class="o">.</span><span class="n">Download</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;download-dataframe-xlsx&quot;</span><span class="p">),</span>
+                <span class="n">init_table</span><span class="p">(),</span>
+            <span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s2">&quot;Gem ændringer&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;update_btn&quot;</span><span class="p">),</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s2">&quot;Tilføj køretøj&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;add_vehicle&quot;</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">className</span><span class="o">=</span><span class="s2">&quot;flex-container&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">init_new_car_modal</span><span class="p">(),</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;table_dummy&quot;</span><span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">className</span><span class="o">=</span><span class="s2">&quot;table_container&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="validate_capacity_decrease_is_percent"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.validate_capacity_decrease_is_percent">[docs]</a><span class="nd">@callback</span><span class="p">(</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;capacity_decrease_in&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid&quot;</span><span class="p">),</span> <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;capacity_decrease_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">validate_capacity_decrease_is_percent</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">elif</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="download_cars_data"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.download_cars_data">[docs]</a><span class="nd">@callback</span><span class="p">(</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;download-dataframe-xlsx&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;download_button&quot;</span><span class="p">,</span> <span class="s2">&quot;n_clicks&quot;</span><span class="p">),</span>
+    <span class="n">prevent_initial_call</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">download_cars_data</span><span class="p">(</span><span class="n">n_clicks</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span>
+        <span class="n">Query</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">data_access</span><span class="o">.</span><span class="n">dbschema</span><span class="o">.</span><span class="n">Cars</span><span class="p">,</span>
+                <span class="n">VehicleTypes</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;Type&quot;</span><span class="p">),</span>
+                <span class="n">FuelTypes</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;Drivmiddel&quot;</span><span class="p">),</span>
+                <span class="n">LeasingTypes</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;Leasingtype&quot;</span><span class="p">),</span>
+                <span class="n">AllowedStarts</span><span class="o">.</span><span class="n">address</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;Adresse&quot;</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">VehicleTypes</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FuelTypes</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">LeasingTypes</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AllowedStarts</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">statement</span><span class="p">,</span>
+        <span class="n">engine</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;fuel&quot;</span><span class="p">,</span> <span class="s2">&quot;leasing_type&quot;</span><span class="p">,</span> <span class="s2">&quot;location&quot;</span><span class="p">])</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;plate&quot;</span><span class="p">:</span> <span class="s2">&quot;Nummnerplade&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;make&quot;</span><span class="p">:</span> <span class="s2">&quot;Mærke&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;Model&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wltp_fossil&quot;</span><span class="p">:</span> <span class="s2">&quot;Wltp (fossil)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wltp_el&quot;</span><span class="p">:</span> <span class="s2">&quot;Wltp (el)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;capacity_decrease&quot;</span><span class="p">:</span> <span class="s2">&quot;Procentvis wltp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;co2_pr_km&quot;</span><span class="p">:</span> <span class="s2">&quot;CO2 (g/km)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;range&quot;</span><span class="p">:</span> <span class="s2">&quot;Rækkevidde (km)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;omkostning_aar&quot;</span><span class="p">:</span> <span class="s2">&quot;Omk./år&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;start_leasing&quot;</span><span class="p">:</span> <span class="s2">&quot;Start leasing&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;end_leasing&quot;</span><span class="p">:</span> <span class="s2">&quot;Slut leasing&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">dcc</span><span class="o">.</span><span class="n">send_data_frame</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">,</span> <span class="s2">&quot;flåde.xlsx&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="add_vehicle"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.add_vehicle">[docs]</a><span class="k">def</span> <span class="nf">add_vehicle</span><span class="p">(</span>
+    <span class="n">plate_in</span><span class="p">,</span>
+    <span class="n">make_in</span><span class="p">,</span>
+    <span class="n">model_in</span><span class="p">,</span>
+    <span class="n">type_in</span><span class="p">,</span>
+    <span class="n">fuel_in</span><span class="p">,</span>
+    <span class="n">wltp_fossil_in</span><span class="p">,</span>
+    <span class="n">wltp_el_in</span><span class="p">,</span>
+    <span class="n">capacity_decrease_in</span><span class="p">,</span>
+    <span class="n">co2_pr_km_in</span><span class="p">,</span>
+    <span class="n">range_in</span><span class="p">,</span>
+    <span class="n">omkostning_aar_in</span><span class="p">,</span>
+    <span class="n">location_in</span><span class="p">,</span>
+    <span class="n">start_leasing_in</span><span class="p">,</span>
+    <span class="n">end_leasing_in</span><span class="p">,</span>
+    <span class="n">leasing_type_in</span><span class="p">,</span>
+    <span class="n">km_aar_in</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">def</span> <span class="nf">float_to_none</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">f</span> <span class="ow">or</span> <span class="kc">None</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">Cars</span><span class="p">(</span>
+                <span class="n">plate</span><span class="o">=</span><span class="n">plate_in</span><span class="p">,</span>
+                <span class="n">make</span><span class="o">=</span><span class="n">make_in</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model_in</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">type_in</span><span class="p">,</span>
+                <span class="n">fuel</span><span class="o">=</span><span class="n">fuel_in</span><span class="p">,</span>
+                <span class="n">wltp_fossil</span><span class="o">=</span><span class="n">float_to_none</span><span class="p">(</span><span class="n">wltp_fossil_in</span><span class="p">),</span>
+                <span class="n">wltp_el</span><span class="o">=</span><span class="n">float_to_none</span><span class="p">(</span><span class="n">wltp_el_in</span><span class="p">),</span>
+                <span class="n">capacity_decrease</span><span class="o">=</span><span class="n">float_to_none</span><span class="p">(</span><span class="n">capacity_decrease_in</span><span class="p">),</span>
+                <span class="n">co2_pr_km</span><span class="o">=</span><span class="n">float_to_none</span><span class="p">(</span><span class="n">co2_pr_km_in</span><span class="p">),</span>
+                <span class="nb">range</span><span class="o">=</span><span class="n">float_to_none</span><span class="p">(</span><span class="n">range_in</span><span class="p">),</span>
+                <span class="n">omkostning_aar</span><span class="o">=</span><span class="n">float_to_none</span><span class="p">(</span><span class="n">omkostning_aar_in</span><span class="p">),</span>
+                <span class="n">location</span><span class="o">=</span><span class="n">location_in</span><span class="p">,</span>
+                <span class="n">start_leasing</span><span class="o">=</span><span class="kc">None</span>
+                <span class="k">if</span> <span class="n">start_leasing_in</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start_leasing_in</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">),</span>
+                <span class="n">end_leasing</span><span class="o">=</span><span class="kc">None</span>
+                <span class="k">if</span> <span class="n">end_leasing_in</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end_leasing_in</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">),</span>
+                <span class="n">leasing_type</span><span class="o">=</span><span class="n">leasing_type_in</span><span class="p">,</span>
+                <span class="n">km_aar</span><span class="o">=</span><span class="n">float_to_none</span><span class="p">(</span><span class="n">km_aar_in</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">error_alert</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span> <span class="n">get_cars_rounded</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">success_alert</span><span class="p">(),</span> <span class="n">get_cars_rounded</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="success_alert"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.success_alert">[docs]</a><span class="k">def</span> <span class="nf">success_alert</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">dbc</span><span class="o">.</span><span class="n">Toast</span><span class="p">(</span>
+        <span class="s2">&quot;Konfigurationen blev opdateret uden problemer&quot;</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;sql-success&quot;</span><span class="p">,</span>
+        <span class="n">header</span><span class="o">=</span><span class="s2">&quot;Success&quot;</span><span class="p">,</span>
+        <span class="n">is_open</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">duration</span><span class="o">=</span><span class="mi">4000</span><span class="p">,</span>
+        <span class="n">dismissable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+        <span class="n">className</span><span class="o">=</span><span class="s2">&quot;data-alert&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="error_alert"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.error_alert">[docs]</a><span class="k">def</span> <span class="nf">error_alert</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">dbc</span><span class="o">.</span><span class="n">Toast</span><span class="p">(</span>
+        <span class="n">error</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;sql-success&quot;</span><span class="p">,</span>
+        <span class="n">header</span><span class="o">=</span><span class="s2">&quot;Fejl&quot;</span><span class="p">,</span>
+        <span class="n">is_open</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">dismissable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;danger&quot;</span><span class="p">,</span>
+        <span class="n">className</span><span class="o">=</span><span class="s2">&quot;data-alert&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="warning_alert"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.warning_alert">[docs]</a><span class="k">def</span> <span class="nf">warning_alert</span><span class="p">(</span><span class="n">warning</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">dbc</span><span class="o">.</span><span class="n">Toast</span><span class="p">(</span>
+        <span class="n">warning</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;sql-success&quot;</span><span class="p">,</span>
+        <span class="n">header</span><span class="o">=</span><span class="s2">&quot;Advarsel&quot;</span><span class="p">,</span>
+        <span class="n">is_open</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">dismissable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span>
+        <span class="n">className</span><span class="o">=</span><span class="s2">&quot;data-alert&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="update_db"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.update_db">[docs]</a><span class="nd">@callback</span><span class="p">(</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;alerts&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;config_table&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;update_btn&quot;</span><span class="p">,</span> <span class="s2">&quot;n_clicks&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;n_clicks&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;plate_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;make_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;model_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;type_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;fuel_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;wltp_fossil_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;wltp_el_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;capacity_decrease_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;co2_pr_km_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;range_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;omkostning_aar_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;location_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;leasing_period_in&quot;</span><span class="p">,</span> <span class="s2">&quot;start_date&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;leasing_period_in&quot;</span><span class="p">,</span> <span class="s2">&quot;end_date&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;leasing_type_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+    <span class="n">State</span><span class="p">(</span><span class="s2">&quot;km_aar_in&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">update_db</span><span class="p">(</span>
+    <span class="n">ub</span><span class="p">,</span>
+    <span class="n">ab</span><span class="p">,</span>
+    <span class="n">plate_in</span><span class="p">,</span>
+    <span class="n">make_in</span><span class="p">,</span>
+    <span class="n">model_in</span><span class="p">,</span>
+    <span class="n">type_in</span><span class="p">,</span>
+    <span class="n">fuel_in</span><span class="p">,</span>
+    <span class="n">wltp_fossil_in</span><span class="p">,</span>
+    <span class="n">wltp_el_in</span><span class="p">,</span>
+    <span class="n">capacity_decrease_in</span><span class="p">,</span>
+    <span class="n">co2_pr_km_in</span><span class="p">,</span>
+    <span class="n">range_in</span><span class="p">,</span>
+    <span class="n">omkostning_aar_in</span><span class="p">,</span>
+    <span class="n">location_in</span><span class="p">,</span>
+    <span class="n">start_leasing_in</span><span class="p">,</span>
+    <span class="n">end_leasing_in</span><span class="p">,</span>
+    <span class="n">leasing_type_in</span><span class="p">,</span>
+    <span class="n">km_aar_in</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">ctx</span> <span class="o">=</span> <span class="n">dash</span><span class="o">.</span><span class="n">callback_context</span>
+    <span class="k">if</span> <span class="n">ctx</span><span class="o">.</span><span class="n">triggered</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prop_id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;update_btn.n_clicks&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">update_cars</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">ctx</span><span class="o">.</span><span class="n">triggered</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prop_id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;add.n_clicks&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">add_vehicle</span><span class="p">(</span>
+            <span class="n">plate_in</span><span class="p">,</span>
+            <span class="n">make_in</span><span class="p">,</span>
+            <span class="n">model_in</span><span class="p">,</span>
+            <span class="n">type_in</span><span class="p">,</span>
+            <span class="n">fuel_in</span><span class="p">,</span>
+            <span class="n">wltp_fossil_in</span><span class="p">,</span>
+            <span class="n">wltp_el_in</span><span class="p">,</span>
+            <span class="n">capacity_decrease_in</span><span class="p">,</span>
+            <span class="n">co2_pr_km_in</span><span class="p">,</span>
+            <span class="n">range_in</span><span class="p">,</span>
+            <span class="n">omkostning_aar_in</span><span class="p">,</span>
+            <span class="n">location_in</span><span class="p">,</span>
+            <span class="n">start_leasing_in</span><span class="p">,</span>
+            <span class="n">end_leasing_in</span><span class="p">,</span>
+            <span class="n">leasing_type_in</span><span class="p">,</span>
+            <span class="n">km_aar_in</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">get_cars_rounded</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="toggle_modal"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.toggle_modal">[docs]</a><span class="nd">@callback</span><span class="p">(</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;modal&quot;</span><span class="p">,</span> <span class="s2">&quot;is_open&quot;</span><span class="p">),</span>
+    <span class="p">[</span><span class="n">Input</span><span class="p">(</span><span class="s2">&quot;add_vehicle&quot;</span><span class="p">,</span> <span class="s2">&quot;n_clicks&quot;</span><span class="p">),</span> <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;n_clicks&quot;</span><span class="p">)],</span>
+    <span class="p">[</span><span class="n">State</span><span class="p">(</span><span class="s2">&quot;modal&quot;</span><span class="p">,</span> <span class="s2">&quot;is_open&quot;</span><span class="p">)],</span>
+    <span class="n">prevent_initial_call</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">toggle_modal</span><span class="p">(</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">,</span> <span class="n">is_open</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n1</span> <span class="ow">or</span> <span class="n">n2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="n">is_open</span>
+    <span class="k">return</span> <span class="n">is_open</span></div>
+
+
+<span class="n">deletions</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">changes</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="update_cars"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.update_cars">[docs]</a><span class="k">def</span> <span class="nf">update_cars</span><span class="p">():</span>
+    <span class="n">deleted_updates</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Cars</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">deletions</span><span class="p">))</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span>
+                <span class="n">synchronize_session</span><span class="o">=</span><span class="s2">&quot;fetch&quot;</span>
+            <span class="p">)</span>
+            <span class="c1"># Find out if user is trying to update items that have been deleted by other users</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">changes</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Cars</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+                    <span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">val</span><span class="p">})</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">deleted_updates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)))</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">error_alert</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span> <span class="n">get_cars_rounded</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">deleted_updates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">success_alert</span><span class="p">(),</span> <span class="n">get_cars_rounded</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">warning_string</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Opdateringerne til køretøjeret/køretøjerne med id </span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">deleted_updates</span><span class="p">)</span><span class="si">}</span><span class="s1"> &#39;</span>
+            <span class="sa">f</span><span class="s2">&quot;er ikke påført da de er blevet slettet af en anden bruger&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">warning_alert</span><span class="p">(</span><span class="n">warning_string</span><span class="p">),</span> <span class="n">get_cars_rounded</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="display_output"><a class="viewcode-back" href="../../../source/fleetmanager.dashboard.html#fleetmanager.dashboard.page_config.display_output">[docs]</a><span class="nd">@callback</span><span class="p">(</span>
+    <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;table_dummy&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;config_table&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;config_table&quot;</span><span class="p">,</span> <span class="s2">&quot;data_previous&quot;</span><span class="p">),</span>
+    <span class="n">prevent_initial_call</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">display_output</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_previous</span><span class="p">):</span>
+    <span class="c1"># If update is triggered by a reload do nothing</span>
+    <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="n">data_previous</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">PreventUpdate</span>
+    <span class="c1"># Dash doesn&#39;t have specific callbacks for different table changes so we have to resort to this</span>
+    <span class="k">if</span> <span class="n">data_previous</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_previous</span><span class="p">):</span>
+        <span class="n">deleted_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data_previous</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+        <span class="n">deletions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deleted_id</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">changes</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">changes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">deleted_id</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">changes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">data_previous</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_previous</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">([</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_previous</span><span class="p">])</span>
+        <span class="n">changed_item</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_previous</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;start_leasing&quot;</span><span class="p">,</span> <span class="s2">&quot;end_leasing&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">changed_item</span><span class="p">:</span>
+                <span class="n">changed_item</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">changed_item</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">changes</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">changes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">changed_item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">):</span>
+                <span class="n">changes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">changed_item</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">changes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">changed_item</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

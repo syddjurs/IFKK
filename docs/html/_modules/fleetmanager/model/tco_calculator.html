@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.model.tco_calculator &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/readme.html">readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.data_access.html">fleetmanager.data_access package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.model.html">fleetmanager.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.model.qampo.html">fleetmanager.model.qampo package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.dashboard.html">fleetmanager.dashboard package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>fleetmanager.model.tco_calculator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fleetmanager.model.tco_calculator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy_financial</span> <span class="k">as</span> <span class="nn">npf</span>
+
+
+<div class="viewcode-block" id="TCOCalculator"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tco_calculator.TCOCalculator">[docs]</a><span class="k">class</span> <span class="nc">TCOCalculator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class used all over the project to calculate the consequence based on the methods provided in &quot;Partnerskab for</span>
+<span class="sd">    offentlige grønne indkøb&quot;s tool &quot;miljoestyrelsen-tco-vaerktoej-motorkoeretoejer&quot;. Made to be independent of</span>
+<span class="sd">    xlwings dependencies unavailable to linux. The methods have been written directly from the tool and thus makes the</span>
+<span class="sd">    same assumptions. Originals can be seen in src.fleetmanager.model.pogi</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters should be loaded with the initialisation.</span>
+<span class="sd">        Most importantly is to define; &quot;drivmiddel&quot;, &quot;bil_type&quot;, &quot;koerselsforbrug&quot; (based on the actual allocated trips),</span>
+
+<span class="sd">        Essential lambda functions here are:</span>
+<span class="sd">            aarlig_braendstofforbrug    :   calculates the fuel usage - fossile: km / kml,</span>
+<span class="sd">                                                                    electrical: km * wh / 1000</span>
+<span class="sd">            aarlig_driftsomkostning :   calculates the yearly fule expense: usage * price * count</span>
+<span class="sd">            nutidsvaerdi_drift  :   calculates the projected fuel expense:</span>
+<span class="sd">                                    yearly fuel expense * (1 + interest rate / 100) ** -year_index</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># oplysninger om produktet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">etableringsgebyr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">braendstofforbrug</span> <span class="o">=</span> <span class="mi">15</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leasingydelse</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leasingtype</span> <span class="o">=</span> <span class="s2">&quot;operationel&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ejerafgift</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elforbrug</span> <span class="o">=</span> <span class="mi">200</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># oplysninger om brugeren</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">antal</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">koerselsforbrug</span> <span class="o">=</span> <span class="mi">30000</span>
+
+        <span class="c1"># baggrundsdata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diskonteringsrente</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evalueringsperiode</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="c1"># 2020 = 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fremskrivnings_aar</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prisstigning_benzin</span> <span class="o">=</span> <span class="mf">1.39</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prisstigning_diesel</span> <span class="o">=</span> <span class="mf">1.45</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pris_el</span> <span class="o">=</span> <span class="mf">2.13</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prisstigning_el</span> <span class="o">=</span> <span class="mf">1.67</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pris_benzin</span> <span class="o">=</span> <span class="mf">12.33</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pris_diesel</span> <span class="o">=</span> <span class="mf">10.83</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drivmiddel</span> <span class="o">=</span> <span class="s2">&quot;benzin&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bil_type</span> <span class="o">=</span> <span class="s2">&quot;benzin&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">forsikring</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loebende_omkostninger</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foerste_aars_brugsperiode</span> <span class="o">=</span> <span class="mi">2021</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vaerdisaetning_tons_co2</span> <span class="o">=</span> <span class="mi">1500</span>
+
+        <span class="c1"># Fra CO2e udledninger Fremskrivningsarket</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">co2e_udledninger_diesel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mf">2.98</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">co2e_udledninger_benzin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mf">2.52</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">co2e_udledninger_el</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="mf">0.089</span><span class="p">,</span>
+            <span class="mf">0.07</span><span class="p">,</span>
+            <span class="mf">0.058</span><span class="p">,</span>
+            <span class="mf">0.054</span><span class="p">,</span>
+            <span class="mf">0.05</span><span class="p">,</span>
+            <span class="mf">0.042</span><span class="p">,</span>
+            <span class="mf">0.037</span><span class="p">,</span>
+            <span class="mf">0.032</span><span class="p">,</span>
+            <span class="mf">0.013</span><span class="p">,</span>
+        <span class="p">]</span> <span class="o">+</span> <span class="p">([</span><span class="mf">0.012</span><span class="p">]</span> <span class="o">*</span> <span class="mi">21</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fremskrivning</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;benzin&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivmiddel_udvikling</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pris_benzin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prisstigning_benzin</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;diesel&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivmiddel_udvikling</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pris_diesel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prisstigning_diesel</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;el&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivmiddel_udvikling</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pris_el</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prisstigning_el</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aarlig_braendstofforbrug</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">koersel</span><span class="p">,</span> <span class="n">kml</span><span class="p">,</span> <span class="n">drivmiddel</span><span class="p">:</span> <span class="n">koersel</span> <span class="o">/</span> <span class="n">kml</span>
+            <span class="k">if</span> <span class="n">drivmiddel</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;el&quot;</span>
+            <span class="k">else</span> <span class="n">koersel</span> <span class="o">*</span> <span class="n">kml</span> <span class="o">/</span> <span class="mi">1000</span>
+        <span class="p">)</span>  <span class="c1"># kwh to wh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aarlig_driftsomkostning</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">forbrug</span><span class="p">,</span> <span class="n">pris</span><span class="p">,</span> <span class="n">antal</span><span class="o">=</span><span class="mi">1</span><span class="p">:</span> <span class="n">forbrug</span> <span class="o">*</span> <span class="n">pris</span> <span class="o">*</span> <span class="n">antal</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nutidsvaerdi_drift</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">driftsomkostning</span><span class="p">,</span> <span class="n">rente</span><span class="p">,</span> <span class="n">aar_index</span><span class="p">:</span> <span class="n">driftsomkostning</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">rente</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="n">aar_index</span>
+        <span class="p">)</span>
+
+        <span class="c1"># calculated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driftsomkostninger_aar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftsomkostninger</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driftsomkostning</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driftsomkostninger_aar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">omkostning</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">omkostninger</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tco</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">driftsomkostning</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">omkostning</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">etableringsgebyr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tco_average</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tco_yearly</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">omkostning_average</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">omkostning_yearly</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TCOCalculator.driftsomkostninger"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tco_calculator.TCOCalculator.driftsomkostninger">[docs]</a>    <span class="k">def</span> <span class="nf">driftsomkostninger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the summed fuel expense on the vehicle.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of expense on fuel over the selected evaluation period</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivmiddel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;benzin&quot;</span><span class="p">,</span> <span class="s2">&quot;diesel&quot;</span><span class="p">,</span> <span class="s2">&quot;el&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nutidsvaerdi_drift</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aarlig_driftsomkostning</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">aarlig_braendstofforbrug</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">koerselsforbrug</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">elforbrug</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivmiddel</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;el&quot;</span>
+                        <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">braendstofforbrug</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">drivmiddel</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fremskrivning</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">drivmiddel</span><span class="p">][</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+                <span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diskonteringsrente</span><span class="p">,</span>
+                <span class="n">k</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evalueringsperiode</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="TCOCalculator.drivmiddel_udvikling"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tco_calculator.TCOCalculator.drivmiddel_udvikling">[docs]</a>    <span class="k">def</span> <span class="nf">drivmiddel_udvikling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pris</span><span class="p">,</span> <span class="n">stigning</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Projecting the development in price of the fuel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pris    :   int, current price</span>
+<span class="sd">        stigning    :   int, percentage rate of fuel increase</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of fuel price for the next 30 years</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">udvikling</span> <span class="o">=</span> <span class="p">[</span><span class="n">pris</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">):</span>
+            <span class="n">udvikling</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">udvikling</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">stigning</span> <span class="o">/</span> <span class="mi">100</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">udvikling</span></div>
+
+<div class="viewcode-block" id="TCOCalculator.omkostninger"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tco_calculator.TCOCalculator.omkostninger">[docs]</a>    <span class="k">def</span> <span class="nf">omkostninger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Summing the expenses not related to fuel expense over the evaluation period</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">leasingydelse</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ejerafgift</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forsikring</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loebende_omkostninger</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskonteringsrente</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="n">aar</span>
+            <span class="k">for</span> <span class="n">aar</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evalueringsperiode</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="TCOCalculator.omkostning_yearly"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tco_calculator.TCOCalculator.omkostning_yearly">[docs]</a>    <span class="k">def</span> <span class="nf">omkostning_yearly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getting the yearly expense with the defined discount interest rate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span>
+            <span class="n">npf</span><span class="o">.</span><span class="n">pmt</span><span class="p">(</span>
+                <span class="n">pv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">omkostning</span><span class="p">,</span>
+                <span class="n">fv</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">diskonteringsrente</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="n">nper</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evalueringsperiode</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="TCOCalculator.tco_yearly"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tco_calculator.TCOCalculator.tco_yearly">[docs]</a>    <span class="k">def</span> <span class="nf">tco_yearly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span>
+            <span class="n">npf</span><span class="o">.</span><span class="n">pmt</span><span class="p">(</span>
+                <span class="n">pv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tco</span><span class="p">,</span>
+                <span class="n">fv</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">diskonteringsrente</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="n">nper</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evalueringsperiode</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="TCOCalculator.ekstern_miljoevirkning"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tco_calculator.TCOCalculator.ekstern_miljoevirkning">[docs]</a>    <span class="k">def</span> <span class="nf">ekstern_miljoevirkning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sum_it</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">udledninger</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">aarligt_forbrug_benzin_diesel</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">0</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">braendstofforbrug</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">koerselsforbrug</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">braendstofforbrug</span>
+        <span class="p">)</span>
+        <span class="n">el_aarligt_stroemforbrug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elforbrug</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">koerselsforbrug</span>
+        <span class="n">el_hybrid_aarligt_forbrug</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">elforbrug</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">koerselsforbrug</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">elforbrug</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bil_type</span> <span class="o">==</span> <span class="s2">&quot;benzin&quot;</span><span class="p">:</span>
+            <span class="n">udledninger</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">aarligt_forbrug_benzin_diesel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">antal</span> <span class="o">*</span> <span class="n">k</span> <span class="o">/</span> <span class="mi">1000</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2e_udledninger_benzin</span>
+            <span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bil_type</span> <span class="o">==</span> <span class="s2">&quot;diesel&quot;</span><span class="p">:</span>
+            <span class="n">udledninger</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">aarligt_forbrug_benzin_diesel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">antal</span> <span class="o">*</span> <span class="n">k</span> <span class="o">/</span> <span class="mi">1000</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2e_udledninger_diesel</span>
+            <span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bil_type</span> <span class="o">==</span> <span class="s2">&quot;el&quot;</span><span class="p">:</span>
+            <span class="n">udledninger</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">antal</span> <span class="o">*</span> <span class="n">el_aarligt_stroemforbrug</span> <span class="o">*</span> <span class="n">k</span> <span class="o">/</span> <span class="mi">1000</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2e_udledninger_el</span>
+            <span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bil_type</span> <span class="o">==</span> <span class="s2">&quot;plugin hybrid benzin&quot;</span><span class="p">:</span>
+            <span class="n">udledninger_el</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">antal</span> <span class="o">*</span> <span class="n">el_aarligt_stroemforbrug</span> <span class="o">*</span> <span class="n">k</span> <span class="o">/</span> <span class="mi">1000</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2e_udledninger_el</span>
+            <span class="p">]</span>
+            <span class="n">udledninger_benzin</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">el_hybrid_aarligt_forbrug</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">antal</span> <span class="o">*</span> <span class="n">k</span> <span class="o">/</span> <span class="mi">1000</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2e_udledninger_benzin</span>
+            <span class="p">]</span>
+            <span class="n">udledninger</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">udledninger_el</span><span class="p">,</span> <span class="n">udledninger_benzin</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bil_type</span> <span class="o">==</span> <span class="s2">&quot;plugin hybrid diesel&quot;</span><span class="p">:</span>
+            <span class="n">udledninger_el</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">antal</span> <span class="o">*</span> <span class="n">el_aarligt_stroemforbrug</span> <span class="o">*</span> <span class="n">k</span> <span class="o">/</span> <span class="mi">1000</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2e_udledninger_el</span>
+            <span class="p">]</span>
+            <span class="n">udledninger_diesel</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">el_hybrid_aarligt_forbrug</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">antal</span> <span class="o">*</span> <span class="n">k</span> <span class="o">/</span> <span class="mi">1000</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2e_udledninger_diesel</span>
+            <span class="p">]</span>
+            <span class="n">udledninger</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">udledninger_el</span><span class="p">,</span> <span class="n">udledninger_diesel</span><span class="p">)]</span>
+        <span class="n">udledninger</span> <span class="o">=</span> <span class="n">udledninger</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fremskrivnings_aar</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fremskrivnings_aar</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">evalueringsperiode</span>
+        <span class="p">]</span>
+        <span class="n">ekstern_virkninger</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">udl</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vaerdisaetning_tons_co2</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskonteringsrente</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">udl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">udledninger</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">sum_it</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">udledninger</span><span class="p">),</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ekstern_virkninger</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">udledninger</span><span class="p">,</span> <span class="n">ekstern_virkninger</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

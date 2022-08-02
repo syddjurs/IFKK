@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.model.vehicle &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/readme.html">readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.data_access.html">fleetmanager.data_access package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.model.html">fleetmanager.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.model.qampo.html">fleetmanager.model.qampo package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.dashboard.html">fleetmanager.dashboard package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>fleetmanager.model.vehicle</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fleetmanager.model.vehicle</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">func</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm.query</span> <span class="kn">import</span> <span class="n">Query</span>
+
+<span class="kn">from</span> <span class="nn">fleetmanager.data_access</span> <span class="kn">import</span> <span class="n">Cars</span><span class="p">,</span> <span class="n">FuelTypes</span><span class="p">,</span> <span class="n">VehicleTypes</span><span class="p">,</span> <span class="n">engine_creator</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.tco_calculator</span> <span class="kn">import</span> <span class="n">TCOCalculator</span>
+
+<span class="c1"># initialise global mappers</span>
+<span class="n">vehicle_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;Ikke tildelt&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;Fossil-bil&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;El-bil&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;El-cykel&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;Cykel&quot;</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="VehicleModel"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleModel">[docs]</a><span class="k">class</span> <span class="nc">VehicleModel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;General vehicle model. Not directly instantiated but specific vehicle models inherit from it&quot;&quot;&quot;</span>
+
+    <span class="n">co2emission_per_km</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># g/km</span>
+    <span class="n">max_distance_per_day</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">omkostning_aar</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">vcprkm</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">qampo_gr</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">vehicle_type_number</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">yearly_set</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vehicle_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_id</span> <span class="o">=</span> <span class="n">vehicle_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeslots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">days</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="VehicleModel.set_timestamps"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleModel.set_timestamps">[docs]</a>    <span class="k">def</span> <span class="nf">set_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_timestamps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initailize timeslot of vehicle to match timestamps.</span>
+
+<span class="sd">        parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_timestamp : array of timestamps</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span> <span class="o">=</span> <span class="n">new_timestamps</span>
+
+        <span class="c1"># initialise timeslots here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeslots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="p">),),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">days</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_timestamp</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_timestamp</span><span class="p">()</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+            <span class="o">/</span> <span class="mi">3600</span>
+            <span class="o">/</span> <span class="mi">24</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="VehicleModel.book_trip"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleModel.book_trip">[docs]</a>    <span class="k">def</span> <span class="nf">book_trip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trip</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Function for trying to book trip on vehicle</span>
+
+<span class="sd">        parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trip : pandas row with a trip</span>
+
+<span class="sd">        returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        booked : boolean, True if vehicle is booked on this vehile</span>
+<span class="sd">        accept : boolean, True if it can accept the type of trip</span>
+<span class="sd">        available: boolean, True if the vehicle is available in this timeperiod</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># try to book on this vehicle. Returns a tuple with (accept, available). Return value &#39;accept&#39; is true if the vehicle can perform this trip and &#39;available&#39; is true if it is available in this</span>
+
+        <span class="c1"># test acceptance of trip</span>
+        <span class="n">accept</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accept_trip</span><span class="p">(</span><span class="n">trip</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">start_slot</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">start_slot</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">start_slot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">end_slot</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">end_slot</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">end_slot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+
+        <span class="c1"># print(trip)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">start_slot</span> <span class="ow">is</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">end_slot</span> <span class="ow">is</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;start_slot=</span><span class="si">{</span><span class="n">start_slot</span><span class="si">}</span><span class="s2">, end_slot=</span><span class="si">{</span><span class="n">end_slot</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+
+        <span class="c1"># lookup in timeslots list</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeslots</span><span class="p">[</span><span class="n">start_slot</span> <span class="p">:</span> <span class="p">(</span><span class="n">end_slot</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">available</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">available</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">start_slot</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">end_slot</span><span class="p">)</span>
+            <span class="n">available</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># collect and book</span>
+        <span class="k">if</span> <span class="n">accept</span> <span class="ow">and</span> <span class="n">available</span><span class="p">:</span>
+            <span class="c1"># vehicle accept trip and vehicle available</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timeslots</span><span class="p">[</span><span class="n">start_slot</span> <span class="p">:</span> <span class="p">(</span><span class="n">end_slot</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">trip</span><span class="o">.</span><span class="n">tripid</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">accept</span><span class="p">,</span> <span class="n">available</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># vehicle not available or cannot accept trip</span>
+            <span class="k">if</span> <span class="n">accept</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">+=</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span>
+            <span class="k">if</span> <span class="n">accept</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">-=</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">accept</span><span class="p">,</span> <span class="n">available</span></div>
+
+<div class="viewcode-block" id="VehicleModel.bypass_book"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleModel.bypass_book">[docs]</a>    <span class="k">def</span> <span class="nf">bypass_book</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trip</span><span class="p">):</span>
+        <span class="n">start_slot</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">start_slot</span><span class="p">)</span>
+        <span class="n">end_slot</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">end_slot</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeslots</span><span class="p">[</span><span class="n">start_slot</span> <span class="p">:</span> <span class="p">(</span><span class="n">end_slot</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">trip</span><span class="o">.</span><span class="n">tripid</span>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="VehicleModel.accept_trip"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleModel.accept_trip">[docs]</a>    <span class="k">def</span> <span class="nf">accept_trip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trip</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</span>
+
+<span class="sd">        parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trip : pandas row with a trip</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="VehicleModel.percentage_accept"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleModel.percentage_accept">[docs]</a>    <span class="k">def</span> <span class="nf">percentage_accept</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method that ensures that bike trips accepted gets as close to the input percentage as possible</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">accepted</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accept_record</span><span class="p">)</span>
+        <span class="n">checked</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accept_record</span><span class="p">)</span>
+        <span class="n">up_or_down</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">percentage</span> <span class="o">-</span> <span class="p">((</span><span class="n">accepted</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">checked</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))),</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">percentage</span> <span class="o">-</span> <span class="p">((</span><span class="n">accepted</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">checked</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))),</span>
+        <span class="p">]</span>
+        <span class="n">closest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">up_or_down</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">closest</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">vehicle_id</span><span class="si">}</span><span class="s2">, name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+<div class="viewcode-block" id="VehicleModel.class_info"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleModel.class_info">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">class_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(co2emission_per_km=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">co2emission_per_km</span><span class="si">}</span><span class="s2">, max_distance_per_day=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span><span class="si">}</span><span class="s2">, omkostning_aar=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">omkostning_aar</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+
+<div class="viewcode-block" id="VehicleModel.print_info"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleModel.print_info">[docs]</a>    <span class="k">def</span> <span class="nf">print_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Print info. Mostly for debugging&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeslots</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Car"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.Car">[docs]</a><span class="k">class</span> <span class="nc">Car</span><span class="p">(</span><span class="n">VehicleModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class for representing a car&quot;&quot;&quot;</span>
+
+    <span class="n">vehicle_type_number</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_distance_per_day</span> <span class="o">=</span> <span class="mi">9999</span>
+    <span class="n">co2emission_per_km</span> <span class="o">=</span> <span class="mi">150</span>
+    <span class="n">wltp_fossil</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">fuel</span> <span class="o">=</span> <span class="s2">&quot;benzin&quot;</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">yearly_allowance</span> <span class="o">=</span> <span class="mi">999999</span>
+    <span class="n">yearly_set</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        initialising a car with its properties from the frame</span>
+<span class="sd">        calculates a tco average in order to approximate the variable cost pr km used by optimisation algorithms</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="s2">&quot;co2emission_per_km&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">co2emission_per_km</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;co2_pr_km&quot;</span><span class="p">)</span>
+
+        <span class="n">tco</span> <span class="o">=</span> <span class="n">TCOCalculator</span><span class="p">(</span>
+            <span class="n">koerselsforbrug</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+            <span class="n">drivmiddel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fuel</span><span class="p">,</span>
+            <span class="n">bil_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fuel</span><span class="p">,</span>
+            <span class="n">antal</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">evalueringsperiode</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">fremskrivnings_aar</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">braendstofforbrug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">,</span>
+            <span class="n">elforbrug</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">leasingydelse</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vcprkm</span> <span class="o">=</span> <span class="n">tco</span><span class="o">.</span><span class="n">tco_average</span> <span class="o">/</span> <span class="mi">10000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qampo_gr</span> <span class="o">=</span> <span class="n">tco</span><span class="o">.</span><span class="n">ekstern_miljoevirkning</span><span class="p">(</span><span class="n">sum_it</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;km_aar&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yearly_allowance</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;km_aar&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.07</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yearly_set</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="Car.accept_trip"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.Car.accept_trip">[docs]</a>    <span class="k">def</span> <span class="nf">accept_trip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trip</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true if the trip is accepted, and false if the yearly_set is true and the yearly_allowance is exceeded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">yearly_set</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">days</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">yearly_allowance</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+=</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+<div class="viewcode-block" id="ElectricCar"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.ElectricCar">[docs]</a><span class="k">class</span> <span class="nc">ElectricCar</span><span class="p">(</span><span class="n">VehicleModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class for representing an electric car&quot;&quot;&quot;</span>
+
+    <span class="n">vehicle_type_number</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">max_distance_per_day</span> <span class="o">=</span> <span class="mi">200</span>
+    <span class="n">co2emission_per_km</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">wltp_el</span> <span class="o">=</span> <span class="mi">200</span>
+    <span class="n">fuel</span> <span class="o">=</span> <span class="s2">&quot;el&quot;</span>
+    <span class="n">sleep</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">yearly_allowance</span> <span class="o">=</span> <span class="mi">999999</span>
+    <span class="n">yearly_set</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        initialising a car with its properties from the frame</span>
+<span class="sd">        calculates a tco average in order to approximate the variable cost pr km used by optimisation algorithms</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># simple battery indicator</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;range&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;range&quot;</span><span class="p">)</span>
+            <span class="n">capacity_decrease</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;capacity_decrease&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">capacity_decrease</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span> <span class="o">*</span> <span class="p">(</span><span class="mi">100</span> <span class="o">-</span> <span class="n">capacity_decrease</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;sleep&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span> <span class="o">=</span> <span class="n">ElectricCar</span><span class="o">.</span><span class="n">sleep</span>
+
+
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;km_aar&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yearly_allowance</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;km_aar&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.07</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yearly_set</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">tco</span> <span class="o">=</span> <span class="n">TCOCalculator</span><span class="p">(</span>
+            <span class="n">koerselsforbrug</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+            <span class="n">drivmiddel</span><span class="o">=</span><span class="s2">&quot;el&quot;</span><span class="p">,</span>
+            <span class="n">bil_type</span><span class="o">=</span><span class="s2">&quot;el&quot;</span><span class="p">,</span>
+            <span class="n">antal</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">evalueringsperiode</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">fremskrivnings_aar</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">braendstofforbrug</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">elforbrug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wltp_el</span><span class="p">,</span>
+            <span class="n">leasingydelse</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vcprkm</span> <span class="o">=</span> <span class="n">tco</span><span class="o">.</span><span class="n">tco_average</span> <span class="o">/</span> <span class="mi">10000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qampo_gr</span> <span class="o">=</span> <span class="n">tco</span><span class="o">.</span><span class="n">ekstern_miljoevirkning</span><span class="p">(</span><span class="n">sum_it</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+
+<div class="viewcode-block" id="ElectricCar.accept_trip"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.ElectricCar.accept_trip">[docs]</a>    <span class="k">def</span> <span class="nf">accept_trip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trip</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true if the trip is accepted, and false if its declined</span>
+<span class="sd">        The electrical car will only accept if the following is true</span>
+<span class="sd">            distance for trip must be less than milage left</span>
+<span class="sd">            vehicle must still be idle for at least self.sleep hours pr. 24 hours</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">time_good</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">):</span>
+            <span class="n">start_of_period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">start_time</span> <span class="o">-</span> <span class="n">start_of_period</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">days</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># reset the milage and the trips record</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trips</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">):</span>
+            <span class="c1"># check that the car can sleep at least 7 hours from last reset</span>
+            <span class="c1"># hours where the car has been idle</span>
+            <span class="n">idles</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="n">forward</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">current</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3600</span>
+                <span class="k">for</span> <span class="n">forward</span><span class="p">,</span> <span class="n">current</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="p">[(</span><span class="n">trip</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="kc">None</span><span class="p">)],</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+            <span class="c1"># indication if the route begins before last end</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">idles</span><span class="p">]):</span>
+                <span class="n">time_good</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">in_between_wait</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">idles</span><span class="p">)</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">timeleft</span> <span class="o">=</span> <span class="p">((</span><span class="mi">24</span> <span class="o">*</span> <span class="mi">3600</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">())</span> <span class="o">/</span> <span class="mi">3600</span>
+            <span class="k">if</span> <span class="n">in_between_wait</span> <span class="o">+</span> <span class="n">timeleft</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">:</span>
+                <span class="n">time_good</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># accept if enough km left on car and update milage_left</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">-</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">time_good</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">yearly_set</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span>
+                <span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">days</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">yearly_allowance</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">-</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">trip</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="n">trip</span><span class="o">.</span><span class="n">end_time</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+=</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># trip is too long to accept or timing not good</span>
+            <span class="k">return</span> <span class="kc">False</span></div></div>
+
+
+<div class="viewcode-block" id="Bike"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.Bike">[docs]</a><span class="k">class</span> <span class="nc">Bike</span><span class="p">(</span><span class="n">VehicleModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class for representing a bike&quot;&quot;&quot;</span>
+
+    <span class="n">vehicle_type_number</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">max_distance_per_day</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">co2emission_per_km</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_distance_pr_trip</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">allowed_driving_time_slots</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">max_time_slot</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">percentage</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;range&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;range&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">accept_record</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">percentage</span> <span class="o">/=</span> <span class="mi">100</span>
+
+<div class="viewcode-block" id="Bike.accept_trip"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.Bike.accept_trip">[docs]</a>    <span class="k">def</span> <span class="nf">accept_trip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trip</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true if the trip is accepted, and false if its declined</span>
+<span class="sd">        The bike will only accept if the following is true</span>
+<span class="sd">            distance for trip must be less than milage left</span>
+<span class="sd">            trip start - and end time must be within the allowed driving slot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">):</span>
+            <span class="n">start_of_period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">start_time</span> <span class="o">-</span> <span class="n">start_of_period</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">days</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># reset the milage and the trips record</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trips</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">trip</span><span class="o">.</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">trip</span><span class="o">.</span><span class="n">start_time</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3600</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_time_slot</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="n">trip</span><span class="o">.</span><span class="n">distance</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_pr_trip</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">-</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">):</span>
+            <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_driving_time_slots</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">trip</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                        <span class="n">trip</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                        <span class="n">trip</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                        <span class="n">trip</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                    <span class="p">]</span>
+                <span class="p">):</span>
+                    <span class="n">accepted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">percentage_accept</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">accept_record</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">accepted</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">accepted</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">-</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">trip</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="n">trip</span><span class="o">.</span><span class="n">end_time</span><span class="p">))</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># trip is too long to accept</span>
+            <span class="k">return</span> <span class="kc">False</span></div></div>
+
+
+<div class="viewcode-block" id="ElectricBike"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.ElectricBike">[docs]</a><span class="k">class</span> <span class="nc">ElectricBike</span><span class="p">(</span><span class="n">VehicleModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class for representing an electric bike&quot;&quot;&quot;</span>
+
+    <span class="n">vehicle_type_number</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">max_distance_per_day</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">co2emission_per_km</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_distance_pr_trip</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">allowed_driving_time_slots</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">max_time_slot</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">percentage</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;range&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;range&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">accept_record</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">percentage</span> <span class="o">/=</span> <span class="mi">100</span>
+
+<div class="viewcode-block" id="ElectricBike.accept_trip"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.ElectricBike.accept_trip">[docs]</a>    <span class="k">def</span> <span class="nf">accept_trip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trip</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true if the trip is accepted, and false if its declined</span>
+<span class="sd">        The bike will only accept if the following is true</span>
+<span class="sd">            distance for trip must be less than milage left</span>
+<span class="sd">            trip start - and end time must be within the allowed driving slot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># accept if enough km left on car</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">):</span>
+            <span class="n">start_of_period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">start_time</span> <span class="o">-</span> <span class="n">start_of_period</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">days</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># reset the milage and the trips record</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_per_day</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trips</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">trip</span><span class="o">.</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">trip</span><span class="o">.</span><span class="n">start_time</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3600</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_time_slot</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="n">trip</span><span class="o">.</span><span class="n">distance</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_pr_trip</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">-</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">):</span>
+            <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_driving_time_slots</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">trip</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                        <span class="n">trip</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                        <span class="n">trip</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                        <span class="n">trip</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                    <span class="p">]</span>
+                <span class="p">):</span>
+                    <span class="n">accepted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">percentage_accept</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">accept_record</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">accepted</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">accepted</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">milage_left</span> <span class="o">-</span> <span class="n">trip</span><span class="o">.</span><span class="n">distance</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">trip</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="n">trip</span><span class="o">.</span><span class="n">end_time</span><span class="p">))</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># trip is too long to accept</span>
+            <span class="k">return</span> <span class="kc">False</span></div></div>
+
+
+<div class="viewcode-block" id="Unassigned"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.Unassigned">[docs]</a><span class="k">class</span> <span class="nc">Unassigned</span><span class="p">(</span><span class="n">VehicleModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class for representing an unassigned vehicle. Used for computing capacity.&quot;&quot;&quot;</span>
+
+    <span class="n">vehicle_type_number</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">max_distance_per_day</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">co2emission_per_km</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Unassigned.accept_trip"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.Unassigned.accept_trip">[docs]</a>    <span class="k">def</span> <span class="nf">accept_trip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trip</span><span class="p">):</span>
+        <span class="c1"># always accept</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+<div class="viewcode-block" id="VehicleClassGenerator"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleClassGenerator">[docs]</a><span class="k">def</span> <span class="nf">VehicleClassGenerator</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">vehicle_type</span><span class="o">=</span><span class="n">Car</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class used to create vehicle types from a dynamic list of vehicle models&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">vehicle_type</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;Class&quot;</span><span class="p">)])</span>
+
+    <span class="n">new_vehicle_class</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">vehicle_type</span><span class="p">,),</span> <span class="p">{</span><span class="s2">&quot;__init__&quot;</span><span class="p">:</span> <span class="fm">__init__</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">new_vehicle_class</span></div>
+
+
+<div class="viewcode-block" id="VehicleFactory"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleFactory">[docs]</a><span class="k">class</span> <span class="nc">VehicleFactory</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class for containing the vehicle types that are used in the simulation&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">engine_creator</span><span class="p">()</span>
+        <span class="n">fuel_query</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">Query</span><span class="p">([</span><span class="n">FuelTypes</span><span class="o">.</span><span class="n">refers_to</span><span class="p">,</span> <span class="n">FuelTypes</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;fuelId&quot;</span><span class="p">)])</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">subquery</span><span class="p">()</span>
+        <span class="n">car_query</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">Query</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">FuelTypes</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;fuel_name&quot;</span><span class="p">),</span>
+                    <span class="n">fuel_query</span><span class="p">,</span>
+                    <span class="n">Cars</span><span class="p">,</span>
+                    <span class="n">VehicleTypes</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;type_name&quot;</span><span class="p">),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Cars</span><span class="p">,</span> <span class="n">func</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Cars</span><span class="o">.</span><span class="n">fuel</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">==</span> <span class="n">fuel_query</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">fuelId</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FuelTypes</span><span class="p">,</span> <span class="n">FuelTypes</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">fuel_query</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">refers_to</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">VehicleTypes</span><span class="p">,</span> <span class="n">Cars</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">VehicleTypes</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">statement</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_vehicles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span>
+            <span class="n">car_query</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_vehicles</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;refers_to&quot;</span><span class="p">,</span> <span class="s2">&quot;fuelId&quot;</span><span class="p">,</span> <span class="s2">&quot;fuel&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_vehicles</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_vehicles</span><span class="o">.</span><span class="n">type_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_vehicles</span><span class="p">[</span><span class="s2">&quot;fuel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_vehicles</span><span class="o">.</span><span class="n">fuel_name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_vehicles</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;omkostning_aar&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unique_vehicles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_vehicles</span>  <span class="c1"># .drop_duplicates([&#39;make&#39;, &#39;model&#39;])</span>
+
+        <span class="c1"># type to class mapper</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type_mapper</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;cykel&quot;</span><span class="p">:</span> <span class="n">Bike</span><span class="p">,</span>
+            <span class="s2">&quot;elcykel&quot;</span><span class="p">:</span> <span class="n">ElectricBike</span><span class="p">,</span>
+            <span class="s2">&quot;fossilbil&quot;</span><span class="p">:</span> <span class="n">Car</span><span class="p">,</span>
+            <span class="s2">&quot;elbil&quot;</span><span class="p">:</span> <span class="n">ElectricCar</span><span class="p">,</span>
+            <span class="s2">&quot;Unassigned&quot;</span><span class="p">:</span> <span class="n">Unassigned</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vmapper</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">vehicle</span><span class="o">.</span><span class="n">Index</span><span class="p">):</span> <span class="n">VehicleClassGenerator</span><span class="p">(</span>
+                <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">vehicle</span><span class="o">.</span><span class="n">make</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">vehicle</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="k">else</span> <span class="n">vehicle</span><span class="o">.</span><span class="n">model</span><span class="p">]</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">type_mapper</span><span class="p">[</span><span class="n">vehicle</span><span class="o">.</span><span class="n">type</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unique_vehicles</span><span class="o">.</span><span class="n">itertuples</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_options</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vmapper</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle_name</span><span class="p">:</span> <span class="n">vehicle_object</span>
+            <span class="k">for</span> <span class="n">vehicle_name</span><span class="p">,</span> <span class="n">vehicle_object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vmapper</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="VehicleFactory.get_new_vehicle"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleFactory.get_new_vehicle">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_vehicle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtype</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">vehicle_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Function for creating new vehicles</span>
+
+<span class="sd">        parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        vtype : string, vtype as key into vmapper, one of (&quot;Bike&quot;, &quot;ElectricBike&quot;, &quot;Car&quot;, &quot;ElectricCar&quot;,&quot;Unassigned&quot;)</span>
+<span class="sd">        name : string, name of vehicle</span>
+<span class="sd">        vehicle_id : int, id of vehicle</span>
+<span class="sd">        returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_vehicle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">vtype</span><span class="p">]()</span>
+        <span class="n">new_vehicle</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="n">new_vehicle</span><span class="o">.</span><span class="n">vehicle_id</span> <span class="o">=</span> <span class="n">vehicle_id</span>
+        <span class="k">return</span> <span class="n">new_vehicle</span></div>
+
+<div class="viewcode-block" id="VehicleFactory.load_options"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.VehicleFactory.load_options">[docs]</a>    <span class="k">def</span> <span class="nf">load_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load options from option file&quot;&quot;&quot;</span>
+
+        <span class="c1"># loop over selection and push settings to vehicle types</span>
+        <span class="k">for</span> <span class="n">vehicle_model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unique_vehicles</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">vehicle_model</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">vehicle_model</span><span class="o">.</span><span class="n">Index</span><span class="p">)],</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vmapper</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}{</span><span class="n">val</span><span class="o">.</span><span class="n">class_info</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="FleetInventory"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.FleetInventory">[docs]</a><span class="k">class</span> <span class="nc">FleetInventory</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class for containing a fleet of vehicles.</span>
+
+<span class="sd">    parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    models: available models type model.VehicleFactory</span>
+<span class="sd">    name: string, name of the fleet, typically &#39;simulation&#39; or &#39;current&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;fleetinventory&quot;</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="n">models</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_types</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_count</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialise_fleet</span><span class="p">()</span>
+
+<div class="viewcode-block" id="FleetInventory.set_count"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.FleetInventory.set_count">[docs]</a>    <span class="k">def</span> <span class="nf">set_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">vehicle_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">vmapper</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vehicle_name</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vehicle_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FleetInventory.initialise_fleet"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.FleetInventory.initialise_fleet">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_fleet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">km_aar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialise fleet by sorting on co2e priority, this results in vehicles being loaded in the following order</span>
+<span class="sd">        bike, electical bike (wltp), electrical car (wltp), car (wltp)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># clear list of vehicles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vehicles</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># bikes don&#39;t differentiate</span>
+        <span class="n">vehicles_sorted</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">vehicle_name</span>
+            <span class="k">for</span> <span class="n">vehicle_name</span><span class="p">,</span> <span class="n">vehicle_object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">vmapper</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">vehicle_object</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="p">]</span>
+
+        <span class="c1"># ebikes sort on wltp</span>
+        <span class="n">ebikes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">vehicle_name</span>
+            <span class="k">for</span> <span class="n">vehicle_name</span><span class="p">,</span> <span class="n">vehicle_object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">vmapper</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">vehicle_object</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="p">]</span>
+        <span class="n">ebikes_sort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">ebike</span><span class="p">]</span><span class="o">.</span><span class="n">wltp_el</span> <span class="k">for</span> <span class="n">ebike</span> <span class="ow">in</span> <span class="n">ebikes</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">vehicles_sorted</span> <span class="o">+=</span> <span class="p">[</span><span class="n">ebikes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ebikes_sort</span><span class="p">]</span>
+
+        <span class="c1"># ecars sort on wltp</span>
+        <span class="n">ecars</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">vehicle_name</span>
+            <span class="k">for</span> <span class="n">vehicle_name</span><span class="p">,</span> <span class="n">vehicle_object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">vmapper</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">vehicle_object</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="p">]</span>
+        <span class="n">ecars_sort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">ecar</span><span class="p">]</span><span class="o">.</span><span class="n">wltp_el</span> <span class="k">for</span> <span class="n">ecar</span> <span class="ow">in</span> <span class="n">ecars</span><span class="p">])</span>
+        <span class="n">vehicles_sorted</span> <span class="o">+=</span> <span class="p">[</span><span class="n">ecars</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ecars_sort</span><span class="p">]</span>
+
+        <span class="c1"># cars sort on wltp</span>
+        <span class="n">cars</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">vehicle_name</span>
+            <span class="k">for</span> <span class="n">vehicle_name</span><span class="p">,</span> <span class="n">vehicle_object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">vmapper</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">vehicle_object</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">]</span>
+        <span class="n">cars_sort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">vmapper</span><span class="p">[</span><span class="n">car</span><span class="p">]</span><span class="o">.</span><span class="n">wltp_fossil</span> <span class="k">for</span> <span class="n">car</span> <span class="ow">in</span> <span class="n">cars</span><span class="p">])[</span>
+            <span class="p">::</span><span class="o">-</span><span class="mi">1</span>
+        <span class="p">]</span>
+        <span class="n">vehicles_sorted</span> <span class="o">+=</span> <span class="p">[</span><span class="n">cars</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cars_sort</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">vehicle_name</span> <span class="ow">in</span> <span class="n">vehicles_sorted</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vehicle_name</span><span class="p">)):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">get_new_vehicle</span><span class="p">(</span>
+                    <span class="n">vtype</span><span class="o">=</span><span class="n">vehicle_name</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">vehicle_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">vehicle_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_total</span><span class="p">(),</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">km_aar</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">yearly_set</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vehicles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FleetInventory.copy_bike_fleet"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.FleetInventory.copy_bike_fleet">[docs]</a>    <span class="k">def</span> <span class="nf">copy_bike_fleet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;fleetinventory&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convenience function used in intelligent simulation for copying only the bike fleet as the Qampo algorithms</span>
+<span class="sd">        does not accept bikes and electrical bikes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bikes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">vehicle</span><span class="o">.</span><span class="n">vehicle_type_number</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="n">vehicle_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">vehicle</span><span class="o">.</span><span class="n">Index</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">vehicle_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bikes</span><span class="p">:</span>
+                <span class="n">bikes</span><span class="p">[</span><span class="n">vehicle_name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">bikes</span><span class="p">[</span><span class="n">vehicle_name</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">new_fleetinventory</span> <span class="o">=</span> <span class="n">FleetInventory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">vehicle_name</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">bikes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">new_fleetinventory</span><span class="p">,</span> <span class="n">vehicle_name</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+        <span class="n">new_fleetinventory</span><span class="o">.</span><span class="n">initialise_fleet</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">new_fleetinventory</span></div>
+
+<div class="viewcode-block" id="FleetInventory.print_timetable"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.FleetInventory.print_timetable">[docs]</a>    <span class="k">def</span> <span class="nf">print_timetable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Print timetable for fleet. Mostly for debugging.&quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Timetable for fleet: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Timestamp&#39;</span><span class="si">:</span><span class="s2">&gt;20</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="si">:</span><span class="s2">&gt;20</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="n">tripid</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">timeslots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">tripid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">tripid</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tripid</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FleetInventory.get_total"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.FleetInventory.get_total">[docs]</a>    <span class="k">def</span> <span class="nf">get_total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vehicles</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FleetInventory.set_timestamps"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.vehicle.FleetInventory.set_timestamps">[docs]</a>    <span class="k">def</span> <span class="nf">set_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;set timestamps for all vehicles&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span> <span class="o">=</span> <span class="n">timestamps</span>
+
+        <span class="c1"># loop over all vehicles and set the timestamps</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">():</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">set_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># iterator that first traverses bikes, ebikes, ecars and then cars</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicles</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.model package &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fleetmanager.model.qampo package" href="fleetmanager.model.qampo.html" />
+    <link rel="prev" title="fleetmanager.data_access package" href="fleetmanager.data_access.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.data_access.html">fleetmanager.data_access package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">fleetmanager.model package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fleetmanager.model.qampo.html">fleetmanager.model.qampo package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.model">fleetmanager.model.model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.roundtripgenerator">fleetmanager.model.roundtripgenerator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.tabu">fleetmanager.model.tabu module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.tco_calculator">fleetmanager.model.tco_calculator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.trip_generator">fleetmanager.model.trip_generator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.vehicle">fleetmanager.model.vehicle module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model.vehicle_optimisation">fleetmanager.model.vehicle_optimisation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fleetmanager.model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.model.qampo.html">fleetmanager.model.qampo package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.dashboard.html">fleetmanager.dashboard package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>fleetmanager.model package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/fleetmanager.model.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fleetmanager-model-package">
+<h1>fleetmanager.model package<a class="headerlink" href="#fleetmanager-model-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="fleetmanager.model.qampo.html">fleetmanager.model.qampo package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.classes">fleetmanager.model.qampo.classes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.cost_calculator">fleetmanager.model.qampo.cost_calculator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.exceptions">fleetmanager.model.qampo.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.helper_functions">fleetmanager.model.qampo.helper_functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.instance_generator">fleetmanager.model.qampo.instance_generator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.main">fleetmanager.model.qampo.main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.qampo_simulation">fleetmanager.model.qampo.qampo_simulation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.routeplan_factory">fleetmanager.model.qampo.routeplan_factory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.routeplan_tester">fleetmanager.model.qampo.routeplan_tester module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.routing_cp">fleetmanager.model.qampo.routing_cp module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.routing_greedy">fleetmanager.model.qampo.routing_greedy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.routing_mip">fleetmanager.model.qampo.routing_mip module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo.validation">fleetmanager.model.qampo.validation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fleetmanager.model.qampo.html#module-fleetmanager.model.qampo">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-fleetmanager.model.model">
+<span id="fleetmanager-model-model-module"></span><h2>fleetmanager.model.model module<a class="headerlink" href="#module-fleetmanager.model.model" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.model.ConsequenceCalculator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.model.</span></span><span class="sig-name descname"><span class="pre">ConsequenceCalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeframe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#ConsequenceCalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.ConsequenceCalculator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>ConsequenceCalculator class for computing economical, transport and emission consequences of a simulation</p>
+<p>Attributes</p>
+<p>capacity_source : bokeh ColumnDataSource for containing capacity computed by the simulation</p>
+<p>consequence_table : bokeh ColumnDataSource for containing consequences computed by the simulation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.ConsequenceCalculator.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drivingallowance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tco_period</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#ConsequenceCalculator.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.ConsequenceCalculator.compute" title="Permalink to this definition"></a></dt>
+<dd><p>The compute function that calculate the consequences;
+1) explicit CO2 emission,</p>
+<blockquote>
+<div><p>Calculated by taking the product of each vehicle’s allocated km to a yearly approximation
+and the vehicle’s explict noted gram CO2-emission pr. kilometer. Since this is only relevant
+for fossile vehicles, we don’t report this number because it would always show the electrical vehicles
+to have 0 emission. Hence, we refer to 6) yearly CO2-e.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>number of trips without vehicle,</dt><dd><p>Sum of all trips that have no vehicle assigned. Displayed in the simulation.trips.[inventory_type_column]
+with a value of -1.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>pay out in driving allowance,</dt><dd><p>In order to punish the unallocated trips driving allowance is simulated. All unallocated trips are summed
+to a yearly approximation. The driving allowance is paid in rates; 3.44 kr. pr. km. under 840 kilometer
+threshold and 1.90 kr. pr. km. above 840 kilometer threshold.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>yearly average expense on hardware</dt><dd><p>Is calculated by taking the sum of the reported “omkostning_aar” for all vehicles</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>yearly expense on fuel</dt><dd><p>Is calculated through the tco_calcluate.TCOCalculator, which is based on the tool
+“tco-vaerktoej-motorkoeretoejer” from POGI. Check the details on the class.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>yearly CO2-e expense (implicit CO2 emission)</dt><dd><p>Is calculated through the tco_calcluate.TCOCalculator, which is based on the tool
+“tco-vaerktoej-motorkoeretoejer” from POGI. Check the details on the class.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>total yearly expense</dt><dd><p>Is calculated by taking the sum of driving allowance, yearly average expense on hardware and yearly expense
+on fuel.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<dl class="simple">
+<dt>simulation<span class="classifier">model.Simulation class - the simulation class with it’s associated trips. The inventory - and distance columns of the</span></dt><dd><p>simulation.trips frame holds the necessary data to calculate the aforementioned values.</p>
+</dd>
+</dl>
+<p>drivingallowance    :   model.DrivingAllowance - a DrivingAllowance class or None.
+tco_period  :   list of two ints ([0, 1]) - the selected tco_period which is passed to the TCO_Calculator object.</p>
+<blockquote>
+<div><p>First int to define projection periode, second int to define the evaluation period.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.ConsequenceCalculator.get_html_information">
+<span class="sig-name descname"><span class="pre">get_html_information</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#ConsequenceCalculator.get_html_information"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.ConsequenceCalculator.get_html_information" title="Permalink to this definition"></a></dt>
+<dd><p>Function for producing html used on infromation panel</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.ConsequenceCalculator.update_capacity_source">
+<span class="sig-name descname"><span class="pre">update_capacity_source</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#ConsequenceCalculator.update_capacity_source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.ConsequenceCalculator.update_capacity_source" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.ConsequenceCalculator.update_consequence_table">
+<span class="sig-name descname"><span class="pre">update_consequence_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#ConsequenceCalculator.update_consequence_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.ConsequenceCalculator.update_consequence_table" title="Permalink to this definition"></a></dt>
+<dd><p>Update the consequence table</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.model.DrivingAllowance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.model.</span></span><span class="sig-name descname"><span class="pre">DrivingAllowance</span></span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#DrivingAllowance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.DrivingAllowance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for containing and manipulating driving allowance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.DrivingAllowance.calculate_allowance">
+<span class="sig-name descname"><span class="pre">calculate_allowance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yearly_distance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#DrivingAllowance.calculate_allowance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.DrivingAllowance.calculate_allowance" title="Permalink to this definition"></a></dt>
+<dd><p>Method for calculating the driving allowance for unallocated trips. Defines a threshold of 840 km which is
+eligible to get the high allowance fee, from which the fee drops to the low allowance. Especially useful in
+tabu search in order not to favor unallocated trips because it is cheap.</p>
+<p>yearly_distance :   int - sum of kilometers without an allocated vehicle</p>
+<p>driving allowance   :   int - sum of money paid out in driving allowance to attribute the unallocated trips</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.model.FleetManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.model.</span></span><span class="sig-name descname"><span class="pre">FleetManager</span></span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#FleetManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.FleetManager" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>FleetManager class keeps track of the fleets and the booking.</p>
+<p>options: options of type model.OptionsFile</p>
+<p>vehicle_factory : types of vehicles in fleet of type vehicle.VehicleFactory
+simulation_fleet : simulation fleet of type vehicle.FleetInventory
+current_fleet : current fleet of type vehicle.FleetInventory</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.FleetManager.get_html_information">
+<span class="sig-name descname"><span class="pre">get_html_information</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#FleetManager.get_html_information"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.FleetManager.get_html_information" title="Permalink to this definition"></a></dt>
+<dd><p>Function for producing html used on infromation panel</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.FleetManager.set_current_fleet">
+<span class="sig-name descname"><span class="pre">set_current_fleet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ebikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#FleetManager.set_current_fleet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.FleetManager.set_current_fleet" title="Permalink to this definition"></a></dt>
+<dd><p>Set current fleet composition</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.FleetManager.set_simulation_fleet">
+<span class="sig-name descname"><span class="pre">set_simulation_fleet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ebikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#FleetManager.set_simulation_fleet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.FleetManager.set_simulation_fleet" title="Permalink to this definition"></a></dt>
+<dd><p>Set simulation fleet composition</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.FleetManager.set_timestamps">
+<span class="sig-name descname"><span class="pre">set_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#FleetManager.set_timestamps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.FleetManager.set_timestamps" title="Permalink to this definition"></a></dt>
+<dd><p>Set timestamps of fleets</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Model">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.model.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tco_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">1)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Model" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Model class for MVC pattern of the simulation tool.</p>
+<p>location    :   int - id of the location selected for the simulation
+dates   :   list of datetime - the selected time frame for the trips to simulated - i.e. [start time, end time]</p>
+<blockquote>
+<div><p>will define the period from which the trips will be pulled.</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Model.compute_histogram">
+<span class="sig-name descname"><span class="pre">compute_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mindist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Model.compute_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Model.compute_histogram" title="Permalink to this definition"></a></dt>
+<dd><p>Compute histograms for current and simulation</p>
+<p>mindist : defaults to 0. Minimum distance to use for histograms
+maxdist : Maximum distance to use for histograms. If None, use the maximum distance of the trips</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Model.run_simulation">
+<span class="sig-name descname"><span class="pre">run_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intelligent_simulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bike_max_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bike_time_slots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bike_time_slot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bike_percentage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">km_aar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Model.run_simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Model.run_simulation" title="Permalink to this definition"></a></dt>
+<dd><p>Create and run a simulation. Updates histograms and consequence information.
+Sets up the simulation and initialises the fleets and runs the simulation.</p>
+<p>intelligent_simulation  :   bool - to be passed to the simulation object
+bike_max_distance   :   int - to define bike configuration, max allowed distance for a bike trip
+bike_time_slots :   bike configuration time slot, when are bike vehicles allowed to accept trips
+max_bike_time_slot  :   bike configuration, how many bike slots are available for bikes
+bike_percentage :   how many percentage of the trips that qualifies for bike trip should be accepted
+km_aar  :   bool - should the vehicles associated km_aar constrain the vehicle from accepting trips when the</p>
+<blockquote>
+<div><p>yearly capacity is reached. Only available on intelligent_simulation = False</p>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Simulation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.model.</span></span><span class="sig-name descname"><span class="pre">Simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fleet_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_callback</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tabu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intelligent_simulation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Simulation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The major Simulation class for performing simulation on trips.</p>
+<p>trips : trips for simulation of type modelTrips
+fleet_manager : fleet manager for handling fleets of type model.FleetManager
+progress_callback : None
+tabu    :   bool - to let the simulation know if it’s a tabu simulation. If so, only the simulation setup will be</p>
+<blockquote>
+<div><p>simulated, and not the current.</p>
+</div></blockquote>
+<p>intelligent_simulation  :   bool - should intelligent simulation be used, i.e. Qampo algorithm to allocate trips.
+timestamp_set   :   bool -  whether the simulation trips already have generated timeslots</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Simulation.generate_qampo_data">
+<span class="sig-name descname"><span class="pre">generate_qampo_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fleet_inventory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trips</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Simulation.generate_qampo_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Simulation.generate_qampo_data" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience function for converting fleet inventory and trips data to json format
+required by qampo api.</p>
+<p>fleet_inventory : fleet inventory to run simualtion on. Type model.FleetInventory.
+trips: trip data to run simulation on.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Simulation.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Simulation.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Simulation.run" title="Permalink to this definition"></a></dt>
+<dd><p>Runs simulation of current and simulation fleet</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Simulation.run_single">
+<span class="sig-name descname"><span class="pre">run_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fleet_inventory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Simulation.run_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Simulation.run_single" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience function for running simualtion on a single fleet</p>
+<p>Takes the fleet and iterates over the trips to see which, if any, vehicle is available for booking.
+If the fleet_inventory name is current, the vehicles are booked according to its recorded trips.
+This will overwrite any rules implied by the simulation, e.g. vehicle cannot be booked for a trip on the
+same minute stamp as it ends a trips, sleep rules for electrical cars etc.</p>
+<p>The vehicles should be sorted according to the desired priority (defaults to co2 emission). For every trip the
+first available vehicle is booked for the trips.</p>
+<p>fleet_inventory : fleet inventory to run simualtion on. Type model.FleetInventory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Simulation.run_single_qampo">
+<span class="sig-name descname"><span class="pre">run_single_qampo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fleet_inventory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exact_mip'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Simulation.run_single_qampo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Simulation.run_single_qampo" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience function for running simualtion on a single fleet through qampo api.</p>
+<p>fleet_inventory : fleet inventory to run simualtion on. Type model.FleetInventory.
+algorithm_type : the algorithm the qampo api uses. must be either ‘exact_mip’, ‘greedy’ or ‘exact_cp’</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Trips">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.model.</span></span><span class="sig-name descname"><span class="pre">Trips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Trips" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Trips class for containing and manipulating trips of the simulation.</p>
+<p>dataset : name (string) of dummy dataset to load. If dataset is a pandas DataFrame it is loaded as trips.all_trips.</p>
+<p>all_trips : All trips in dataset (no filtering)
+trips : Trips in dataset applying date and department filter
+date_filter : boolean numpy array with same length as all_trips
+department_filter : boolean numpy array with same length as all_trips</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Trips.get_dummy_trips">
+<span class="sig-name descname"><span class="pre">get_dummy_trips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Trips.get_dummy_trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Trips.get_dummy_trips" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to generate fake data for testing</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Trips.set_assignment">
+<span class="sig-name descname"><span class="pre">set_assignment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Trips.set_assignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Trips.set_assignment" title="Permalink to this definition"></a></dt>
+<dd><p>Method for setting up necessary columns on the trips in order
+to book-keep the allocated vehicles on the trips.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Trips.set_filtered_trips">
+<span class="sig-name descname"><span class="pre">set_filtered_trips</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Trips.set_filtered_trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Trips.set_filtered_trips" title="Permalink to this definition"></a></dt>
+<dd><p>Applies date and department filter and sets model.trips accordingly.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.model.Trips.set_timestamps">
+<span class="sig-name descname"><span class="pre">set_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/model.html#Trips.set_timestamps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.model.Trips.set_timestamps" title="Permalink to this definition"></a></dt>
+<dd><p>Set timestamps of Trips and mapped all trips to the corresponding timeslots.</p>
+<p>timestamps : pandas PeriodIndex</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.roundtripgenerator">
+<span id="fleetmanager-model-roundtripgenerator-module"></span><h2>fleetmanager.model.roundtripgenerator module<a class="headerlink" href="#module-fleetmanager.model.roundtripgenerator" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.roundtripgenerator.calc_distance">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.roundtripgenerator.</span></span><span class="sig-name descname"><span class="pre">calc_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coord1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/roundtripgenerator.html#calc_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.roundtripgenerator.calc_distance" title="Permalink to this definition"></a></dt>
+<dd><p>Simple distance function to measure the distance in km from two coordinates (lat, long) (lat, long)
+Parameters
+———-
+coord1 : (latitude, longitude)
+coord2 : (latitude, longitude)</p>
+<p>distance in km</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.roundtripgenerator.get_car_starts">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.roundtripgenerator.</span></span><span class="sig-name descname"><span class="pre">get_car_starts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_starts_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/roundtripgenerator.html#get_car_starts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.roundtripgenerator.get_car_starts" title="Permalink to this definition"></a></dt>
+<dd><p>Function to retrieve allowed starts for the cars. Iterates over all trips for a specific car
+and finds the start to which it’s closest. If the distance to an allowed start is less than .2 km
+the start is accepted. The 3 most frequent starts for each car is returned for use in the later
+process when the roundtrips are defined</p>
+<p>trips : trips from the table expected in pandas format. At least “car_id”, “start_latitude”, “start_longitude”
+allowed_starts : list of cordinates (lat, lon) that are accepted start locations</p>
+<p>dictionary for each car id that contain the 3 most frequent starts for the car
+{car_id: [(lat,lon), (lat,lon), (lat,lon)], car_id: [(lat,lon), (lat,lon), (lat,lon)] …}</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.roundtripgenerator.get_consective_groups">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.roundtripgenerator.</span></span><span class="sig-name descname"><span class="pre">get_consective_groups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">car_trips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/roundtripgenerator.html#get_consective_groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.roundtripgenerator.get_consective_groups" title="Permalink to this definition"></a></dt>
+<dd><p>Extracts the untripped trips from the car trips dataframe. The trip_extractor returns the aggregated trips,
+from the original frame we can extract the trips logs that are not used in a qualified roundtrip.
+The logs that have adjacent logs will be sought to be grouped and added together in order to attribute these logs
+in the roundtrip frame. Otherwise, we end up having less trips in the dataset than what has actually be driven.
+Parameters
+———-
+car_trips   :   dataframe, the trips
+routes  :   routes, the aggregated routes</p>
+<p>not_in  :   dataframe, the trips that are not used in a route
+groups  :   list, list of index groups that are adjacent and unused</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.roundtripgenerator.group_exceeded">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.roundtripgenerator.</span></span><span class="sig-name descname"><span class="pre">group_exceeded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/roundtripgenerator.html#group_exceeded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.roundtripgenerator.group_exceeded" title="Permalink to this definition"></a></dt>
+<dd><p>Function for collecting un-aggregated trips. The trip_extractor returns the aggregated trips, from the original
+frame we can extract the trips logs that are not used in a qualified roundtrip. The logs that have adjacent
+logs will be sought to be grouped and added together in order to attribute these logs in the roundtrip frame.
+Otherwise, we end up having less trips in the dataset than what has actually be driven.
+Calls the route_check to check the coherence of the collection of trips.</p>
+<p>Iterates over the group, and adds the trip to a route if the log is started less than .75 hour from the last log</p>
+<p>group   :   dataframe, the collected trips that are adjacent
+skip_last   :   bool, if the group is part of the last pulled trips on the major trip frame,</p>
+<blockquote>
+<div><p>we skip adding as a route to allow the next aggregation job to properly aggregate these trips</p>
+</div></blockquote>
+<p>list of routes</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.roundtripgenerator.inb">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.roundtripgenerator.</span></span><span class="sig-name descname"><span class="pre">inb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/roundtripgenerator.html#inb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.roundtripgenerator.inb" title="Permalink to this definition"></a></dt>
+<dd><p>Checks that there are no overlapping timestamps. Sometimes the APIs return invalid data.</p>
+<p>row :   dataframe row
+ts  :   times of the trips in route</p>
+<p>False if everything is ok, else ids for overlapping</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.roundtripgenerator.point_to_starts">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.roundtripgenerator.</span></span><span class="sig-name descname"><span class="pre">point_to_starts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/roundtripgenerator.html#point_to_starts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.roundtripgenerator.point_to_starts" title="Permalink to this definition"></a></dt>
+<dd><p>Function used to measure the distance between a selected start to a list of starts
+iterates over the starts list and returns the distance and coordinates to the starting location
+to which there’s the shortest distance.</p>
+<p>coordinate : (lat, lon)
+starts : list of (lat, lon) - [(lat, lon), (lat, lon), (lat, lon) …]</p>
+<p>(min_distance, best_start) - distance to closest start, (lat, lon) to closest start</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.roundtripgenerator.post_routing_sanitation">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.roundtripgenerator.</span></span><span class="sig-name descname"><span class="pre">post_routing_sanitation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">routes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starts_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/roundtripgenerator.html#post_routing_sanitation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.roundtripgenerator.post_routing_sanitation" title="Permalink to this definition"></a></dt>
+<dd><p>Function used post routing to do sanitation - especially useful to scrutinise the trips that doesn’t “make sense”
+from a distance or time perspective.
+The time (7 days) and distance (200 km) criteria defines which routes will be sought to be re-defined.
+For the selected routes it selects the trips points from the start - and end time, new starting locations are
+defined - isolated to those present as opposed to all log points for the car. The trips log points and new
+locations are sent to the trip extractor to define possible new routes.</p>
+<p>routes : the defined routes from trip_extractor
+trips : the trips frame
+<a href="#id1"><span class="problematic" id="id2">starts_</span></a> : frame holding the allowed starts from the allowed_starts table</p>
+<p>routes that were originally accepted and possible sanitized routes</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.roundtripgenerator.route_check">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.roundtripgenerator.</span></span><span class="sig-name descname"><span class="pre">route_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">route</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/roundtripgenerator.html#route_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.roundtripgenerator.route_check" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience function to check if a list of trips qualifies to a roundtrip.
+Checks that the distance of the trip is above .5 km and the duration is less than 16.9 hours.
+Criteria are hardcoded since the function is only called with roundtrips that are aggregated based on
+trips that could not be aggregated with trip_extractor.</p>
+<p>route   :   list of frame objects that make up the</p>
+<p>bool    :   roundtrip qualified</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.roundtripgenerator.route_format">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.roundtripgenerator.</span></span><span class="sig-name descname"><span class="pre">route_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">route</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">car_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/roundtripgenerator.html#route_format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.roundtripgenerator.route_format" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience function to convert to unified route format before saving to database</p>
+<p>route   :   list of trips that makes up the route
+car_id  :   int, id of the car
+location    :   int, id of the location that should be enforced
+distance    :   int, the km distance of trip</p>
+<p>dictionary of the trip</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.roundtripgenerator.trip_aggregator">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.roundtripgenerator.</span></span><span class="sig-name descname"><span class="pre">trip_aggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">car</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_trips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_starts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hour_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">definition_of_home</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_travel_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/roundtripgenerator.html#trip_aggregator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.roundtripgenerator.trip_aggregator" title="Permalink to this definition"></a></dt>
+<dd><p>Function for handling the aggregation library.
+Called by the SkyHost - and FleetCompleteExtractor to easily aggregate the new trips. Handles the whole
+process.</p>
+<p>car :   car object, with a defined id and location id
+c_trips :   dataframe, the car trips that will be sought to be aggregated into roundtrips
+allowed_starts  :   dataframe, the starts that are available to the car
+hour_threshold  :   int, the hour threshold for the aggregated trips
+definition_of_home  int, the distance allowed to a start
+min_travel_distance int, the minimum travel distance for a trip.</p>
+<p>list of aggregated trips in dictionary.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.roundtripgenerator.trip_extractor">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.roundtripgenerator.</span></span><span class="sig-name descname"><span class="pre">trip_extractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_car_starts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hour_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">definition_of_home</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_travel_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enforce_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/roundtripgenerator.html#trip_extractor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.roundtripgenerator.trip_extractor" title="Permalink to this definition"></a></dt>
+<dd><p>Major roundtrip generator function. Takes the trips pulled and the defined allowed starts
+for each car. Assumes that a route will start and end at the same location (+-definition of home), exists of
+at least 2 log points, travelled distance is more than 500 meters and driver is the same
+(except if driver defined moves from nan to driver_name or driver_name to nan once)</p>
+<p>frame : trips frame from trips table
+allowed_car_starts : dictionary of allowed starts for each car_id present in trips frame
+start_frame: frame holding the allowed starts from the allowed_starts table
+hour_threshold  :   int, standard for limiting the allowed length of a trip.
+definition_of_home  :   int, allowed distance to home. If a log is definition_of_home close to an allowed start</p>
+<blockquote>
+<div><p>at unstarted trip, the trip will begin. If a trip is underway, the trips ends if a log
+is seen that is definition_of_home close to the defined allowed start</p>
+</div></blockquote>
+<p>min_travel_distance :   int, the minimum travel distance for accepting the trip as a valid roundtrip
+recurs  :   int, should not be changed. Internal value for constraining the function to only recurs once to parse</p>
+<blockquote>
+<div><p>unqualified roundtrips in to qualified roundtrips. E.g. There could be vehicles that find home after
+days because it has been lend out to another location, then the allowed start has been “wrongly” selected
+and should be defined to the location to which the vehicle has been lend in order to record the trips
+driven in the other location.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>enforce_location<span class="classifier">int, defining the location. In accordance with the aforementioned, this value will overwrite</span></dt><dd><p>the found location and always allocate the trip to the location to where the vehicle belong</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>list of accepted routes in dictionary format including following attributes: start_time, end_time, start_point,</dt><dd><p>end_point, car_id, distance, gps_points, driver, ids</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.tabu">
+<span id="fleetmanager-model-tabu-module"></span><h2>fleetmanager.model.tabu module<a class="headerlink" href="#module-fleetmanager.model.tabu" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.tabu.</span></span><span class="sig-name descname"><span class="pre">TabuSearch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fleetoptimiser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_km</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_antal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2e_goal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expense_goal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intelligent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">km_aar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for handling the tabu search algorithm. Sets a number of parameters before the algorithm can be started
+by calling the “run” method. In addition to the below-mentioned parameters (init), the following attributes are set.</p>
+<p>minimum_cars is calculated in least_viable to find the minimum number of cars needed in the solution
+breakpoint_solution is the solution that is least viable - least number of cars needed in the solution
+total_trips is the whole set of trips selected based on the location id and dates
+slack is not yet used, but is intended as an adjustable parameter to allow solution to have undriven trips below a</p>
+<blockquote>
+<div><p>specific distance; max_distance_for_undriven</p>
+</div></blockquote>
+<dl class="simple">
+<dt>bins is not yet used, but will be used when slack is used to bin the undriven trips - will punish trips above the</dt><dd><p>threshold heavily</p>
+</dd>
+<dt>dummy_trips is used in the least_viable and search to more efficiently search as oposed if this was done on the</dt><dd><p>whole set.</p>
+</dd>
+</dl>
+<p>vehicle_properties is used in the tabu search to retrieve the cost/objective of each vehicle based on the eval_km
+cheap_list is an ordered list of the most expensive vehicles first. Used in the least_viable function which assumes</p>
+<blockquote>
+<div><p>that the most expensive is the one with the best capacity.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>vehicle2id, id2vehicle, vehicle2type are used in the algortihm all over to enable indexing from unique vehicles to</dt><dd><p>an id and vice versa</p>
+</dd>
+<dt>best_objective_value will hold the current best_objective_value, is first set in the run_current_setup when the</dt><dd><p>current solution is simulated</p>
+</dd>
+</dl>
+<p>report value for holding the search report to be pulled by the frontend.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.build_tabu_structure">
+<span class="sig-name descname"><span class="pre">build_tabu_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_removal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.build_tabu_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.build_tabu_structure" title="Permalink to this definition"></a></dt>
+<dd><p>Essential method for the tabu search that generates a structure to hold all the possible moves.
+For all indexes in the self.fixed list two moves are made; +1 and -1.
+E.g. a database holding 3 unique cars with one fixed car (a car that cannot be removed due to continued lease),
+could look like:</p>
+<blockquote>
+<div><p>[0, 0, 1]</p>
+</div></blockquote>
+<p>and allow_removal = False
+would yield a tabu structure:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>{</dt><dd><p>(0, 1): {“tabu_time”: 0, “objective_value”: math.inf},
+(0, -1): {“tabu_time”: 0, “objective_value”: math.inf},
+(1, 1): {“tabu_time”: 0, “objective_value”: math.inf},
+(1, -1): {“tabu_time”: 0, “objective_value”: math.inf},
+(2, 1): {“tabu_time”: 0, “objective_value”: math.inf},
+(2, -1): {“tabu_time”: 0, “objective_value”: math.inf},</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<dl class="simple">
+<dt>allow_removal<span class="classifier">bool, is the search allowed to remove vehicles from the fixed. Useful if current solution</span></dt><dd><p>holds, to the simulation, redundant vehicles, i.e. if there are more vehicles than needed
+in the current solution to satisfy the need.</p>
+</dd>
+</dl>
+<p>dict of key move (index, +1/-1) value (dict attributes)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.calculate_slack">
+<span class="sig-name descname"><span class="pre">calculate_slack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fleet_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fleetinventory'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.calculate_slack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.calculate_slack" title="Permalink to this definition"></a></dt>
+<dd><p>Method used when calculating the allowed slack. Right now slack is set to 0, however one can allow
+that a specific number of trips below a certain distance length is unallocated. The unallocated trips
+that fall in the last bin will be punished by 10 as opposed to 1 - accounting for 10 unallocated trips.</p>
+<p>simulation  :   model.Simulation object - with the trips frame after the simulation has been run
+fleet_name  :   the name of the fleet, in order to index the proper column</p>
+<p>twv     :   int, the number of trips without a vehicle</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.calculate_vehicle_cost">
+<span class="sig-name descname"><span class="pre">calculate_vehicle_cost</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.calculate_vehicle_cost"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.calculate_vehicle_cost" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the vehicle attributes: co2, co2e, cost, obj and expense based on the eval_km.
+Uses the TCOCalculator based on the tool “tco-vaerktoej-motorkoeretoejer” created by POGI.
+In tabu search the objective value is used and based on the weight;
+(normalised cost) + (normalised co2e * weight)</p>
+<p>vehicles_dict   :   a dictionary; id of vehicle to its calculated attributes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.control">
+<span class="sig-name descname"><span class="pre">control</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.control" title="Permalink to this definition"></a></dt>
+<dd><p>Method for controlling the tabu search, which is called 4 times by default.
+It’s done in order to “diversify” the search, to have both solutions present that removes vehicles, and
+solutions present that adds vehicles. After running the tabu searches, we iterate over the solutions sorted
+on the best objective values. Then real simulation happens on the whole trip set, if the solution satisfies all
+criteria; minimum cars, expense goal, co2e goal and 0 unallocated trips, the solution is stored. If it doesn’t,
+the solution is stored as a fallback solution, in order to provide results in the case that no solution satis-
+fies all criteria.
+To improve efficiency, the tests are stopped after hitting 5 qualified solutions. In addition, it’s recorded
+for each solution how many of each vehicle type is used and if the combination satisfied the capacity need.</p>
+<p>list, of the top 5 solutions based on the objective value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.drivability_search">
+<span class="sig-name descname"><span class="pre">drivability_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">down</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numbers_checked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.drivability_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.drivability_search" title="Permalink to this definition"></a></dt>
+<dd><p>Recursive method to find the least number of cars needed to satisfy the capacity needed for the trips pulled
+Starts with the number of fixed cars on one particular index, checks if the solution satisifies. If yes, choose
+the median number between the current checked and highest value that did not satisfy the need. If no, choose the
+median number between the current checked and the lowest value that did satisfy the need.</p>
+<p>solution    :   the solution that should be checked
+down    :   if the next solution should go down
+old :   the previously checked solution
+numbers_checked :   a dictionary holding the number of vehicles and a bool for satisfaction
+iteration   :   number of iterations used to stop searching at max_iter
+max_iter    :   max number of iterations allowed
+start   :   the start solution number - always 0, which yelds a numbers_checked dict {0: False}</p>
+<p>Bool for least viability found, solution for least viability</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.driving_checking">
+<span class="sig-name descname"><span class="pre">driving_checking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.driving_checking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.driving_checking" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by drivability_search to test the solution. Will use the input solution and test against
+the dummy trip set to efficiently simulate.</p>
+<p>solution    :   dict, key: vehicle, value: count</p>
+<p>bool    :   is solution able to satisfy the need with no unallocated trips</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.get_expenses">
+<span class="sig-name descname"><span class="pre">get_expenses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.get_expenses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.get_expenses" title="Permalink to this definition"></a></dt>
+<dd><p>Method currently unused. Useful for providing product solution to attribute matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.get_nabo">
+<span class="sig-name descname"><span class="pre">get_nabo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c_solution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_removal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_cars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.get_nabo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.get_nabo" title="Permalink to this definition"></a></dt>
+<dd><p>Method for generating neighbours to the current solution. I.e. from the tabu structure generate the
+specific solution from the current solution and the move. It checks if the solution satisfies the minimum
+number of cars criteria.</p>
+<p>c_solution  :   list, the current solution from which new solutions will be build
+allow_removal   :   bool, is it allowed to remove vehicles from the fixed cars
+min_cars    :   int, the minimum number of cars that should be in the solution</p>
+<p>generator, that yields the possible solutions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.initialise_real">
+<span class="sig-name descname"><span class="pre">initialise_real</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.initialise_real"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.initialise_real" title="Permalink to this definition"></a></dt>
+<dd><p>Initialises and prepares the whole trip set defined by the location and selected time period</p>
+<p>dataframe of roundtrips</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.initialise_trips">
+<span class="sig-name descname"><span class="pre">initialise_trips</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.initialise_trips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.initialise_trips" title="Permalink to this definition"></a></dt>
+<dd><p>Initialises and prepares a dummy set for efficient search and test
+Pulls the peak day in the selected time period. Assumes that a fleet that can satisfy a peak day would be able
+to satisfy the whole period.</p>
+<p>dataframe of roundtrips for the peak day</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.least_viable">
+<span class="sig-name descname"><span class="pre">least_viable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.least_viable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.least_viable" title="Permalink to this definition"></a></dt>
+<dd><p>Method to control the least viability search to find the minimum vehicles needed to satisfy the number of
+trips. Sets the starts to max_vehicles which is the current number of vehicles based on the time period times
+1.5. If the breakpoint is not found, the minimum cars are set to current number times 1.5.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.mapper">
+<span class="sig-name descname"><span class="pre">mapper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.mapper" title="Permalink to this definition"></a></dt>
+<dd><p>Method for generating mappers used all over the class in order to index the proper vehicle</p>
+<p>vehicle_name_to_id  :   dictionary, name from vehicle_optimisation.FleetOptimisation to the assigned id
+id_to_vehicle_name  :   dictionary, id to the name from vehicle_optimisation.FleetOptimisation
+vehicle2type    :   dictionary, name from vehicle_optimisation.FleetOptimisation to the vehicle type</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.objective_value">
+<span class="sig-name descname"><span class="pre">objective_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.objective_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.objective_value" title="Permalink to this definition"></a></dt>
+<dd><p>Method for providing the objective value of specific solution.</p>
+<p>solution    :   dictionary of the solution to get the objective value of
+test    :   if the solution also should be tested</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.real_simulation">
+<span class="sig-name descname"><span class="pre">real_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">small_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fleet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">special_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intelligent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.real_simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.real_simulation" title="Permalink to this definition"></a></dt>
+<dd><p>Method performing simulation and returning the consequences</p>
+<p>solution    :   list, input solution if no fleet is defined, index is vehicle id, value is count.
+small_set   :   bool, if the small dummy_set should be used.
+fleet   :   vehicle.fleetinventory class if solution is none
+special_name    :   string, defining the name and booked column from Simulation.trips.trips
+intelligent :   bool, intelligent simulation (Qampo)</p>
+<p>expense, co2e, number of trips without vehicles</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.run" title="Permalink to this definition"></a></dt>
+<dd><p>Method for handling the run of the tabu search. First calls the least_viable to get the least number of
+cars needed in the final solutions. It then gets the initial objective value, which is the current setup.
+The current solution is then “simulated” to get the current expense and co2e in order to calculate the
+expense - and co2e goal. Finally, the “control” method is run, which handles the tabu search and assigns
+the result to report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.run_current_setup">
+<span class="sig-name descname"><span class="pre">run_current_setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.run_current_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.run_current_setup" title="Permalink to this definition"></a></dt>
+<dd><p>Method responsible for running the current setup on the whole selected trip set.
+It will take all the vehicles that were active in the selected time period no matter if they were not selected
+in the simulation setup. This is done in order to get the “real” value, otherwise one could select no vehicles
+and have an expense on 0, which would make it infeasible for the search to improve.</p>
+<p>Initialises the fleet with the active vehicles in the selected time period
+Runs a “real” simulation on the whole trip set
+Calculates the expense - and co2e goal based on the input values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.start_solution">
+<span class="sig-name descname"><span class="pre">start_solution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.start_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.start_solution" title="Permalink to this definition"></a></dt>
+<dd><p>Method for generating the start solution and building the structure for the search.
+Generates a start solution with all the cars that a fixed due to a running lease that does not end before
+the selected time period.</p>
+<dl>
+<dt>Returns:</dt><dd><p>solution    :   dictionary - id to count of the solution
+vehicle_types   :   dictionary - vehicle type to count of solution
+fixed   :   list - list of n available cars with value that defines how many of that index are fixed in the</p>
+<blockquote>
+<div><p>final solution</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.swap_move">
+<span class="sig-name descname"><span class="pre">swap_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">move</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.swap_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.swap_move" title="Permalink to this definition"></a></dt>
+<dd><p>Method used to make the move from the solution to the best move selected.</p>
+<p>solution    :   list, solution index to number, e.g. [0,0,1,2,1,5,0]
+move    :   tuple, the move from the tabu structure to make, e.g. (5, -1)</p>
+<p>list, the new solution with the move made</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.tabu_search">
+<span class="sig-name descname"><span class="pre">tabu_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_cars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.tabu_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.tabu_search" title="Permalink to this definition"></a></dt>
+<dd><p>The tabu search algorithm.</p>
+<p>Responsible for search the space for solutions and recording the immediate best solutions.
+From the input min_cars it’s calculated if the solutions should prioritise removing or adding vehicles
+to the current solution. From this information, the tabu structure is build and search starts. It’s always
+pushed towards a better objective value, and by punishing the unallocated trips it’s desired by the search
+to go into spaces where this condition is satisfied.</p>
+<p>For new and better solutions the record is saved, and the time of the move is recorded such that we don’t
+fall into the same space over and over again. The move is however allowed if it improves the global best
+objective value.</p>
+<p>min_cars    :   the minimum number of cars needed in the generated solutions.</p>
+<p>dict, holding the recorded best solution during the search.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tabu.TabuSearch.vehicle_ordered">
+<span class="sig-name descname"><span class="pre">vehicle_ordered</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tabu.html#TabuSearch.vehicle_ordered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tabu.TabuSearch.vehicle_ordered" title="Permalink to this definition"></a></dt>
+<dd><p>Orders the vehicle in most expensive to least expensive. Useful for the least viable function
+as well as ordering the electrical bikes, bikes and unassigned type last.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.tco_calculator">
+<span id="fleetmanager-model-tco-calculator-module"></span><h2>fleetmanager.model.tco_calculator module<a class="headerlink" href="#module-fleetmanager.model.tco_calculator" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.tco_calculator.TCOCalculator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.tco_calculator.</span></span><span class="sig-name descname"><span class="pre">TCOCalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tco_calculator.html#TCOCalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tco_calculator.TCOCalculator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class used all over the project to calculate the consequence based on the methods provided in “Partnerskab for
+offentlige grønne indkøb”s tool “miljoestyrelsen-tco-vaerktoej-motorkoeretoejer”. Made to be independent of
+xlwings dependencies unavailable to linux. The methods have been written directly from the tool and thus makes the
+same assumptions. Originals can be seen in src.fleetmanager.model.pogi</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tco_calculator.TCOCalculator.driftsomkostninger">
+<span class="sig-name descname"><span class="pre">driftsomkostninger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tco_calculator.html#TCOCalculator.driftsomkostninger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tco_calculator.TCOCalculator.driftsomkostninger" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the summed fuel expense on the vehicle.
+Returns
+——-
+list of expense on fuel over the selected evaluation period</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tco_calculator.TCOCalculator.drivmiddel_udvikling">
+<span class="sig-name descname"><span class="pre">drivmiddel_udvikling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pris</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stigning</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tco_calculator.html#TCOCalculator.drivmiddel_udvikling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tco_calculator.TCOCalculator.drivmiddel_udvikling" title="Permalink to this definition"></a></dt>
+<dd><p>Projecting the development in price of the fuel.</p>
+<p>pris    :   int, current price
+stigning    :   int, percentage rate of fuel increase</p>
+<p>list of fuel price for the next 30 years</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tco_calculator.TCOCalculator.ekstern_miljoevirkning">
+<span class="sig-name descname"><span class="pre">ekstern_miljoevirkning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sum_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tco_calculator.html#TCOCalculator.ekstern_miljoevirkning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tco_calculator.TCOCalculator.ekstern_miljoevirkning" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tco_calculator.TCOCalculator.omkostning_yearly">
+<span class="sig-name descname"><span class="pre">omkostning_yearly</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tco_calculator.html#TCOCalculator.omkostning_yearly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tco_calculator.TCOCalculator.omkostning_yearly" title="Permalink to this definition"></a></dt>
+<dd><p>Getting the yearly expense with the defined discount interest rate</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tco_calculator.TCOCalculator.omkostninger">
+<span class="sig-name descname"><span class="pre">omkostninger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tco_calculator.html#TCOCalculator.omkostninger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tco_calculator.TCOCalculator.omkostninger" title="Permalink to this definition"></a></dt>
+<dd><p>Summing the expenses not related to fuel expense over the evaluation period</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.tco_calculator.TCOCalculator.tco_yearly">
+<span class="sig-name descname"><span class="pre">tco_yearly</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/tco_calculator.html#TCOCalculator.tco_yearly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.tco_calculator.TCOCalculator.tco_yearly" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.trip_generator">
+<span id="fleetmanager-model-trip-generator-module"></span><h2>fleetmanager.model.trip_generator module<a class="headerlink" href="#module-fleetmanager.model.trip_generator" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.trip_generator.generate_trips_simulation">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.trip_generator.</span></span><span class="sig-name descname"><span class="pre">generate_trips_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pool_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/trip_generator.html#generate_trips_simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.trip_generator.generate_trips_simulation" title="Permalink to this definition"></a></dt>
+<dd><p>Generates two list of possible trips for specific pool</p>
+<dl class="simple">
+<dt>dates<span class="classifier">list</span></dt><dd><p>The selected start - and end date of simulation period</p>
+</dd>
+<dt>pool_id<span class="classifier">int</span></dt><dd><p>The pool to simulate.</p>
+</dd>
+<dt>seed<span class="classifier">int</span></dt><dd><p>The seed of the random function that samples trips.</p>
+</dd>
+<dt>padding<span class="classifier">float</span></dt><dd><p>increases the amount of simulated trips by a percentage</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>simulated_day: list[Dict]</dt><dd><p>A list of trips from an average simulated day.</p>
+</dd>
+<dt>peak_day: list[Dict]</dt><dd><p>The list of trips from the day with most trips.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.vehicle">
+<span id="fleetmanager-model-vehicle-module"></span><h2>fleetmanager.model.vehicle module<a class="headerlink" href="#module-fleetmanager.model.vehicle" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Bike">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.vehicle.</span></span><span class="sig-name descname"><span class="pre">Bike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#Bike"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.Bike" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fleetmanager.model.vehicle.VehicleModel" title="fleetmanager.model.vehicle.VehicleModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">VehicleModel</span></code></a></p>
+<p>Class for representing a bike</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Bike.accept_trip">
+<span class="sig-name descname"><span class="pre">accept_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#Bike.accept_trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.Bike.accept_trip" title="Permalink to this definition"></a></dt>
+<dd><p>Returns true if the trip is accepted, and false if its declined
+The bike will only accept if the following is true</p>
+<blockquote>
+<div><p>distance for trip must be less than milage left
+trip start - and end time must be within the allowed driving slot</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Bike.allowed_driving_time_slots">
+<span class="sig-name descname"><span class="pre">allowed_driving_time_slots</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Bike.allowed_driving_time_slots" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Bike.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Bike.co2emission_per_km" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Bike.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Bike.max_distance_per_day" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Bike.max_distance_pr_trip">
+<span class="sig-name descname"><span class="pre">max_distance_pr_trip</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Bike.max_distance_pr_trip" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Bike.max_time_slot">
+<span class="sig-name descname"><span class="pre">max_time_slot</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Bike.max_time_slot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Bike.percentage">
+<span class="sig-name descname"><span class="pre">percentage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Bike.percentage" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Bike.vehicle_type_number">
+<span class="sig-name descname"><span class="pre">vehicle_type_number</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Bike.vehicle_type_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Car">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.vehicle.</span></span><span class="sig-name descname"><span class="pre">Car</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#Car"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.Car" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fleetmanager.model.vehicle.VehicleModel" title="fleetmanager.model.vehicle.VehicleModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">VehicleModel</span></code></a></p>
+<p>Class for representing a car</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Car.accept_trip">
+<span class="sig-name descname"><span class="pre">accept_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#Car.accept_trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.Car.accept_trip" title="Permalink to this definition"></a></dt>
+<dd><p>Returns true if the trip is accepted, and false if the yearly_set is true and the yearly_allowance is exceeded</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Car.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">150</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Car.co2emission_per_km" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Car.counter">
+<span class="sig-name descname"><span class="pre">counter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Car.counter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Car.fuel">
+<span class="sig-name descname"><span class="pre">fuel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'benzin'</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Car.fuel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Car.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9999</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Car.max_distance_per_day" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Car.vehicle_type_number">
+<span class="sig-name descname"><span class="pre">vehicle_type_number</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Car.vehicle_type_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Car.wltp_fossil">
+<span class="sig-name descname"><span class="pre">wltp_fossil</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Car.wltp_fossil" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Car.yearly_allowance">
+<span class="sig-name descname"><span class="pre">yearly_allowance</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">999999</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Car.yearly_allowance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Car.yearly_set">
+<span class="sig-name descname"><span class="pre">yearly_set</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Car.yearly_set" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricBike">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.vehicle.</span></span><span class="sig-name descname"><span class="pre">ElectricBike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#ElectricBike"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricBike" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fleetmanager.model.vehicle.VehicleModel" title="fleetmanager.model.vehicle.VehicleModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">VehicleModel</span></code></a></p>
+<p>Class for representing an electric bike</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricBike.accept_trip">
+<span class="sig-name descname"><span class="pre">accept_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#ElectricBike.accept_trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricBike.accept_trip" title="Permalink to this definition"></a></dt>
+<dd><p>Returns true if the trip is accepted, and false if its declined
+The bike will only accept if the following is true</p>
+<blockquote>
+<div><p>distance for trip must be less than milage left
+trip start - and end time must be within the allowed driving slot</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricBike.allowed_driving_time_slots">
+<span class="sig-name descname"><span class="pre">allowed_driving_time_slots</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricBike.allowed_driving_time_slots" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricBike.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricBike.co2emission_per_km" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricBike.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricBike.max_distance_per_day" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricBike.max_distance_pr_trip">
+<span class="sig-name descname"><span class="pre">max_distance_pr_trip</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricBike.max_distance_pr_trip" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricBike.max_time_slot">
+<span class="sig-name descname"><span class="pre">max_time_slot</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricBike.max_time_slot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricBike.percentage">
+<span class="sig-name descname"><span class="pre">percentage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricBike.percentage" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricBike.vehicle_type_number">
+<span class="sig-name descname"><span class="pre">vehicle_type_number</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricBike.vehicle_type_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricCar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.vehicle.</span></span><span class="sig-name descname"><span class="pre">ElectricCar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#ElectricCar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricCar" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fleetmanager.model.vehicle.VehicleModel" title="fleetmanager.model.vehicle.VehicleModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">VehicleModel</span></code></a></p>
+<p>Class for representing an electric car</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricCar.accept_trip">
+<span class="sig-name descname"><span class="pre">accept_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#ElectricCar.accept_trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricCar.accept_trip" title="Permalink to this definition"></a></dt>
+<dd><p>Returns true if the trip is accepted, and false if its declined
+The electrical car will only accept if the following is true</p>
+<blockquote>
+<div><p>distance for trip must be less than milage left
+vehicle must still be idle for at least self.sleep hours pr. 24 hours</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricCar.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricCar.co2emission_per_km" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricCar.counter">
+<span class="sig-name descname"><span class="pre">counter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricCar.counter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricCar.fuel">
+<span class="sig-name descname"><span class="pre">fuel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'el'</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricCar.fuel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricCar.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">200</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricCar.max_distance_per_day" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricCar.sleep">
+<span class="sig-name descname"><span class="pre">sleep</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricCar.sleep" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricCar.vehicle_type_number">
+<span class="sig-name descname"><span class="pre">vehicle_type_number</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricCar.vehicle_type_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricCar.wltp_el">
+<span class="sig-name descname"><span class="pre">wltp_el</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">200</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricCar.wltp_el" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricCar.yearly_allowance">
+<span class="sig-name descname"><span class="pre">yearly_allowance</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">999999</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricCar.yearly_allowance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.ElectricCar.yearly_set">
+<span class="sig-name descname"><span class="pre">yearly_set</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.ElectricCar.yearly_set" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.FleetInventory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.vehicle.</span></span><span class="sig-name descname"><span class="pre">FleetInventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fleetinventory'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#FleetInventory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.FleetInventory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for containing a fleet of vehicles.</p>
+<p>models: available models type model.VehicleFactory
+name: string, name of the fleet, typically ‘simulation’ or ‘current’</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.FleetInventory.copy_bike_fleet">
+<span class="sig-name descname"><span class="pre">copy_bike_fleet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fleetinventory'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#FleetInventory.copy_bike_fleet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.FleetInventory.copy_bike_fleet" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience function used in intelligent simulation for copying only the bike fleet as the Qampo algorithms
+does not accept bikes and electrical bikes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.FleetInventory.get_total">
+<span class="sig-name descname"><span class="pre">get_total</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#FleetInventory.get_total"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.FleetInventory.get_total" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.FleetInventory.initialise_fleet">
+<span class="sig-name descname"><span class="pre">initialise_fleet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">km_aar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#FleetInventory.initialise_fleet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.FleetInventory.initialise_fleet" title="Permalink to this definition"></a></dt>
+<dd><p>Initialise fleet by sorting on co2e priority, this results in vehicles being loaded in the following order
+bike, electical bike (wltp), electrical car (wltp), car (wltp)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.FleetInventory.print_timetable">
+<span class="sig-name descname"><span class="pre">print_timetable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#FleetInventory.print_timetable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.FleetInventory.print_timetable" title="Permalink to this definition"></a></dt>
+<dd><p>Print timetable for fleet. Mostly for debugging.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.FleetInventory.set_count">
+<span class="sig-name descname"><span class="pre">set_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#FleetInventory.set_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.FleetInventory.set_count" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.FleetInventory.set_timestamps">
+<span class="sig-name descname"><span class="pre">set_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#FleetInventory.set_timestamps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.FleetInventory.set_timestamps" title="Permalink to this definition"></a></dt>
+<dd><p>set timestamps for all vehicles</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Unassigned">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.vehicle.</span></span><span class="sig-name descname"><span class="pre">Unassigned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#Unassigned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.Unassigned" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fleetmanager.model.vehicle.VehicleModel" title="fleetmanager.model.vehicle.VehicleModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">VehicleModel</span></code></a></p>
+<p>Class for representing an unassigned vehicle. Used for computing capacity.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Unassigned.accept_trip">
+<span class="sig-name descname"><span class="pre">accept_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#Unassigned.accept_trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.Unassigned.accept_trip" title="Permalink to this definition"></a></dt>
+<dd><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p>
+<p>trip : pandas row with a trip</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Unassigned.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Unassigned.co2emission_per_km" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Unassigned.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Unassigned.max_distance_per_day" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.Unassigned.vehicle_type_number">
+<span class="sig-name descname"><span class="pre">vehicle_type_number</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.Unassigned.vehicle_type_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleClassGenerator">
+<span class="sig-prename descclassname"><span class="pre">fleetmanager.model.vehicle.</span></span><span class="sig-name descname"><span class="pre">VehicleClassGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicle_type=&lt;class</span> <span class="pre">'fleetmanager.model.vehicle.Car'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleClassGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleClassGenerator" title="Permalink to this definition"></a></dt>
+<dd><p>Class used to create vehicle types from a dynamic list of vehicle models</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.vehicle.</span></span><span class="sig-name descname"><span class="pre">VehicleFactory</span></span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleFactory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for containing the vehicle types that are used in the simulation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleFactory.get_new_vehicle">
+<span class="sig-name descname"><span class="pre">get_new_vehicle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicle_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleFactory.get_new_vehicle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleFactory.get_new_vehicle" title="Permalink to this definition"></a></dt>
+<dd><p>Function for creating new vehicles</p>
+<p>vtype : string, vtype as key into vmapper, one of (“Bike”, “ElectricBike”, “Car”, “ElectricCar”,”Unassigned”)
+name : string, name of vehicle
+vehicle_id : int, id of vehicle
+returns
+——-</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleFactory.load_options">
+<span class="sig-name descname"><span class="pre">load_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleFactory.load_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleFactory.load_options" title="Permalink to this definition"></a></dt>
+<dd><p>Load options from option file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.vehicle.</span></span><span class="sig-name descname"><span class="pre">VehicleModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicle_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>General vehicle model. Not directly instantiated but specific vehicle models inherit from it</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.accept_trip">
+<span class="sig-name descname"><span class="pre">accept_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleModel.accept_trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.accept_trip" title="Permalink to this definition"></a></dt>
+<dd><p>function that returns true if the given type of trip is possible for the vehicle given length, duration, milage_left should be overwritten for each type of vehicle</p>
+<p>trip : pandas row with a trip</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.book_trip">
+<span class="sig-name descname"><span class="pre">book_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleModel.book_trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.book_trip" title="Permalink to this definition"></a></dt>
+<dd><p>Function for trying to book trip on vehicle</p>
+<p>trip : pandas row with a trip</p>
+<p>booked : boolean, True if vehicle is booked on this vehile
+accept : boolean, True if it can accept the type of trip
+available: boolean, True if the vehicle is available in this timeperiod</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.bypass_book">
+<span class="sig-name descname"><span class="pre">bypass_book</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleModel.bypass_book"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.bypass_book" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.class_info">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">class_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleModel.class_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.class_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.co2emission_per_km">
+<span class="sig-name descname"><span class="pre">co2emission_per_km</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.co2emission_per_km" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.location">
+<span class="sig-name descname"><span class="pre">location</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.location" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.max_distance_per_day">
+<span class="sig-name descname"><span class="pre">max_distance_per_day</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.max_distance_per_day" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.omkostning_aar">
+<span class="sig-name descname"><span class="pre">omkostning_aar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.omkostning_aar" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.percentage_accept">
+<span class="sig-name descname"><span class="pre">percentage_accept</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleModel.percentage_accept"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.percentage_accept" title="Permalink to this definition"></a></dt>
+<dd><p>Method that ensures that bike trips accepted gets as close to the input percentage as possible</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.print_info">
+<span class="sig-name descname"><span class="pre">print_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleModel.print_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.print_info" title="Permalink to this definition"></a></dt>
+<dd><p>Print info. Mostly for debugging</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.qampo_gr">
+<span class="sig-name descname"><span class="pre">qampo_gr</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.qampo_gr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.set_timestamps">
+<span class="sig-name descname"><span class="pre">set_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_timestamps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle.html#VehicleModel.set_timestamps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.set_timestamps" title="Permalink to this definition"></a></dt>
+<dd><p>Initailize timeslot of vehicle to match timestamps.</p>
+<p>new_timestamp : array of timestamps</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.vcprkm">
+<span class="sig-name descname"><span class="pre">vcprkm</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.vcprkm" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.vehicle_type_number">
+<span class="sig-name descname"><span class="pre">vehicle_type_number</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.vehicle_type_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle.VehicleModel.yearly_set">
+<span class="sig-name descname"><span class="pre">yearly_set</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#fleetmanager.model.vehicle.VehicleModel.yearly_set" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model.vehicle_optimisation">
+<span id="fleetmanager-model-vehicle-optimisation-module"></span><h2>fleetmanager.model.vehicle_optimisation module<a class="headerlink" href="#module-fleetmanager.model.vehicle_optimisation" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle_optimisation.FleetOptimisation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fleetmanager.model.vehicle_optimisation.</span></span><span class="sig-name descname"><span class="pre">FleetOptimisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">km_aar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle_optimisation.html#FleetOptimisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle_optimisation.FleetOptimisation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class used by tabu search to handle the fleet and vehicles in the connected database</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle_optimisation.FleetOptimisation.build_fleet_simulation">
+<span class="sig-name descname"><span class="pre">build_fleet_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fleetinventory'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle_optimisation.html#FleetOptimisation.build_fleet_simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle_optimisation.FleetOptimisation.build_fleet_simulation" title="Permalink to this definition"></a></dt>
+<dd><p>Method for building and initialising a fleet for simulation</p>
+<p>solution    :   dict, solution to build
+name    :   string, name for the fleet</p>
+<p>fleet   :   FleetInventory</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle_optimisation.FleetOptimisation.get_active_vehicles">
+<span class="sig-name descname"><span class="pre">get_active_vehicles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle_optimisation.html#FleetOptimisation.get_active_vehicles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle_optimisation.FleetOptimisation.get_active_vehicles" title="Permalink to this definition"></a></dt>
+<dd><p>Method for loading the active vehicles. In order not to exhaust the resources, unique types
+of the vehicles are loaded in the uniquely value. If a car of a type that was removed because it was identical
+to a cheaper one, it’s added to the translation dictionary, which bookkeeps the vehicles.</p>
+<p>active_vehicles :   dict holding the currently active vehicles with key: count
+temp    :   dict, holding the unique cars available to the search</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fleetmanager.model.vehicle_optimisation.FleetOptimisation.sort_settings">
+<span class="sig-name descname"><span class="pre">sort_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_settings</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fleetmanager/model/vehicle_optimisation.html#FleetOptimisation.sort_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fleetmanager.model.vehicle_optimisation.FleetOptimisation.sort_settings" title="Permalink to this definition"></a></dt>
+<dd><p>loading the settings</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-fleetmanager.model">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fleetmanager.model" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fleetmanager.data_access.html" class="btn btn-neutral float-left" title="fleetmanager.data_access package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fleetmanager.model.qampo.html" class="btn btn-neutral float-right" title="fleetmanager.model.qampo package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

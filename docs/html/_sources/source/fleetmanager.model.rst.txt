@@ -1,0 +1,77 @@
+fleetmanager.model package
+==========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   fleetmanager.model.qampo
+
+Submodules
+----------
+
+fleetmanager.model.model module
+-------------------------------
+
+.. automodule:: fleetmanager.model.model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.model.roundtripgenerator module
+--------------------------------------------
+
+.. automodule:: fleetmanager.model.roundtripgenerator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.model.tabu module
+------------------------------
+
+.. automodule:: fleetmanager.model.tabu
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.model.tco\_calculator module
+-----------------------------------------
+
+.. automodule:: fleetmanager.model.tco_calculator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.model.trip\_generator module
+-----------------------------------------
+
+.. automodule:: fleetmanager.model.trip_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.model.vehicle module
+---------------------------------
+
+.. automodule:: fleetmanager.model.vehicle
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fleetmanager.model.vehicle\_optimisation module
+-----------------------------------------------
+
+.. automodule:: fleetmanager.model.vehicle_optimisation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: fleetmanager.model
+   :members:
+   :undoc-members:
+   :show-inheritance:

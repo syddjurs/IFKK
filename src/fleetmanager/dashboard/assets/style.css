@@ -250,6 +250,21 @@ div#vehicle_view.vehicle-card table.table thead{
 }
 
 /* ============ Flådesammensætning =========== */
+#cancel_sim {
+    z-index: 999;
+    margin: 100px -80px;
+    top: 50%;
+    left: 50%;
+    position: fixed;
+}
+#cancel_sim_goal {
+    z-index: 999;
+    margin: 100px -80px;
+    top: 50%;
+    left: 50%;
+    position: fixed;
+}
+
 .fleet-view table.table thead{
     position: sticky;
     top: 0;
@@ -339,4 +354,34 @@ div#vehicle_view.vehicle-card table.table thead{
     box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
     -webkit-box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
     -moz-box-shadow: 0px -4px 28px -2px rgba(0,0,0,0.21);
+}
+
+
+div.accJohn button {
+    padding: 0px;
+}
+
+span#car_count{
+    float: right;
+    margin-right: -13px;
+    padding-bottom: 12px;
+
+}
+
+div#unique_car_count{
+    text-align: right;
+    padding-right: 27px;
+}
+
+div#car_omkostning{
+    overflow: visible;
+    margin-left: 164px:
+}
+
+.mantine-Accordion-label{
+    overflow: visible;
+}
+
+div#car_udledning.col{
+    padding-left: 40px;
 }

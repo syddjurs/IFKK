@@ -17,7 +17,7 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     package_data={"fleetmanager": ["dummy_data.sql", "dashboard/assets/style.css",],},
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     install_requires=[
         "requests~=2.2",
         "numpy~=1.2",

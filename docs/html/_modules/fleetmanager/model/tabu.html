@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fleetmanager.model.tabu &mdash; Intelligent Flådestyring og Klimasmarte Kørselsmønstre 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Intelligent Flådestyring og Klimasmarte Kørselsmønstre
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/readme.html">readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.data_access.html">fleetmanager.data_access package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.model.html">fleetmanager.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.model.qampo.html">fleetmanager.model.qampo package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/fleetmanager.dashboard.html">fleetmanager.dashboard package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Intelligent Flådestyring og Klimasmarte Kørselsmønstre</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>fleetmanager.model.tabu</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fleetmanager.model.tabu</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MinMaxScaler</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm.query</span> <span class="kn">import</span> <span class="n">Query</span>
+
+<span class="kn">from</span> <span class="nn">fleetmanager.dashboard.utils</span> <span class="kn">import</span> <span class="n">get_emission</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.data_access.db_engine</span> <span class="kn">import</span> <span class="n">engine_creator</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.data_access.dbschema</span> <span class="kn">import</span> <span class="n">RoundTrips</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.model</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConsequenceCalculator</span><span class="p">,</span>
+    <span class="n">FleetManager</span><span class="p">,</span>
+    <span class="n">Simulation</span><span class="p">,</span>
+    <span class="n">Trips</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.tco_calculator</span> <span class="kn">import</span> <span class="n">TCOCalculator</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.trip_generator</span> <span class="kn">import</span> <span class="n">generate_trips_simulation</span>
+<span class="kn">from</span> <span class="nn">fleetmanager.model.vehicle</span> <span class="kn">import</span> <span class="n">Unassigned</span>
+
+
+<div class="viewcode-block" id="TabuSearch"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch">[docs]</a><span class="k">class</span> <span class="nc">TabuSearch</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for handling the tabu search algorithm. Sets a number of parameters before the algorithm can be started</span>
+<span class="sd">    by calling the &quot;run&quot; method. In addition to the below-mentioned parameters (init), the following attributes are set.</span>
+
+<span class="sd">    minimum_cars is calculated in least_viable to find the minimum number of cars needed in the solution</span>
+<span class="sd">    breakpoint_solution is the solution that is least viable - least number of cars needed in the solution</span>
+<span class="sd">    total_trips is the whole set of trips selected based on the location id and dates</span>
+<span class="sd">    slack is not yet used, but is intended as an adjustable parameter to allow solution to have undriven trips below a</span>
+<span class="sd">        specific distance; max_distance_for_undriven</span>
+<span class="sd">    bins is not yet used, but will be used when slack is used to bin the undriven trips - will punish trips above the</span>
+<span class="sd">        threshold heavily</span>
+<span class="sd">    dummy_trips is used in the least_viable and search to more efficiently search as oposed if this was done on the</span>
+<span class="sd">        whole set.</span>
+<span class="sd">    vehicle_properties is used in the tabu search to retrieve the cost/objective of each vehicle based on the eval_km</span>
+<span class="sd">    cheap_list is an ordered list of the most expensive vehicles first. Used in the least_viable function which assumes</span>
+<span class="sd">        that the most expensive is the one with the best capacity.</span>
+<span class="sd">    vehicle2id, id2vehicle, vehicle2type are used in the algortihm all over to enable indexing from unique vehicles to</span>
+<span class="sd">        an id and vice versa</span>
+<span class="sd">    best_objective_value will hold the current best_objective_value, is first set in the run_current_setup when the</span>
+<span class="sd">        current solution is simulated</span>
+<span class="sd">    report value for holding the search report to be pulled by the frontend.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">fleetoptimiser</span><span class="p">,</span>
+        <span class="n">location</span><span class="p">,</span>
+        <span class="n">dates</span><span class="p">,</span>
+        <span class="n">eval_km</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>
+        <span class="n">fixed_antal</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">co2e_goal</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+        <span class="n">expense_goal</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+        <span class="n">weight</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">intelligent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">km_aar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the needed attributes for the search.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fleetoptimiser  :   FleetOptimisation class, used to handle the selected vehicles and the available vehicles for</span>
+<span class="sd">                            the tabu search to select</span>
+<span class="sd">        location    :   int, location id of the selected location</span>
+<span class="sd">        dates   :   list of date times, [start time, end time] for the selected simulation period.</span>
+<span class="sd">                    Defines from when to when the trips will be pulled</span>
+<span class="sd">        eval_km :   The initial evaluation km. Defines how many kilometer should be the basis for the tco calculation to</span>
+<span class="sd">                    extract the objective/fitness values, the expense and emission values for the vehicles</span>
+<span class="sd">        fixed_antal :   int, if minimum number of cars/electrical cars should be fixed</span>
+<span class="sd">        co2e_goal   :   int, the co2e emission goal, input should be a percentage 0-100, the current co2e will be the basis</span>
+<span class="sd">                        calculated in run_current_setup</span>
+<span class="sd">        expense_goal    :   int, the addition og subtractive amount of DKK from the current expense, which will be the basis</span>
+<span class="sd">                            calculated in run_current_setup</span>
+<span class="sd">        weight  :   int, the weight between expense and co2e, 5 is defined as balance, 0 prioritises cheaper solutions and</span>
+<span class="sd">                    10 prioritises cheap co2e solutions.</span>
+<span class="sd">        intelligent :   bool, should the tabu search use intelligent allocation (Qampo) in the solution simulation</span>
+<span class="sd">        km_aar  :   bool, should the simulation constrain vehicle booking when the yearly km allowance has been reached.</span>
+<span class="sd">                    Not available with intelligent simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">co2e_goal</span> <span class="o">=</span> <span class="n">co2e_goal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expense_goal</span> <span class="o">=</span> <span class="n">expense_goal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_antal</span> <span class="o">=</span> <span class="n">fixed_antal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intelligent</span> <span class="o">=</span> <span class="n">intelligent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">km_aar</span> <span class="o">=</span> <span class="n">km_aar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fleet_optimisation</span> <span class="o">=</span> <span class="n">fleetoptimiser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dates</span> <span class="o">=</span> <span class="n">dates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimum_cars</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breakpoint_solution</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_trips</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialise_real</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slack</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_trips</span><span class="o">.</span><span class="n">trips</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slack</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slack</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="c1"># todo enable toggling of undriven through ui</span>
+        <span class="c1"># for now we reset these to 0 to restrict solutions to have no undriven trips</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_for_undriven</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slack</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_distance_for_undriven</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="mi">9999</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_km</span> <span class="o">=</span> <span class="n">eval_km</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dummy_trips</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialise_trips</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_properties</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_vehicle_cost</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cheap_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_ordered</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vehicle2id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id2vehicle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle2type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_objective_value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">report</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="TabuSearch.run"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for handling the run of the tabu search. First calls the least_viable to get the least number of</span>
+<span class="sd">        cars needed in the final solutions. It then gets the initial objective value, which is the current setup.</span>
+<span class="sd">        The current solution is then &quot;simulated&quot; to get the current expense and co2e in order to calculate the</span>
+<span class="sd">        expense - and co2e goal. Finally, the &quot;control&quot; method is run, which handles the tabu search and assigns</span>
+<span class="sd">        the result to report.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">least_viable</span><span class="p">()</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_solution</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_solution_vehicle_types</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fixed</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_solution</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_objective_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objective_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_solution</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_current_setup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">report</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TabuSearch.run_current_setup"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.run_current_setup">[docs]</a>    <span class="k">def</span> <span class="nf">run_current_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method responsible for running the current setup on the whole selected trip set.</span>
+<span class="sd">        It will take all the vehicles that were active in the selected time period no matter if they were not selected</span>
+<span class="sd">        in the simulation setup. This is done in order to get the &quot;real&quot; value, otherwise one could select no vehicles</span>
+<span class="sd">        and have an expense on 0, which would make it infeasible for the search to improve.</span>
+
+<span class="sd">        Initialises the fleet with the active vehicles in the selected time period</span>
+<span class="sd">        Runs a &quot;real&quot; simulation on the whole trip set</span>
+<span class="sd">        Calculates the expense - and co2e goal based on the input values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fm</span> <span class="o">=</span> <span class="n">FleetManager</span><span class="p">()</span>
+        <span class="n">current_solution</span> <span class="o">=</span> <span class="n">fm</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">all_vehicles</span><span class="p">[</span>
+            <span class="p">(</span>
+                <span class="p">(</span><span class="n">fm</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">all_vehicles</span><span class="o">.</span><span class="n">end_leasing</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dates</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="o">|</span> <span class="p">(</span><span class="n">fm</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">all_vehicles</span><span class="o">.</span><span class="n">end_leasing</span><span class="o">.</span><span class="n">isna</span><span class="p">())</span>
+            <span class="p">)</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">fm</span><span class="o">.</span><span class="n">vehicle_factory</span><span class="o">.</span><span class="n">all_vehicles</span><span class="o">.</span><span class="n">location</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">current_solution</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">fm</span><span class="o">.</span><span class="n">current_fleet</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">vehicle</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">fm</span><span class="o">.</span><span class="n">current_fleet</span><span class="o">.</span><span class="n">initialise_fleet</span><span class="p">()</span>
+
+        <span class="n">cur_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_simulation</span><span class="p">(</span>
+            <span class="n">fleet</span><span class="o">=</span><span class="n">fm</span><span class="o">.</span><span class="n">current_fleet</span><span class="p">,</span>
+            <span class="n">small_set</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">special_name</span><span class="o">=</span><span class="s2">&quot;current&quot;</span><span class="p">,</span>
+            <span class="n">intelligent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cur_result</span> <span class="o">=</span> <span class="n">cur_results</span>
+        <span class="n">new_goal_expense</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expense_goal</span> <span class="o">+</span> <span class="n">cur_results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">new_goal_co2e</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2e_goal</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">cur_results</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expense_goal</span> <span class="o">=</span> <span class="n">new_goal_expense</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">co2e_goal</span> <span class="o">=</span> <span class="n">new_goal_co2e</span></div>
+
+<div class="viewcode-block" id="TabuSearch.vehicle_ordered"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.vehicle_ordered">[docs]</a>    <span class="k">def</span> <span class="nf">vehicle_ordered</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Orders the vehicle in most expensive to least expensive. Useful for the least viable function</span>
+<span class="sd">        as well as ordering the electrical bikes, bikes and unassigned type last.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># todo we assume that the most expensive is the car with the highest capacity</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">objective_value</span><span class="p">({</span><span class="n">vehicle</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+            <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_properties</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">weight</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="TabuSearch.start_solution"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.start_solution">[docs]</a>    <span class="k">def</span> <span class="nf">start_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for generating the start solution and building the structure for the search.</span>
+<span class="sd">        Generates a start solution with all the cars that a fixed due to a running lease that does not end before</span>
+<span class="sd">        the selected time period.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            solution    :   dictionary - id to count of the solution</span>
+<span class="sd">            vehicle_types   :   dictionary - vehicle type to count of solution</span>
+<span class="sd">            fixed   :   list - list of n available cars with value that defines how many of that index are fixed in the</span>
+<span class="sd">                        final solution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># the start solution must at least include minimum # cars fossil/el, and prefill the &quot;unchangeable&quot;</span>
+
+        <span class="c1"># fill in the unchangeable LOCKED</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">vehicle</span><span class="p">,</span> <span class="n">vehicle_props</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fleet_optimisation</span><span class="o">.</span><span class="n">proper</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">solution</span><span class="p">[</span><span class="n">vehicle</span><span class="p">]</span> <span class="o">=</span> <span class="n">vehicle_props</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span>
+
+        <span class="c1"># fill in the rest</span>
+        <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_properties</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">vehicle</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">solution</span><span class="p">:</span>
+                <span class="n">solution</span><span class="p">[</span><span class="n">vehicle</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">solution</span><span class="p">[</span><span class="s2">&quot;unassigned&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># build the structure to hold the fixed cars</span>
+        <span class="n">fixed</span> <span class="o">=</span> <span class="p">[</span><span class="n">solution</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id2vehicle</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">solution</span><span class="p">))]</span>
+        <span class="n">indexes_that_hold_cars</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vehicle2id</span><span class="p">[</span><span class="n">vehicle</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cheap_list</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle2type</span><span class="p">[</span><span class="n">vehicle</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;elbil&quot;</span><span class="p">,</span> <span class="s2">&quot;fossilbil&quot;</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">car_index</span> <span class="o">=</span> <span class="n">indexes_that_hold_cars</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># check that the start solution adhere to the least viable solution</span>
+        <span class="k">while</span> <span class="p">(</span>
+            <span class="nb">sum</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">count</span>
+                    <span class="k">for</span> <span class="n">vehicle</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">solution</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle2type</span><span class="p">[</span><span class="n">vehicle</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;fossilbil&quot;</span><span class="p">,</span> <span class="s2">&quot;elbil&quot;</span><span class="p">]</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum_cars</span>
+        <span class="p">):</span>
+            <span class="n">solution</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cheap_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">vehicle_types</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;cykel&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;elcykel&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;elbil&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;fossilbil&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;unassigned&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">vehicle</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">solution</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">vehicle_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle2type</span><span class="p">[</span><span class="n">vehicle</span><span class="p">]</span>
+            <span class="n">vehicle_types</span><span class="p">[</span><span class="n">vehicle_type</span><span class="p">]</span> <span class="o">+=</span> <span class="n">count</span>
+        <span class="k">return</span> <span class="n">solution</span><span class="p">,</span> <span class="n">vehicle_types</span><span class="p">,</span> <span class="n">fixed</span></div>
+
+<div class="viewcode-block" id="TabuSearch.calculate_vehicle_cost"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.calculate_vehicle_cost">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_vehicle_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the vehicle attributes: co2, co2e, cost, obj and expense based on the eval_km.</span>
+<span class="sd">        Uses the TCOCalculator based on the tool &quot;tco-vaerktoej-motorkoeretoejer&quot; created by POGI.</span>
+<span class="sd">        In tabu search the objective value is used and based on the weight;</span>
+<span class="sd">        (normalised cost) + (normalised co2e * weight)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        vehicles_dict   :   a dictionary; id of vehicle to its calculated attributes</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vehicles_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">vehicles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">vehicle</span><span class="p">,</span> <span class="n">vehicle_props</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fleet_optimisation</span><span class="o">.</span><span class="n">proper</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">vehicle_class</span> <span class="o">=</span> <span class="n">vehicle_props</span><span class="p">[</span><span class="s2">&quot;class&quot;</span><span class="p">]</span>
+            <span class="n">tco</span> <span class="o">=</span> <span class="n">TCOCalculator</span><span class="p">(</span>
+                <span class="n">drivmiddel</span><span class="o">=</span><span class="n">vehicle_class</span><span class="o">.</span><span class="n">fuel</span><span class="p">,</span>
+                <span class="n">bil_type</span><span class="o">=</span><span class="n">vehicle_class</span><span class="o">.</span><span class="n">fuel</span><span class="p">,</span>
+                <span class="n">koerselsforbrug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_km</span><span class="p">,</span>
+                <span class="n">braendstofforbrug</span><span class="o">=</span><span class="n">vehicle_class</span><span class="o">.</span><span class="n">wltp_fossil</span><span class="p">,</span>
+                <span class="n">elforbrug</span><span class="o">=</span><span class="n">vehicle_class</span><span class="o">.</span><span class="n">wltp_el</span><span class="p">,</span>
+                <span class="n">evalueringsperiode</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">co2e</span><span class="p">,</span> <span class="n">samfund</span> <span class="o">=</span> <span class="n">tco</span><span class="o">.</span><span class="n">ekstern_miljoevirkning</span><span class="p">(</span><span class="n">sum_it</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">expense</span> <span class="o">=</span> <span class="n">vehicle_class</span><span class="o">.</span><span class="n">omkostning_aar</span> <span class="o">+</span> <span class="n">tco</span><span class="o">.</span><span class="n">driftsomkostning</span> <span class="o">+</span> <span class="n">samfund</span>
+            <span class="n">cost</span> <span class="o">=</span> <span class="n">expense</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_km</span>
+            <span class="n">co2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_km</span> <span class="o">*</span> <span class="n">vehicle_class</span><span class="o">.</span><span class="n">co2_pr_km</span> <span class="o">/</span> <span class="mi">1000</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;co2&quot;</span><span class="p">:</span> <span class="n">co2</span><span class="p">,</span>
+                    <span class="s2">&quot;co2e&quot;</span><span class="p">:</span> <span class="n">co2e</span><span class="p">,</span>
+                    <span class="s2">&quot;cost&quot;</span><span class="p">:</span> <span class="n">cost</span><span class="p">,</span>
+                    <span class="s2">&quot;obj&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">co2e</span><span class="p">)</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">cost</span><span class="p">),</span>
+                    <span class="s2">&quot;expense&quot;</span><span class="p">:</span> <span class="n">expense</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+            <span class="n">vehicles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vehicle</span><span class="p">)</span>
+
+        <span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">vehicle</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">props</span><span class="p">]</span>
+        <span class="n">co2e</span> <span class="o">=</span> <span class="p">[</span><span class="n">vehicle</span><span class="p">[</span><span class="s2">&quot;co2e&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">vehicle</span> <span class="ow">in</span> <span class="n">props</span><span class="p">]</span>
+        <span class="n">scaled</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">([(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">co2e</span><span class="p">)])</span>
+
+        <span class="n">shifted</span> <span class="o">=</span> <span class="p">[(</span><span class="n">v</span><span class="p">,</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">vehicles</span><span class="p">,</span> <span class="n">scaled</span><span class="p">)]</span>
+
+        <span class="n">obj</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">cost_</span><span class="p">,</span> <span class="n">co2e_</span><span class="p">,</span> <span class="n">weight</span><span class="p">:</span> <span class="n">cost_</span> <span class="o">+</span> <span class="p">(</span><span class="n">co2e_</span> <span class="o">*</span> <span class="n">weight</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">vkey</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">co2e</span><span class="p">)</span> <span class="ow">in</span> <span class="n">shifted</span><span class="p">:</span>
+            <span class="n">vehicles_dict</span><span class="p">[</span><span class="n">vkey</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;norm_cost&quot;</span><span class="p">:</span> <span class="n">cost</span><span class="p">,</span>
+                <span class="s2">&quot;norm_co2e&quot;</span><span class="p">:</span> <span class="n">co2e</span><span class="p">,</span>
+                <span class="s2">&quot;norm_obj&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">co2e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="n">vehicles_dict</span><span class="p">[</span><span class="s2">&quot;unassigned&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;norm_obj&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">vehicles_dict</span></div>
+
+<div class="viewcode-block" id="TabuSearch.get_expenses"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.get_expenses">[docs]</a>    <span class="k">def</span> <span class="nf">get_expenses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method currently unused. Useful for providing product solution to attribute matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj_array</span><span class="p">,</span> <span class="n">expense_array</span><span class="p">,</span> <span class="n">co2e_array</span><span class="p">,</span> <span class="n">cost_array</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vehicle_properties</span><span class="p">)):</span>
+            <span class="n">vehicle_properties</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_properties</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id2vehicle</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span>
+            <span class="n">obj_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vehicle_properties</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">])</span>
+            <span class="n">expense_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vehicle_properties</span><span class="p">[</span><span class="s2">&quot;expense&quot;</span><span class="p">])</span>
+            <span class="n">co2e_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vehicle_properties</span><span class="p">[</span><span class="s2">&quot;co2e&quot;</span><span class="p">])</span>
+            <span class="n">cost_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vehicle_properties</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obj_array</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">expense_array</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">co2e_array</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cost_array</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="TabuSearch.objective_value"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.objective_value">[docs]</a>    <span class="k">def</span> <span class="nf">objective_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for providing the objective value of specific solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        solution    :   dictionary of the solution to get the objective value of</span>
+<span class="sd">        test    :   if the solution also should be tested</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if slacks becomes editable &#39;twv&#39; becomes relevant</span>
+        <span class="n">twv</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">test</span><span class="p">:</span>
+            <span class="n">neighbour_co2e</span><span class="p">,</span> <span class="n">neighbour_cost</span><span class="p">,</span> <span class="n">twv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_simulation</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+            <span class="n">solution</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id2vehicle</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span> <span class="n">count</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">solution</span><span class="p">)}</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="n">solution</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id2vehicle</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span> <span class="n">count</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">solution</span><span class="p">)}</span>
+
+        <span class="n">n_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_properties</span><span class="p">[</span><span class="n">vehicle</span><span class="p">][</span><span class="s2">&quot;norm_obj&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">count</span>
+                <span class="k">for</span> <span class="n">vehicle</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">solution</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">n_sum</span></div>
+
+<div class="viewcode-block" id="TabuSearch.mapper"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.mapper">[docs]</a>    <span class="k">def</span> <span class="nf">mapper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for generating mappers used all over the class in order to index the proper vehicle</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        vehicle_name_to_id  :   dictionary, name from vehicle_optimisation.FleetOptimisation to the assigned id</span>
+<span class="sd">        id_to_vehicle_name  :   dictionary, id to the name from vehicle_optimisation.FleetOptimisation</span>
+<span class="sd">        vehicle2type    :   dictionary, name from vehicle_optimisation.FleetOptimisation to the vehicle type</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vehicle_name_to_id</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle_name</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">vehicle_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cheap_list</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="c1"># vehicle_name_to_id = {vehicle_name: k for k, vehicle_name in enumerate(self.vehicle_properties.keys())}</span>
+        <span class="n">id_to_vehicle_name</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">vehicle_name</span> <span class="k">for</span> <span class="n">vehicle_name</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">vehicle_name_to_id</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="c1"># id_to_vehicle_name = {value: vehicle_name for vehicle_name, value in vehicle_name_to_id.items()}</span>
+        <span class="n">vehicle2type</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">vehicle_name</span><span class="p">:</span> <span class="n">vehicle_props</span><span class="p">[</span><span class="s2">&quot;class&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+            <span class="k">for</span> <span class="n">vehicle_name</span><span class="p">,</span> <span class="n">vehicle_props</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fleet_optimisation</span><span class="o">.</span><span class="n">proper</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">vehicle2type</span><span class="p">[</span><span class="s2">&quot;unassigned&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unassigned&quot;</span>
+        <span class="k">return</span> <span class="n">vehicle_name_to_id</span><span class="p">,</span> <span class="n">id_to_vehicle_name</span><span class="p">,</span> <span class="n">vehicle2type</span></div>
+
+<div class="viewcode-block" id="TabuSearch.drivability_search"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.drivability_search">[docs]</a>    <span class="k">def</span> <span class="nf">drivability_search</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">solution</span><span class="p">,</span>
+        <span class="n">down</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">old</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">numbers_checked</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">iteration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursive method to find the least number of cars needed to satisfy the capacity needed for the trips pulled</span>
+<span class="sd">        Starts with the number of fixed cars on one particular index, checks if the solution satisifies. If yes, choose</span>
+<span class="sd">        the median number between the current checked and highest value that did not satisfy the need. If no, choose the</span>
+<span class="sd">        median number between the current checked and the lowest value that did satisfy the need.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        solution    :   the solution that should be checked</span>
+<span class="sd">        down    :   if the next solution should go down</span>
+<span class="sd">        old :   the previously checked solution</span>
+<span class="sd">        numbers_checked :   a dictionary holding the number of vehicles and a bool for satisfaction</span>
+<span class="sd">        iteration   :   number of iterations used to stop searching at max_iter</span>
+<span class="sd">        max_iter    :   max number of iterations allowed</span>
+<span class="sd">        start   :   the start solution number - always 0, which yelds a numbers_checked dict {0: False}</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Bool for least viability found, solution for least viability</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">vehicle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cheap_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">numbers_checked</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">numbers_checked</span> <span class="o">=</span> <span class="p">{</span><span class="n">start</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">driving_checking</span><span class="p">({</span><span class="n">vehicle</span><span class="p">:</span> <span class="n">start</span><span class="p">})}</span>
+        <span class="k">if</span> <span class="n">old</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">old</span> <span class="o">=</span> <span class="n">solution</span><span class="p">[</span><span class="n">vehicle</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">down</span><span class="p">:</span>
+            <span class="n">bottom</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">max</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">number</span>
+                        <span class="k">for</span> <span class="n">number</span><span class="p">,</span> <span class="n">viable</span> <span class="ow">in</span> <span class="n">numbers_checked</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">viable</span> <span class="ow">is</span> <span class="kc">False</span>
+                    <span class="p">]</span>
+                    <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">numbers_checked</span>
+                <span class="k">else</span> <span class="mi">0</span>
+            <span class="p">)</span>
+            <span class="n">numbers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">bottom</span><span class="p">,</span> <span class="n">solution</span><span class="p">[</span><span class="n">vehicle</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">numbers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">solution</span><span class="p">[</span><span class="n">vehicle</span><span class="p">],</span> <span class="n">old</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">middle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">numbers</span><span class="p">))</span>
+        <span class="n">new_solution</span> <span class="o">=</span> <span class="p">{</span><span class="n">vehicle</span><span class="p">:</span> <span class="n">middle</span><span class="p">}</span>
+        <span class="n">drivable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">driving_checking</span><span class="p">(</span><span class="n">new_solution</span><span class="p">)</span>
+        <span class="n">numbers_checked</span><span class="p">[</span><span class="n">middle</span><span class="p">]</span> <span class="o">=</span> <span class="n">drivable</span>
+
+        <span class="c1"># found breaking point?</span>
+        <span class="n">checked</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">numbers_checked</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">checked</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">difference</span> <span class="o">=</span> <span class="n">checked</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">checked</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">terminate</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">checked</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">difference</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">diff</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="n">numbers_checked</span><span class="p">[</span><span class="n">checked</span><span class="p">[</span><span class="n">index</span><span class="p">]]</span> <span class="ow">is</span> <span class="kc">False</span>
+            <span class="ow">and</span> <span class="n">numbers_checked</span><span class="p">[</span><span class="n">checked</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">terminate</span><span class="p">:</span>
+            <span class="n">chec</span> <span class="o">=</span> <span class="n">checked</span><span class="p">[</span><span class="n">terminate</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">twv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_simulation</span><span class="p">([</span><span class="n">chec</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">twv</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">chec</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">new_solution</span> <span class="o">=</span> <span class="p">{</span><span class="n">vehicle</span><span class="p">:</span> <span class="n">chec</span><span class="p">}</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">new_solution</span>
+        <span class="k">elif</span> <span class="n">iteration</span> <span class="o">&gt;</span> <span class="n">max_iter</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">new_solution</span>
+
+        <span class="c1"># check if we should go lower or higher</span>
+        <span class="k">if</span> <span class="n">drivable</span><span class="p">:</span>
+            <span class="n">new_solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivability_search</span><span class="p">(</span>
+                <span class="n">new_solution</span><span class="p">,</span>
+                <span class="n">down</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">numbers_checked</span><span class="o">=</span><span class="n">numbers_checked</span><span class="p">,</span>
+                <span class="n">iteration</span><span class="o">=</span><span class="n">iteration</span><span class="p">,</span>
+                <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivability_search</span><span class="p">(</span>
+                <span class="n">new_solution</span><span class="p">,</span>
+                <span class="n">down</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">old</span><span class="o">=</span><span class="n">old</span><span class="p">,</span>
+                <span class="n">numbers_checked</span><span class="o">=</span><span class="n">numbers_checked</span><span class="p">,</span>
+                <span class="n">iteration</span><span class="o">=</span><span class="n">iteration</span><span class="p">,</span>
+                <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_solution</span></div>
+
+<div class="viewcode-block" id="TabuSearch.least_viable"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.least_viable">[docs]</a>    <span class="k">def</span> <span class="nf">least_viable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to control the least viability search to find the minimum vehicles needed to satisfy the number of</span>
+<span class="sd">        trips. Sets the starts to max_vehicles which is the current number of vehicles based on the time period times</span>
+<span class="sd">        1.5. If the breakpoint is not found, the minimum cars are set to current number times 1.5.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get the number of cars in current solution</span>
+        <span class="n">max_vehicles</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fleet_optimisation</span><span class="o">.</span><span class="n">location_total</span> <span class="o">*</span> <span class="mf">1.5</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_antal</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">minimum_cars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_antal</span>
+
+        <span class="c1"># construct the most expensive solution</span>
+        <span class="n">most_expensive_solution</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cheap_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">max_vehicles</span><span class="p">}</span>
+        <span class="c1"># find the minimum number of cars required to handle the driving requirement</span>
+        <span class="n">breakpoint_found</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">breakpoint_solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivability_search</span><span class="p">(</span>
+            <span class="n">most_expensive_solution</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">breakpoint_found</span><span class="p">:</span>
+            <span class="n">breakpoint_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">breakpoint_solution</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">minimum_cars</span> <span class="o">=</span> <span class="n">breakpoint_number</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">minimum_cars</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fleet_optimisation</span><span class="o">.</span><span class="n">vf</span><span class="o">.</span><span class="n">all_vehicles</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">fleet_optimisation</span><span class="o">.</span><span class="n">vf</span><span class="o">.</span><span class="n">all_vehicles</span><span class="o">.</span><span class="n">location</span>
+                        <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+                <span class="o">*</span> <span class="mf">1.5</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="TabuSearch.driving_checking"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.driving_checking">[docs]</a>    <span class="k">def</span> <span class="nf">driving_checking</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method called by drivability_search to test the solution. Will use the input solution and test against</span>
+<span class="sd">        the dummy trip set to efficiently simulate.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        solution    :   dict, key: vehicle, value: count</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool    :   is solution able to satisfy the need with no unallocated trips</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fleet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fleet_optimisation</span><span class="o">.</span><span class="n">build_fleet_simulation</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+        <span class="n">simulation</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dummy_trips</span><span class="p">,</span>
+            <span class="n">fleet</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">tabu</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">intelligent_simulation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">intelligent</span><span class="p">,</span>
+            <span class="n">timestamps_set</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">simulation</span><span class="o">.</span><span class="n">timestamps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_trips</span><span class="o">.</span><span class="n">timestamps</span>
+        <span class="n">simulation</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="n">drivable</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">False</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_slack</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">True</span>
+        <span class="p">)</span>  <span class="c1"># self.slack else True  # todo edit above to self.slack if slack becomes editable</span>
+        <span class="k">return</span> <span class="n">drivable</span></div>
+
+<div class="viewcode-block" id="TabuSearch.calculate_slack"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.calculate_slack">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_slack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">fleet_name</span><span class="o">=</span><span class="s2">&quot;fleetinventory&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method used when calculating the allowed slack. Right now slack is set to 0, however one can allow</span>
+<span class="sd">        that a specific number of trips below a certain distance length is unallocated. The unallocated trips</span>
+<span class="sd">        that fall in the last bin will be punished by 10 as opposed to 1 - accounting for 10 unallocated trips.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        simulation  :   model.Simulation object - with the trips frame after the simulation has been run</span>
+<span class="sd">        fleet_name  :   the name of the fleet, in order to index the proper column</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        twv     :   int, the number of trips without a vehicle</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">twv</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="n">simulation</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fleet_name</span><span class="si">}</span><span class="s2">_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">twv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># punish longer trips than self.max_distance_for_undriven allows</span>
+            <span class="n">tip</span> <span class="o">=</span> <span class="n">twv</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">twv</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bins</span><span class="p">))</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+            <span class="n">bin_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">twv</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span> <span class="k">if</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">bin_length</span> <span class="k">else</span> <span class="n">a</span> <span class="o">*</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tip</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">twv</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">twv</span></div>
+
+<div class="viewcode-block" id="TabuSearch.real_simulation"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.real_simulation">[docs]</a>    <span class="k">def</span> <span class="nf">real_simulation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">solution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">small_set</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">fleet</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">special_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">intelligent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method performing simulation and returning the consequences</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        solution    :   list, input solution if no fleet is defined, index is vehicle id, value is count.</span>
+<span class="sd">        small_set   :   bool, if the small dummy_set should be used.</span>
+<span class="sd">        fleet   :   vehicle.fleetinventory class if solution is none</span>
+<span class="sd">        special_name    :   string, defining the name and booked column from Simulation.trips.trips</span>
+<span class="sd">        intelligent :   bool, intelligent simulation (Qampo)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        expense, co2e, number of trips without vehicles</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;fle&quot;</span>
+        <span class="n">fleet_name</span> <span class="o">=</span> <span class="s2">&quot;fleetinventory&quot;</span>
+        <span class="k">if</span> <span class="n">special_name</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">special_name</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">fleet_name</span> <span class="o">=</span> <span class="n">special_name</span>
+
+        <span class="k">if</span> <span class="n">small_set</span><span class="p">:</span>
+            <span class="n">trip_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_trips</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">trip_set</span><span class="o">.</span><span class="n">trips</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">trip_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_trips</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">trip_set</span><span class="o">.</span><span class="n">trips</span><span class="p">)</span>
+        <span class="n">trip_set</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="s2">&quot;current&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="p">[</span><span class="n">Unassigned</span><span class="p">()]</span>
+        <span class="n">trip_set</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="s2">&quot;current_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">trip_set</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="s2">&quot;simulation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="p">[</span><span class="n">Unassigned</span><span class="p">()]</span>
+        <span class="n">trip_set</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="s2">&quot;simulation_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">fleet</span><span class="p">):</span>
+            <span class="n">solution</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id2vehicle</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span> <span class="n">count</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">solution</span><span class="p">)}</span>
+            <span class="n">fleet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fleet_optimisation</span><span class="o">.</span><span class="n">build_fleet_simulation</span><span class="p">(</span>
+                <span class="n">solution</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">fleet_name</span>
+            <span class="p">)</span>
+        <span class="n">simulation</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span>
+            <span class="n">trip_set</span><span class="p">,</span> <span class="n">fleet</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tabu</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">intelligent_simulation</span><span class="o">=</span><span class="n">intelligent</span><span class="p">,</span> <span class="n">timestamps_set</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">simulation</span><span class="o">.</span><span class="n">timestamps</span> <span class="o">=</span> <span class="n">trip_set</span><span class="o">.</span><span class="n">timestamps</span>
+        <span class="n">simulation</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="nb">setattr</span><span class="p">(</span>
+            <span class="n">simulation</span><span class="o">.</span><span class="n">fleet_manager</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fleet_name</span><span class="si">}</span><span class="s2">_fleet&quot;</span><span class="p">,</span>
+            <span class="n">simulation</span><span class="o">.</span><span class="n">fleet_manager</span><span class="o">.</span><span class="n">vehicles</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">cq</span> <span class="o">=</span> <span class="n">ConsequenceCalculator</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="p">[</span><span class="n">fleet_name</span><span class="p">])</span>
+        <span class="n">cq</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># todo use the below commented function if slack becomes editable</span>
+        <span class="c1"># twv = self.calculate_slack(simulation, fleet_name=fleet_name)</span>
+        <span class="n">twv</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">simulation</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="n">simulation</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">trips</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fleet_name</span><span class="si">}</span><span class="s2">_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">savings_key</span> <span class="o">=</span> <span class="n">cq</span><span class="o">.</span><span class="n">consequence_table</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;keys&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span>
+            <span class="s2">&quot;Samlet omkostning [kr/år]&quot;</span>
+        <span class="p">)</span>
+        <span class="n">co2e_key</span> <span class="o">=</span> <span class="n">cq</span><span class="o">.</span><span class="n">consequence_table</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;keys&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span>
+            <span class="s2">&quot;POGI CO2-ækvivalent udledning [CO2e]&quot;</span>
+        <span class="p">)</span>
+        <span class="n">savings</span> <span class="o">=</span> <span class="n">cq</span><span class="o">.</span><span class="n">consequence_table</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_values&quot;</span><span class="p">][</span><span class="n">savings_key</span><span class="p">]</span>
+        <span class="n">co2e_savings</span> <span class="o">=</span> <span class="n">cq</span><span class="o">.</span><span class="n">consequence_table</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_values&quot;</span><span class="p">][</span><span class="n">co2e_key</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">small_set</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">savings</span><span class="p">,</span> <span class="n">co2e_savings</span><span class="p">,</span> <span class="n">twv</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">cq</span><span class="o">.</span><span class="n">consequence_table</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_values&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span>
+            <span class="n">cq</span><span class="o">.</span><span class="n">consequence_table</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_values&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">twv</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="TabuSearch.initialise_real"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.initialise_real">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_real</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialises and prepares the whole trip set defined by the location and selected time period</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dataframe of roundtrips</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">engine_creator</span><span class="p">()</span>
+        <span class="n">rt</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span>
+                <span class="n">Query</span><span class="p">(</span><span class="n">RoundTrips</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">RoundTrips</span><span class="o">.</span><span class="n">start_location_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
+                    <span class="n">RoundTrips</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">RoundTrips</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dates</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">statement</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;start_time&quot;</span><span class="p">])</span>
+            <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+        <span class="p">)</span>
+        <span class="n">rt</span><span class="p">[</span><span class="s2">&quot;tripid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rt</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">rt</span><span class="p">[</span><span class="s2">&quot;fleetinventory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rt</span><span class="p">)</span> <span class="o">*</span> <span class="p">[</span><span class="n">Unassigned</span><span class="p">()]</span>
+        <span class="n">rt</span><span class="p">[</span><span class="s2">&quot;fleetinventory_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">rt</span><span class="p">),),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">t_rt</span> <span class="o">=</span> <span class="n">Trips</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">rt</span><span class="p">)</span>
+        <span class="n">time_resolution</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">start_day</span> <span class="o">=</span> <span class="n">t_rt</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="n">end_day</span> <span class="o">=</span> <span class="n">t_rt</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">timestamps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start_day</span><span class="p">,</span> <span class="n">end_day</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">time_resolution</span><span class="p">)</span>
+        <span class="n">t_rt</span><span class="o">.</span><span class="n">set_timestamps</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t_rt</span></div>
+
+<div class="viewcode-block" id="TabuSearch.initialise_trips"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.initialise_trips">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_trips</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialises and prepares a dummy set for efficient search and test</span>
+<span class="sd">        Pulls the peak day in the selected time period. Assumes that a fleet that can satisfy a peak day would be able</span>
+<span class="sd">        to satisfy the whole period.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dataframe of roundtrips for the peak day</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">average_day</span><span class="p">,</span> <span class="n">peak_day</span> <span class="o">=</span> <span class="n">generate_trips_simulation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">dates</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dates</span>
+        <span class="p">)</span>
+
+        <span class="n">peak_day</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">peak_day</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;start_time&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+        <span class="p">)</span>
+        <span class="n">peak_day</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;length_in_kilometers&quot;</span><span class="p">:</span> <span class="s2">&quot;distance&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">peak_day</span><span class="p">[</span><span class="s2">&quot;tripid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">peak_day</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">peak_day</span><span class="p">[[</span><span class="s2">&quot;start_location_id&quot;</span><span class="p">,</span> <span class="s2">&quot;department&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span>
+        <span class="n">peak_day</span><span class="p">[</span><span class="s2">&quot;fleetinventory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">peak_day</span><span class="p">)</span> <span class="o">*</span> <span class="p">[</span><span class="n">Unassigned</span><span class="p">()]</span>
+        <span class="n">peak_day</span><span class="p">[</span><span class="s2">&quot;fleetinventory_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">peak_day</span><span class="p">),),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">peak_day</span><span class="p">[</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;driver_name&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;car_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;start_latitude&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;start_longitude&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;end_latitude&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;end_longitude&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">pd_t</span> <span class="o">=</span> <span class="n">Trips</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">peak_day</span><span class="p">)</span>
+        <span class="n">time_resolution</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">start_day</span> <span class="o">=</span> <span class="n">pd_t</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="n">end_day</span> <span class="o">=</span> <span class="n">pd_t</span><span class="o">.</span><span class="n">trips</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">timestamps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start_day</span><span class="p">,</span> <span class="n">end_day</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">time_resolution</span><span class="p">)</span>
+        <span class="n">pd_t</span><span class="o">.</span><span class="n">set_timestamps</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pd_t</span></div>
+
+<div class="viewcode-block" id="TabuSearch.build_tabu_structure"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.build_tabu_structure">[docs]</a>    <span class="k">def</span> <span class="nf">build_tabu_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_removal</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Essential method for the tabu search that generates a structure to hold all the possible moves.</span>
+<span class="sd">        For all indexes in the self.fixed list two moves are made; +1 and -1.</span>
+<span class="sd">        E.g. a database holding 3 unique cars with one fixed car (a car that cannot be removed due to continued lease),</span>
+<span class="sd">        could look like:</span>
+<span class="sd">                [0, 0, 1]</span>
+<span class="sd">        and allow_removal = False</span>
+<span class="sd">        would yield a tabu structure:</span>
+<span class="sd">            {</span>
+<span class="sd">                (0, 1): {&quot;tabu_time&quot;: 0, &quot;objective_value&quot;: math.inf},</span>
+<span class="sd">                (0, -1): {&quot;tabu_time&quot;: 0, &quot;objective_value&quot;: math.inf},</span>
+<span class="sd">                (1, 1): {&quot;tabu_time&quot;: 0, &quot;objective_value&quot;: math.inf},</span>
+<span class="sd">                (1, -1): {&quot;tabu_time&quot;: 0, &quot;objective_value&quot;: math.inf},</span>
+<span class="sd">                (2, 1): {&quot;tabu_time&quot;: 0, &quot;objective_value&quot;: math.inf},</span>
+<span class="sd">                (2, -1): {&quot;tabu_time&quot;: 0, &quot;objective_value&quot;: math.inf},</span>
+<span class="sd">            }</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        allow_removal   :   bool, is the search allowed to remove vehicles from the fixed. Useful if current solution</span>
+<span class="sd">                            holds, to the simulation, redundant vehicles, i.e. if there are more vehicles than needed</span>
+<span class="sd">                            in the current solution to satisfy the need.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict of key move (index, +1/-1) value (dict attributes)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">allow_removal</span> <span class="ow">and</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">mov</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+                <span class="n">ts</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">mov</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tabu_time&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;objective_value&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">ts</span></div>
+
+<div class="viewcode-block" id="TabuSearch.get_nabo"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.get_nabo">[docs]</a>    <span class="k">def</span> <span class="nf">get_nabo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c_solution</span><span class="p">,</span> <span class="n">allow_removal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_cars</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for generating neighbours to the current solution. I.e. from the tabu structure generate the</span>
+<span class="sd">        specific solution from the current solution and the move. It checks if the solution satisfies the minimum</span>
+<span class="sd">        number of cars criteria.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c_solution  :   list, the current solution from which new solutions will be build</span>
+<span class="sd">        allow_removal   :   bool, is it allowed to remove vehicles from the fixed cars</span>
+<span class="sd">        min_cars    :   int, the minimum number of cars that should be in the solution</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        generator, that yields the possible solutions.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">min_cars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">min_cars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum_cars</span>
+        <span class="n">min_suffice</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">sol</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sol</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">car_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="n">min_cars</span>
+        <span class="k">if</span> <span class="n">allow_removal</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c_solution</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">cop</span> <span class="o">=</span> <span class="n">c_solution</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                    <span class="n">cop</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">min_suffice</span><span class="p">(</span><span class="n">cop</span><span class="p">):</span>
+                        <span class="k">yield</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">cop</span>
+                <span class="k">elif</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>  <span class="c1"># allow climb again</span>
+                    <span class="n">cop</span> <span class="o">=</span> <span class="n">c_solution</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                    <span class="n">cop</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">yield</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cop</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c_solution</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">cop</span> <span class="o">=</span> <span class="n">c_solution</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                    <span class="n">cop</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">yield</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cop</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">count</span><span class="p">:</span>
+                        <span class="n">cop</span> <span class="o">=</span> <span class="n">c_solution</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                        <span class="n">cop</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+                        <span class="k">yield</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cop</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                            <span class="n">cop</span> <span class="o">=</span> <span class="n">c_solution</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                            <span class="n">mov</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+                            <span class="n">cop</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="n">mov</span>
+                            <span class="k">if</span> <span class="n">a</span><span class="p">:</span>
+                                <span class="k">yield</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">mov</span><span class="p">),</span> <span class="n">cop</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">min_suffice</span><span class="p">(</span><span class="n">cop</span><span class="p">):</span>
+                                    <span class="k">yield</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">mov</span><span class="p">),</span> <span class="n">cop</span></div>
+
+<div class="viewcode-block" id="TabuSearch.swap_move"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.swap_move">[docs]</a>    <span class="k">def</span> <span class="nf">swap_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="p">,</span> <span class="n">move</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method used to make the move from the solution to the best move selected.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        solution    :   list, solution index to number, e.g. [0,0,1,2,1,5,0]</span>
+<span class="sd">        move    :   tuple, the move from the tabu structure to make, e.g. (5, -1)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list, the new solution with the move made</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cop</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">cop</span><span class="p">[</span><span class="n">move</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">move</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">cop</span></div>
+
+<div class="viewcode-block" id="TabuSearch.tabu_search"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.tabu_search">[docs]</a>    <span class="k">def</span> <span class="nf">tabu_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_cars</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The tabu search algorithm.</span>
+
+<span class="sd">        Responsible for search the space for solutions and recording the immediate best solutions.</span>
+<span class="sd">        From the input min_cars it&#39;s calculated if the solutions should prioritise removing or adding vehicles</span>
+<span class="sd">        to the current solution. From this information, the tabu structure is build and search starts. It&#39;s always</span>
+<span class="sd">        pushed towards a better objective value, and by punishing the unallocated trips it&#39;s desired by the search</span>
+<span class="sd">        to go into spaces where this condition is satisfied.</span>
+
+<span class="sd">        For new and better solutions the record is saved, and the time of the move is recorded such that we don&#39;t</span>
+<span class="sd">        fall into the same space over and over again. The move is however allowed if it improves the global best</span>
+<span class="sd">        objective value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        min_cars    :   the minimum number of cars needed in the generated solutions.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict, holding the recorded best solution during the search.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">min_cars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">min_cars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum_cars</span>
+        <span class="n">best_solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">divide</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed</span><span class="p">)</span>
+        <span class="n">allow_remove</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">min_cars</span> <span class="o">&lt;</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">min_cars</span> <span class="o">/</span> <span class="n">divide</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">tenure</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nb">len</span><span class="p">([</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed</span> <span class="k">if</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tenure</span> <span class="o">=</span> <span class="mi">10</span>
+
+        <span class="c1"># get the structure and possible moves for settings</span>
+        <span class="n">tabu_structure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_tabu_structure</span><span class="p">(</span><span class="n">allow_remove</span><span class="p">)</span>
+        <span class="n">best_objvalue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objective_value</span><span class="p">(</span><span class="n">best_solution</span><span class="p">)</span>
+        <span class="n">current_solution</span> <span class="o">=</span> <span class="n">best_solution</span>
+        <span class="n">current_objvalue</span> <span class="o">=</span> <span class="n">best_objvalue</span>
+
+        <span class="c1"># save the solutions so we don&#39;t have to re-run the obj method</span>
+        <span class="n">saved_solutions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">saved_solutions</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">current_solution</span><span class="p">)]</span> <span class="o">=</span> <span class="n">current_objvalue</span>
+
+        <span class="n">iteration</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">stop_iter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">stop_iter</span> <span class="o">&lt;</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">generated</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">moves</span> <span class="o">=</span> <span class="n">tabu_structure</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+            <span class="c1"># reset the moves, so that we don&#39;t repeat the same moves</span>
+            <span class="k">for</span> <span class="n">move</span> <span class="ow">in</span> <span class="n">moves</span><span class="p">:</span>
+                <span class="n">tabu_structure</span><span class="p">[</span><span class="n">move</span><span class="p">][</span><span class="s2">&quot;objective_value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+
+            <span class="c1"># iterate over the possible moves to get it&#39;s associated move objective value</span>
+            <span class="k">for</span> <span class="n">move</span><span class="p">,</span> <span class="n">candidate_solution</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nabo</span><span class="p">(</span>
+                <span class="n">current_solution</span><span class="p">,</span> <span class="n">allow_removal</span><span class="o">=</span><span class="n">allow_remove</span><span class="p">,</span> <span class="n">min_cars</span><span class="o">=</span><span class="n">min_cars</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="n">move</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tabu_structure</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">generated</span> <span class="o">=</span> <span class="kc">True</span>
+
+                <span class="c1"># skip getting objective value for already checked solutions</span>
+                <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">candidate_solution</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saved_solutions</span><span class="p">:</span>
+                    <span class="n">candidate_objvalue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objective_value</span><span class="p">(</span><span class="n">candidate_solution</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">candidate_objvalue</span> <span class="o">=</span> <span class="n">saved_solutions</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">candidate_solution</span><span class="p">)]</span>
+                <span class="n">tabu_structure</span><span class="p">[</span><span class="n">move</span><span class="p">][</span><span class="s2">&quot;objective_value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">candidate_objvalue</span>
+
+            <span class="c1"># break if there are no more moves to be made</span>
+            <span class="k">if</span> <span class="n">generated</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="c1"># check the possible steps</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="c1"># if no moves are allowed because tabu_time exceeds iteration we increment and break</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;objective_value&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">tabu_structure</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+                <span class="p">):</span>
+                    <span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+
+                <span class="c1"># the best step is selected</span>
+                <span class="n">best_move</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                    <span class="n">tabu_structure</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">tabu_structure</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;objective_value&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">move_obj</span> <span class="o">=</span> <span class="n">tabu_structure</span><span class="p">[</span><span class="n">best_move</span><span class="p">][</span><span class="s2">&quot;objective_value&quot;</span><span class="p">]</span>
+                <span class="n">tabu_time</span> <span class="o">=</span> <span class="n">tabu_structure</span><span class="p">[</span><span class="n">best_move</span><span class="p">][</span><span class="s2">&quot;tabu_time&quot;</span><span class="p">]</span>
+
+                <span class="c1"># move is allowed</span>
+                <span class="k">if</span> <span class="n">tabu_time</span> <span class="o">&lt;</span> <span class="n">iteration</span><span class="p">:</span>
+                    <span class="n">current_solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">swap_move</span><span class="p">(</span><span class="n">current_solution</span><span class="p">,</span> <span class="n">best_move</span><span class="p">)</span>
+                    <span class="n">current_objvalue</span> <span class="o">=</span> <span class="n">move_obj</span>
+                    <span class="n">saved_solutions</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">current_solution</span><span class="p">)]</span> <span class="o">=</span> <span class="n">current_objvalue</span>
+
+                    <span class="c1"># if we found the best objective value so far we reset the over all iteration</span>
+                    <span class="k">if</span> <span class="n">move_obj</span> <span class="o">&lt;</span> <span class="n">best_objvalue</span><span class="p">:</span>
+                        <span class="n">best_solution</span> <span class="o">=</span> <span class="n">current_solution</span>
+                        <span class="n">best_objvalue</span> <span class="o">=</span> <span class="n">current_objvalue</span>
+                        <span class="n">stop_iter</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">stop_iter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="c1"># the move gets added to the tabu list be banning the move for n steps</span>
+                    <span class="n">tabu_structure</span><span class="p">[</span><span class="n">best_move</span><span class="p">][</span><span class="s2">&quot;tabu_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iteration</span> <span class="o">+</span> <span class="n">tenure</span>
+                    <span class="k">if</span> <span class="n">allow_remove</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                        <span class="n">tabu_structure</span><span class="p">[</span>
+                            <span class="p">(</span><span class="n">best_move</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">best_move</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="p">][</span><span class="s2">&quot;tabu_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">iteration</span> <span class="o">+</span> <span class="n">tenure</span><span class="p">)</span>
+                    <span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+
+                <span class="c1"># the move is only allowed if the solution beats the current best solution</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">move_obj</span> <span class="o">&lt;</span> <span class="n">best_objvalue</span><span class="p">:</span>
+                        <span class="n">current_solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">swap_move</span><span class="p">(</span><span class="n">current_solution</span><span class="p">,</span> <span class="n">best_move</span><span class="p">)</span>
+                        <span class="n">current_objvalue</span> <span class="o">=</span> <span class="n">move_obj</span>
+                        <span class="n">best_solution</span> <span class="o">=</span> <span class="n">current_solution</span>
+                        <span class="n">best_objvalue</span> <span class="o">=</span> <span class="n">current_objvalue</span>
+                        <span class="n">saved_solutions</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">best_solution</span><span class="p">)]</span> <span class="o">=</span> <span class="n">best_objvalue</span>
+                        <span class="n">stop_iter</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">tabu_structure</span><span class="p">[</span><span class="n">best_move</span><span class="p">][</span><span class="s2">&quot;objective_value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+                        <span class="k">continue</span>
+
+        <span class="c1"># return only the solutions that satisfies the minimum number of cars</span>
+        <span class="n">saved_solutions</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">value</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">saved_solutions</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">key</span><span class="p">)[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">car_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="n">min_cars</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">saved_solutions</span></div>
+
+<div class="viewcode-block" id="TabuSearch.control"><a class="viewcode-back" href="../../../source/fleetmanager.model.html#fleetmanager.model.tabu.TabuSearch.control">[docs]</a>    <span class="k">def</span> <span class="nf">control</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for controlling the tabu search, which is called 4 times by default.</span>
+<span class="sd">        It&#39;s done in order to &quot;diversify&quot; the search, to have both solutions present that removes vehicles, and</span>
+<span class="sd">        solutions present that adds vehicles. After running the tabu searches, we iterate over the solutions sorted</span>
+<span class="sd">        on the best objective values. Then real simulation happens on the whole trip set, if the solution satisfies all</span>
+<span class="sd">        criteria; minimum cars, expense goal, co2e goal and 0 unallocated trips, the solution is stored. If it doesn&#39;t,</span>
+<span class="sd">        the solution is stored as a fallback solution, in order to provide results in the case that no solution satis-</span>
+<span class="sd">        fies all criteria.</span>
+<span class="sd">        To improve efficiency, the tests are stopped after hitting 5 qualified solutions. In addition, it&#39;s recorded</span>
+<span class="sd">        for each solution how many of each vehicle type is used and if the combination satisfied the capacity need.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list, of the top 5 solutions based on the objective value.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">solutions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">solutions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabu_search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minimum_cars</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">solutions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabu_search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minimum_cars</span><span class="p">))</span>
+        <span class="n">solutions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tabu_search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minimum_cars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># extra buffer for electrical car compensation</span>
+        <span class="n">solutions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tabu_search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minimum_cars</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># extra buffer for electrical car compensation</span>
+
+        <span class="n">sorted_solutions</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">solutions</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">sorted_solutions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">sorted_solutions</span><span class="p">]))</span>
+        <span class="n">fallback_solutions</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># for saving solutions that exceed the goals</span>
+        <span class="n">vehicle_assumption</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[]</span>
+        <span class="p">)</span>  <span class="c1"># for saving vehicle type count for skipping previous failed type combinations</span>
+        <span class="n">vehicle_approved</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[]</span>
+        <span class="p">)</span>  <span class="c1"># for allowing the solution to run if the type combination previously succeeded</span>
+        <span class="n">qualified</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># the solutions that was successful</span>
+        <span class="n">typtrans</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;fossilbil&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;elbil&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;elcykel&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;cykel&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">solution</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_solutions</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_solutions</span><span class="p">),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1">#  create vehicle type representation to check if solution should be skipped</span>
+            <span class="n">type_count</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">solution</span><span class="p">):</span>
+                <span class="n">typ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle2type</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id2vehicle</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span>
+                <span class="n">type_count</span><span class="p">[</span><span class="n">typtrans</span><span class="p">[</span><span class="n">typ</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">count</span>
+
+            <span class="c1">#  stop the search if we found 5 solutions that satisfies the criteria</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">qualified</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="c1">#  check if the vehicle type representation failed previously</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="n">type_count</span><span class="p">)</span> <span class="ow">in</span> <span class="n">vehicle_assumption</span>
+                <span class="ow">and</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">type_count</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vehicle_approved</span>
+            <span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">c_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_simulation</span><span class="p">(</span>
+                <span class="n">solution</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">intelligent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">intelligent</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">c_result</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">vehicle_assumption</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">type_count</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">c_result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">expense_goal</span> <span class="ow">or</span> <span class="n">c_result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2e_goal</span><span class="p">:</span>
+                <span class="n">fallback_solutions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">solution</span><span class="p">,</span> <span class="n">c_result</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="n">vehicle_approved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">type_count</span><span class="p">))</span>
+            <span class="n">qualified</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">solution</span><span class="p">,</span> <span class="n">c_result</span><span class="p">))</span>
+
+        <span class="n">fallback</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">qualified</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fallback</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">qualified</span> <span class="o">=</span> <span class="n">fallback_solutions</span>
+
+        <span class="n">detailed_solutions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">c_result</span><span class="p">)</span> <span class="ow">in</span> <span class="n">qualified</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;omkostning&quot;</span><span class="p">:</span> <span class="n">c_result</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;co2e&quot;</span><span class="p">:</span> <span class="n">c_result</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;ukørte&quot;</span><span class="p">:</span> <span class="n">c_result</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]}</span>
+
+            <span class="n">fleet</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">vid</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">solution</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">vehicle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fleet_optimisation</span><span class="o">.</span><span class="n">proper</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id2vehicle</span><span class="p">[</span><span class="n">vid</span><span class="p">]][</span><span class="s2">&quot;class&quot;</span><span class="p">]</span>
+                <span class="n">fleet</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;fleet_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id2vehicle</span><span class="p">[</span><span class="n">vid</span><span class="p">],</span>
+                        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">vid</span><span class="p">,</span>
+                        <span class="s2">&quot;class_name&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">vehicle</span><span class="o">.</span><span class="n">make</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">vehicle</span><span class="o">.</span><span class="n">model</span><span class="p">)]),</span>
+                        <span class="s2">&quot;omkostning_aar&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">vehicle</span><span class="o">.</span><span class="n">omkostning_aar</span><span class="p">),</span>
+                        <span class="s2">&quot;stringified_emission&quot;</span><span class="p">:</span> <span class="n">get_emission</span><span class="p">(</span><span class="n">vehicle</span><span class="p">),</span>
+                        <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">count</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;flåde&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fleet</span>
+            <span class="n">detailed_solutions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+        <span class="n">max_cost</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="ow">in</span> <span class="n">qualified</span><span class="p">])</span>
+        <span class="n">max_co2e</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="ow">in</span> <span class="n">qualified</span><span class="p">])</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">cost</span><span class="p">,</span> <span class="n">co2e</span><span class="p">,</span> <span class="n">weight</span><span class="p">:</span> <span class="n">cost</span> <span class="o">+</span> <span class="p">(</span><span class="n">co2e</span> <span class="o">*</span> <span class="p">(</span><span class="n">weight</span><span class="p">))</span>
+        <span class="n">objectives_with_allocation</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">obj</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">max_cost</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">max_co2e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">qualified</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">fallback</span><span class="p">:</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">([</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;omkostning&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">detailed_solutions</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+                    <span class="n">objectives_with_allocation</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+        <span class="n">report</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">order</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
+            <span class="n">report</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">detailed_solutions</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">report</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Droids Agency.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
