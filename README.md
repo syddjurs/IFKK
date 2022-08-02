@@ -2,7 +2,7 @@
 ### Indledning
 Dette repositorie indeholder simuleringstoolet som er udviklet i løbet af AI-signaturprojektet Intelligent flådestyring og klimasmarte kørselsmønstre (https://ifkk.syddjurs.dk/forside/). 
 
-Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, https://github.com/syddjurs/IFKK. Den anvendelsesorienterede dokumentation findes i https://raw.githubusercontent.com/syddjurs/IFKK/master/docs/html/ifkk_dokumentation.pdf.
+Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, https://github.com/syddjurs/IFKK / https://syddjurs.github.io/IFKK/. Den anvendelsesorienterede dokumentation findes i https://raw.githubusercontent.com/syddjurs/IFKK/master/docs/html/ifkk_dokumentation.pdf.
 
 
 ### Repository oversigt
@@ -34,7 +34,7 @@ Specifikt, deles applikationen op 3 typer simulering:
 ![Package relationship](src/build/ark.png)
 
 Simuleringstoolet er udviklet i python på backenden og brugergrænsefladen er ligeledes opsat med python-biblioteket Dash.
-Dokumentationen på de enkelte dele af koden er at finde i det tilhørende Github-projekt, https://github.com/syddjurs/IFKK eller på https://github.com/syddjurs/IFKK
+Dokumentationen på de enkelte dele af koden er at finde i det tilhørende Github-projekt, https://github.com/syddjurs/IFKK eller på https://syddjurs.github.io/IFKK/
 #### Extractors
 I dette repository findes to moduler udviklet for at trække data fra flådestyringssystemerne; FleetComplete `FleetCompleteExtractor` og SkyHost `SkyHostExtractor`.
 De har hver deres readme og requirements filer. 

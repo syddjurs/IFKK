@@ -3,6 +3,9 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+with open("src/requirements.txt") as f:
+    requirements = [a for a in f.read().split('\n') if len(a) >= 2 and "#" not in a]
+
 setuptools.setup(
     name="fleetmanager-droidsagency",
     version="1.0.0",
@@ -27,5 +30,5 @@ setuptools.setup(
         "dash-bootstrap-templates~=1.0",
         "numpy-financial~=1.0",
         "bokeh~=2.4",  # TODO: Get rid of this
-    ],
+    ] + requirements,
 )
