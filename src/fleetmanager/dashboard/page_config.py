@@ -558,13 +558,15 @@ def update_cars():
             )
             # Find out if user is trying to update items that have been deleted by other users
             for item in changes:
-                r = (
-                    sess.query(Cars)
-                    .filter(Cars.id == item["id"])
-                    .update({key: val for key, val in item.items() if val})
-                )
-                if r == 0:
-                    deleted_updates.append(str(item.get("id")))
+                r = sess.query(Cars).filter(Cars.id == item['id'])
+                for car in r:
+                    for key, val in item.items():
+                        if key == 'id' or val is None:
+                            continue
+                        print(f"setting attribute {key} to {val} for car with id {item['id']}", flush=True)
+                        setattr(car, key, val)
+                sess.commit()
+                break
             sess.commit()
     except Exception as e:
         return error_alert(str(e)), get_cars_rounded()
@@ -600,6 +602,8 @@ def display_output(data, data_previous):
         changed_item = [item for item in data if item not in data_previous][0]
         for s in ("start_leasing", "end_leasing"):
             if s in changed_item:
+                if changed_item[s] is None:
+                    continue
                 changed_item[s] = datetime.strptime(changed_item[s], "%Y-%m-%d")
         for i in range(len(changes)):
             if changes[i].get("id") == changed_item.get("id"):

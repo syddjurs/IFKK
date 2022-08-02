@@ -658,6 +658,8 @@ class TabuSearch:
             .reset_index()
             .iloc[:, 1:]
         )
+        if len(rt) == 0:
+            raise RuntimeError("Could not find any roundtrips")
         rt["tripid"] = rt.index.values
         rt["fleetinventory"] = len(rt) * [Unassigned()]
         rt["fleetinventory_type"] = -np.ones((len(rt),), dtype=int)

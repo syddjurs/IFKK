@@ -1,13 +1,23 @@
+import io
 from datetime import datetime
+import pandas as pd
 
 import dash_bootstrap_components as dbc
 from dash import ALL, Input, Output, State, callback, callback_context, dcc, html
 from dash.exceptions import PreventUpdate
+from sqlalchemy import func
+from sqlalchemy.orm import Query
 
 import fleetmanager.data_access.db_engine as db
 from .utils import get_emission, toggle_all
 from fleetmanager.dashboard.utils import input_table
-from fleetmanager.data_access import AllowedStarts, Cars
+from fleetmanager.data_access import (
+    AllowedStarts,
+    Cars,
+    RoundTrips,
+    VehicleTypes,
+    FuelTypes,
+)
 
 location_view = [
     html.H3("Lokationer"),
@@ -37,7 +47,25 @@ datepicker_view = dbc.Card(
 )
 
 vehicle_view = [
-    html.H3("Køretøjer tilknyttet til den valgte lokation"),
+    dbc.Row(
+        [
+            dbc.Col(
+                [
+                    html.H3("Køretøjer tilknyttet til den valgte lokation"),
+                ]
+            ),
+            dbc.Col(
+                [
+                    dbc.Button(
+                        "Download dataperiode",
+                        id="download_aggregated_button",
+                        style={"float": "right"},
+                    ),
+                    dcc.Download(id="download-aggregated"),
+                ]
+            ),
+        ]
+    ),
     dbc.Card(
         [
             dbc.CardBody(
@@ -56,9 +84,10 @@ vehicle_view = [
         color="success",
         className="left-btn",
         id="choose_all",
-        style={"visibility": "hidden"}
+        style={"visibility": "hidden"},
     ),
     dcc.Store("choose_value_holder"),
+    dcc.Store("download_click"),
     dbc.Nav(
         [
             dbc.NavItem(
@@ -68,7 +97,7 @@ vehicle_view = [
                     active="exact",
                     className="btn btn-primary",
                     disabled=True,
-                    id='pf_link'
+                    id="pf_link",
                 )
             ),
             dbc.NavItem(
@@ -78,7 +107,7 @@ vehicle_view = [
                     active="exact",
                     className="btn btn-primary",
                     disabled=True,
-                    id="pg_link"
+                    id="pg_link",
                 )
             ),
         ],
@@ -119,6 +148,71 @@ layout = html.Div(
 
 
 Session = db.session_factory(db.engine_creator())
+
+
+@callback(
+    Output("download-aggregated", "data"),
+    Output("download_click", "data"),
+    Input("date_store", "data"),
+    Input("download_aggregated_button", "n_clicks"),
+    Input("download_click", "data"),
+    prevent_initial_call=True,
+)
+def download_aggregated(dates, n_clicks, o_click):
+    if n_clicks is None:
+        return None, None
+    if n_clicks == o_click:
+        return None, o_click
+
+    # frame = pd.DataFrame({'this is': ['some test data', 'but I guess'], 'that with': ['test data', 'it works']})
+    engine = db.engine_creator()
+    start = dates[0]
+    end = dates[-1]
+
+    fuel_query = (Query([FuelTypes.refers_to, FuelTypes.id.label("fuelId")])).subquery()
+    car_query = (
+        Query(
+            [
+                FuelTypes.name.label("fuel_name"),
+                fuel_query,
+                Cars,
+                VehicleTypes.name.label("type_name"),
+                AllowedStarts.address.label("lokation"),
+            ]
+        )
+        .filter(func.coalesce(Cars.end_leasing, end) >= end)
+        .join(Cars, func.coalesce(Cars.fuel, 10) == fuel_query.c.fuelId)
+        .join(FuelTypes, FuelTypes.id == fuel_query.c.refers_to)
+        .join(VehicleTypes, Cars.type == VehicleTypes.id)
+        .join(AllowedStarts, Cars.location == AllowedStarts.id)
+        .statement
+    )
+    all_vehicles = pd.read_sql(
+        car_query,
+        engine,
+    )
+    all_vehicles.drop(["refers_to", "fuelId", "fuel", "type"], axis=1, inplace=True)
+    all_vehicles["type"] = all_vehicles.type_name
+    all_vehicles["fuel"] = all_vehicles.fuel_name
+
+    all_vehicles.drop(["type_name", "location", "fuel_name"], axis=1, inplace=True)
+
+    q = (
+        Query([RoundTrips, AllowedStarts.address.label("lokation")])
+        .filter((RoundTrips.start_time >= start) & (RoundTrips.end_time <= end))
+        .join(AllowedStarts, RoundTrips.start_location_id == AllowedStarts.id)
+        .statement
+    )
+    selected_roundtrips = pd.read_sql(q, engine)
+    selected_roundtrips.drop(["driver_name", "start_location_id"], axis=1, inplace=True)
+
+    output = io.BytesIO()
+    with pd.ExcelWriter(output) as writer:
+        selected_roundtrips.to_excel(writer, sheet_name="Ture", index=False)
+        all_vehicles.to_excel(writer, sheet_name="Køretøjer", index=False)
+        writer.save()
+        data = output.getvalue()
+    return [dcc.send_bytes(data, filename=f"aggregated_data.xlsx"), n_clicks]
 
 
 @callback(

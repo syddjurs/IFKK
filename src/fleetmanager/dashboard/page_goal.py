@@ -1,6 +1,8 @@
 import datetime
+import pdb
 
 import dash_bootstrap_components as dbc
+import dash_mantine_components as dmc
 import dash_daq as daq
 import pandas as pd
 import plotly.graph_objects as go
@@ -269,6 +271,7 @@ layout = html.Div(
                                             id="optim_spinner",
                                             type="grow",
                                         ),
+                                        dbc.Button("Afbryd Simulering", id="cancel_sim_goal", color="danger")
                                     ]
                                 ),
                             ]
@@ -339,8 +342,14 @@ def long_callback_optim(*args):
             Output("optim_spinner", "fullscreen_style"),
             {"visibility": "visible"},
             {"visibility": "hidden"},
+        ),
+        (
+                Output("cancel_sim_goal", "style"),
+                {"visibility": "visible"},
+                {"visibility": "hidden"},
         )
     ],
+    cancel=[Input("cancel_sim_goal", "n_clicks")],
     interval=3000,
     prevent_initial_call=True,
 )
@@ -380,17 +389,28 @@ def optim(args):
         "active_vehicles": active_vehicles,
     }
     fo = FleetOptimisation(settings, km_aar=km_aar)
-
-    tb = TabuSearch(
-        fo,
-        location_id,
-        dates,
-        co2e_goal=0 if pd.isna(reduktion_co2e) else reduktion_co2e,
-        expense_goal=0 if pd.isna(ekstra_omkostning) else ekstra_omkostning,
-        weight=co2e_prioritization,
-        intelligent=intelligent_simulation,
-        km_aar=km_aar,
-    )
+    try:
+        tb = TabuSearch(
+            fo,
+            location_id,
+            dates,
+            co2e_goal=0 if pd.isna(reduktion_co2e) else reduktion_co2e,
+            expense_goal=0 if pd.isna(ekstra_omkostning) else ekstra_omkostning,
+            weight=co2e_prioritization,
+            intelligent=intelligent_simulation,
+            km_aar=km_aar,
+        )
+    except RuntimeError:
+        # Output({"type": "goal_fig", "index": 1}, "figure"),
+        # Output({"type": "goal_fig", "index": 2}, "figure"),
+        # Output("accordinan_solution", "children"),
+        # Output("solution_udledning", "children"),
+        # Output("solution_udledning", "style"),
+        # Output("solution_omkostning", "children"),
+        # Output("solution_omkostning", "style"),
+        omk_value = 0 if pd.isna(omkostning) else omkostning
+        udl_value = 0 if pd.isna(udledning) else udledning
+        return [*figs, [], 0, {}, 0, {}]
     if len(tb.dummy_trips.trips) == 0:
         tb.report = []
     else:
@@ -410,8 +430,8 @@ def optim(args):
         html.Tr(
             [
                 html.Th("Biltype"),
-                html.Th("Årlig omk. (DKK)"),
                 html.Th("Drivmiddel forbrug"),
+                html.Th("Årlig omk. (DKK)"),
                 html.Th("Antal"),
             ]
         )
@@ -442,18 +462,114 @@ def optim(args):
 
         fleet = []
 
+        unique = {}
+        for sv in solution['flåde']:
+            name_emission = "__split__".join([sv['class_name'], sv['stringified_emission']])
+            if name_emission not in unique:
+                unique[name_emission] = {}
+            car_omk = sv['omkostning_aar']
+            if car_omk not in unique[name_emission]:
+                unique[name_emission][car_omk] = 0
+            unique[name_emission][car_omk] += sv['count']
+        print(unique)
         # generate accordian vehicle table
-        for solution_vehicle in solution["flåde"]:
-            fleet.append(
-                html.Tr(
-                    [
-                        html.Td(f'{solution_vehicle["class_name"]}'),
-                        html.Td(solution_vehicle["omkostning_aar"]),
-                        html.Td(solution_vehicle["stringified_emission"]),
-                        html.Td(solution_vehicle["count"]),
-                    ]
+        # for solution_vehicle in solution["flåde"]:
+        #     fleet.append(
+        #         html.Tr(
+        #             [
+        #                 html.Td(f'{solution_vehicle["class_name"]}'),
+        #                 html.Td(solution_vehicle["omkostning_aar"]),
+        #                 html.Td(solution_vehicle["stringified_emission"]),
+        #                 html.Td(solution_vehicle["count"]),
+        #             ]
+        #         )
+        #     )
+        for car_type, omkostninger in unique.items():
+            print(car_type)
+            car_name, car_udledning = car_type.split("__split__")
+            if len(omkostninger) == 1:
+                fleet.append(
+                    html.Tr(
+                        [
+                            html.Td(car_name),
+                            html.Td(car_udledning),
+                            html.Td(list(omkostninger.keys())[0]),
+                            html.Td(list(omkostninger.values())[0])
+                        ]
+                    )
                 )
-            )
+            else:
+                maj = []
+                tot = 0
+                for unique_omkostning, type_count in omkostninger.items():
+                    maj.append(
+                        html.Div(
+                            [
+                                # html.Td(car_name),
+                                # html.Td(car_udledning),
+                                html.Div("", className="col"),
+                                html.Div("", className="col"),
+                                html.Div("", className="col"),
+                                html.Div("", className="col"),
+                                html.Div(unique_omkostning, id="car_omkostning", className="col-md-auto"),
+                                html.Div(type_count, id="unique_car_count", className="col")
+                            ],
+                        className="row")
+                    )
+                    tot += type_count
+                ac = html.Tr(
+                    html.Td(
+                        dmc.Accordion(
+                            dmc.AccordionItem(
+                                maj,
+                                label=[
+                                    html.Div(
+                                        [
+                                            html.Div(car_name, className="col"),
+                                            html.Div(car_udledning, className="col", id="car_udledning"),
+                                            html.Div(html.Span(tot, id="car_count"), className="col")
+                                        ],
+                                        className="row")
+                                ],
+                                      ),
+                            iconPosition="right",
+                            class_name="accJohn",
+                        ),
+                        colSpan=4,
+                    )
+                )
+                fleet.append(ac)
+
+
+
+        # html.Div(
+        #     children=[
+        #         dmc.Accordion(
+        #             id="accordion",
+        #             state={"0": False, "1": True},
+        #             children=[
+        #                 dmc.AccordionItem(
+        #                     "Content 1",
+        #                     label="Section 1",
+        #                 ),
+        #                 dmc.AccordionItem(
+        #                     "Content 2",
+        #                     label="Section 2",
+        #                 ),
+        #             ],
+        #         ),
+        #         dmc.Text(id="accordion-state", style={"marginTop": 10}),
+        #     ]
+        # )
+
+
+
+
+
+
+
+
+
 
         # details for the "Simuleringsdetaljer" table
         besparelse = round(tb.cur_result[0]) - round(solution["omkostning"])

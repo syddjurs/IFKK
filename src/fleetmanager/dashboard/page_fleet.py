@@ -322,6 +322,7 @@ layout = html.Div(
             fullscreen_style={"visibility": "hidden"},
             type="grow",
         ),
+        dbc.Button("Afbryd Simulering", id="cancel_sim", color="danger")
     ]
 )
 
@@ -698,9 +699,15 @@ def lcb_in(*args):
             Output("sim_spinner", "fullscreen_style"),
             {"visibility": "visible"},
             {"visibility": "hidden"},
+        ),
+        (
+            Output("cancel_sim", "style"),
+            {"visibility": "visible"},
+            {"visibility": "hidden"},
         )
     ],
     prevent_initial_call=True,
+    cancel=[Input("cancel_sim", "n_clicks")],
 )
 def simulate(args):
     if args[0] is None:
@@ -778,8 +785,18 @@ def simulate(args):
             antal_description,
             trip_store0,
         )
-
-    m = Model(location=location_id, dates=date_range)
+    try:
+        m = Model(location=location_id, dates=date_range)
+    except RuntimeError:
+        return (
+            *figs,
+            sim_daterange0,
+            *trips_without_vehicle0,
+            *savings_pr_year0,
+            *savings_pr_year_co2e0,
+            antal_description,
+            trip_store0,
+        )
 
     bike_time_slots = [
         (
@@ -870,7 +887,7 @@ def simulate(args):
             m.simulation_hist,
             "Turlængde (km)",
             "Antal",
-            "Turforderling for simuleret flåde",
+            "Turfordeling for simuleret flåde",
         ),
         dato,
         twv,
