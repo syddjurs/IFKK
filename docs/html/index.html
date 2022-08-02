@@ -77,7 +77,7 @@
 <section id="indledning">
 <h3>Indledning<a class="headerlink" href="#indledning" title="Permalink to this heading"></a></h3>
 <p>Dette repositorie indeholder simuleringstoolet som er udviklet i løbet af AI-signaturprojektet Intelligent flådestyring og klimasmarte kørselsmønstre (<a class="reference external" href="https://ifkk.syddjurs.dk/forside/">https://ifkk.syddjurs.dk/forside/</a>).</p>
-<p>Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, <a class="reference external" href="https://andreasdroid.github.io/ifkkDoc/src/build/html/index.html">https://andreasdroid.github.io/ifkkDoc/src/build/html/index.html</a>. Den anvendelsesorienterede dokumentation findes i <a class="reference external" href="https://andreasdroid.github.io/ifkkDoc/src/build/ifkk_dokumentation.pdf">https://andreasdroid.github.io/ifkkDoc/src/build/ifkk_dokumentation.pdf</a>.</p>
+<p>Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, <a class="reference external" href="https://syddjurs.github.io/IFKK/">https://syddjurs.github.io/IFKK/</a>. Den anvendelsesorienterede dokumentation findes i <a class="reference external" href="https://raw.githubusercontent.com/syddjurs/IFKK/master/docs/html/ifkk_dokumentation.pdf">ifkk_dokumentation.pdf</a>.</p>
 </section>
 <section id="repository-oversigt">
 <h3>Repository oversigt<a class="headerlink" href="#repository-oversigt" title="Permalink to this heading"></a></h3>
@@ -111,7 +111,7 @@ Specifikt, deles applikationen op 3 typer simulering:</p>
 </li>
 </ol>
 <p>Simuleringstoolet er udviklet i python på backenden og brugergrænsefladen er ligeledes opsat med python-biblioteket Dash.
-Dokumentationen på de enkelte dele af koden er at finde i det tilhørende Github-projekt, <a class="reference external" href="https://github.com/syddjurs/IFKK">https://github.com/syddjurs/IFKK</a> eller på <a class="reference external" href="https://andreasdroid.github.io/ifkkDoc/src/build/html/index.html">https://andreasdroid.github.io/ifkkDoc/src/build/html/index.html</a></p>
+Dokumentationen på de enkelte dele af koden er at finde i det tilhørende Github-projekt, <a class="reference external" href="https://github.com/syddjurs/IFKK">https://github.com/syddjurs/IFKK</a> eller på <a class="reference external" href="https://syddjurs.github.io/IFKK/">https://syddjurs.github.io/IFKK/</a></p>
 <section id="extractors">
 <h4>Extractors<a class="headerlink" href="#extractors" title="Permalink to this heading"></a></h4>
 <p>I dette repository findes to moduler udviklet for at trække data fra flådestyringssystemerne; FleetComplete <code class="docutils literal notranslate"><span class="pre">FleetCompleteExtractor</span></code> og SkyHost <code class="docutils literal notranslate"><span class="pre">SkyHostExtractor</span></code>.
@@ -128,9 +128,9 @@ De har hver deres readme og requirements filer.</p>
 <section id="forudsaetninger">
 <h3>Forudsætninger<a class="headerlink" href="#forudsaetninger" title="Permalink to this heading"></a></h3>
 <p>Applikationen er testet på Windows og Linux. Applikationen er afhængig af en række biblioteker der kan ses i <code class="docutils literal notranslate"><span class="pre">src/requirements.txt</span></code>
-Applikationen kræver Python &gt;= 3.8. Den installerede version af Python kan checkes ved at køre følgende kommando i kommandolinjen i Windows:</p>
+Applikationen kræver Python &gt;= 3.9. Den installerede version af Python kan checkes ved at køre følgende kommando i kommandolinjen i Windows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="p">:</span>\<span class="n">Users</span>\<span class="n">user</span><span class="o">&gt;</span><span class="n">python</span> <span class="o">-</span><span class="n">V</span>
-<span class="n">Python</span> <span class="mf">3.8.5</span>
+<span class="n">Python</span> <span class="mf">3.9</span>
 </pre></div>
 </div>
 <p>De nødvendige biblioteker kan installeres med pip:</p>
@@ -170,7 +170,7 @@ Der kan med fordel oprettes en <code class="docutils literal notranslate"><span 
 <h3>Data<a class="headerlink" href="#data" title="Permalink to this heading"></a></h3>
 <p>Applikationen er afhængig af data på tilladte startsteder, biler (inkl. metadata) og ikke mindst rundture. I applikation run-time er alle tabeller påkrævet,
 på-nær: <code class="docutils literal notranslate"><span class="pre">trips</span></code> og <code class="docutils literal notranslate"><span class="pre">leasing_types</span></code>. <code class="docutils literal notranslate"><span class="pre">RoundTrips</span></code> vil altid kun indeholde GPS-koordinater der er tæt på det tilladte startsted (+- x antal meter, den tilladte distance defineret i extractor’en).
-For at læse mere om hvor data stammer fra, hvilke forudsætninger der er og hvilke antagelser der laves, refereres til <code class="docutils literal notranslate"><span class="pre">FleetCompleteExtractor</span></code> eller <code class="docutils literal notranslate"><span class="pre">SkyhostExtractor</span></code> eller den fulde dokumentation på data og algortimer her: <a class="reference external" href="https://andreasdroid.github.io/ifkkDoc/src/build/ifkk_dokumentation.pdf">https://andreasdroid.github.io/ifkkDoc/src/build/ifkk_dokumentation.pdf</a></p>
+For at læse mere om hvor data stammer fra, hvilke forudsætninger der er og hvilke antagelser der laves, refereres til <code class="docutils literal notranslate"><span class="pre">FleetCompleteExtractor</span></code> eller <code class="docutils literal notranslate"><span class="pre">SkyhostExtractor</span></code> eller den fulde dokumentation på data og algortimer her: <a class="reference external" href="https://raw.githubusercontent.com/syddjurs/IFKK/master/docs/html/ifkk_dokumentation.pdf">ifkk_dokumentation.pdf</a></p>
 <a class="reference external image-reference" href="src/build/er.png"><img alt="ER diagram" src="src/build/er.png" /></a>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>

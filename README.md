@@ -2,7 +2,7 @@
 ### Indledning
 Dette repositorie indeholder simuleringstoolet som er udviklet i løbet af AI-signaturprojektet Intelligent flådestyring og klimasmarte kørselsmønstre (https://ifkk.syddjurs.dk/forside/). 
 
-Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, https://andreasdroid.github.io/ifkkDoc/src/build/html/index.html. Den anvendelsesorienterede dokumentation findes i https://andreasdroid.github.io/ifkkDoc/src/build/ifkk_dokumentation.pdf.
+Dokumentationen er delt i to dele, en teknisk del rettet imod udviklere og leverandører og en anvendelsesorienteret rettet imod slutbrugere. Den tekniske del findes i det Github-repositorie som er tilknyttet projektet, https://github.com/syddjurs/IFKK. Den anvendelsesorienterede dokumentation findes i https://raw.githubusercontent.com/syddjurs/IFKK/master/docs/html/ifkk_dokumentation.pdf.
 
 
 ### Repository oversigt
@@ -34,7 +34,7 @@ Specifikt, deles applikationen op 3 typer simulering:
 ![Package relationship](src/build/ark.png)
 
 Simuleringstoolet er udviklet i python på backenden og brugergrænsefladen er ligeledes opsat med python-biblioteket Dash.
-Dokumentationen på de enkelte dele af koden er at finde i det tilhørende Github-projekt, https://github.com/syddjurs/IFKK eller på https://andreasdroid.github.io/ifkkDoc/src/build/html/index.html
+Dokumentationen på de enkelte dele af koden er at finde i det tilhørende Github-projekt, https://github.com/syddjurs/IFKK eller på https://github.com/syddjurs/IFKK
 #### Extractors
 I dette repository findes to moduler udviklet for at trække data fra flådestyringssystemerne; FleetComplete `FleetCompleteExtractor` og SkyHost `SkyHostExtractor`.
 De har hver deres readme og requirements filer. 
@@ -89,7 +89,7 @@ Dash is running on http://127.0.0.1:8050/
 ### Data
 Applikationen er afhængig af data på tilladte startsteder, biler (inkl. metadata) og ikke mindst rundture. I applikation run-time er alle tabeller påkrævet, 
 på-nær: `trips` og `leasing_types`. `RoundTrips` vil altid kun indeholde GPS-koordinater der er tæt på det tilladte startsted (+- x antal meter, den tilladte distance defineret i extractor'en).
-For at læse mere om hvor data stammer fra, hvilke forudsætninger der er og hvilke antagelser der laves, refereres til `FleetCompleteExtractor` eller `SkyhostExtractor` eller den fulde dokumentation på data og algortimer her: https://andreasdroid.github.io/ifkkDoc/src/build/ifkk_dokumentation.pdf   
+For at læse mere om hvor data stammer fra, hvilke forudsætninger der er og hvilke antagelser der laves, refereres til `FleetCompleteExtractor` eller `SkyhostExtractor` eller den fulde dokumentation på data og algortimer her: https://raw.githubusercontent.com/syddjurs/IFKK/master/docs/html/ifkk_dokumentation.pdf   
 
 ![ER diagram](src/build/er.png)
 
