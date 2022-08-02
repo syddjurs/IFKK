@@ -51,7 +51,7 @@ Python 3.9
 ```
 
 Det er tiltænkt at installere applikationen som et python module for at lette import af moduler, der sker på tværs i applikation. <br>
-Installation af modulerne fra via setup:
+Installation af modulerne fra rod via setup:
 ```
 python setup.py install
 ```
