@@ -375,9 +375,7 @@ def optim(args):
     # todo persist accordions
     # todo persist values
     if n_clicks is None or frame is None:
-        omk_value = 0 if pd.isna(omkostning) else omkostning
-        udl_value = 0 if pd.isna(udledning) else udledning
-        return [*figs, [], *udl_value, *omk_value]
+        return [*figs, [], 0, {}, 0, {}]
     active_vehicles = {}
     for vehicle in frame:
         if vehicle["id"] not in active_vehicles:
@@ -401,24 +399,13 @@ def optim(args):
             km_aar=km_aar,
         )
     except RuntimeError:
-        # Output({"type": "goal_fig", "index": 1}, "figure"),
-        # Output({"type": "goal_fig", "index": 2}, "figure"),
-        # Output("accordinan_solution", "children"),
-        # Output("solution_udledning", "children"),
-        # Output("solution_udledning", "style"),
-        # Output("solution_omkostning", "children"),
-        # Output("solution_omkostning", "style"),
-        omk_value = 0 if pd.isna(omkostning) else omkostning
-        udl_value = 0 if pd.isna(udledning) else udledning
         return [*figs, [], 0, {}, 0, {}]
     if len(tb.dummy_trips.trips) == 0:
         tb.report = []
     else:
         tb.run()
     if len(tb.report) == 0:
-        omk_value = 0 if pd.isna(omkostning) else omkostning
-        udl_value = 0 if pd.isna(udledning) else udledning
-        return [*figs, [], *udl_value, *omk_value]
+        return [*figs, [], 0, {}, 0, {}]
 
     omkostning = []
     co2e = []
